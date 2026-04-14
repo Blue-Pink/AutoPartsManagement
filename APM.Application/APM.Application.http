@@ -1,0 +1,6 @@
+@APM.Application_HostAddress = https://172.23.96.1:32771
+
+GET {{APM.Application_HostAddress}}/Test/
+Accept: application/json
+
+###

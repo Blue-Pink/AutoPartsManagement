@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/APM.Application/">
+    <Project Path="APM.Application/APM.Application.csproj" Id="732171dc-a543-4f22-973b-b1370d530c53" />
+  </Folder>
+  <Folder Name="/APM.Domain/">
+    <Project Path="APM.Business/APM.Business.csproj" Id="e885b3a1-aa79-4638-bb2f-7a88a1f36d29" />
+    <Project Path="APM.IBusiness/APM.IBusiness.csproj" Id="71b2bc72-2603-4e34-9ed0-0db0de5923a6" />
+  </Folder>
+  <Folder Name="/APM.Infrastructure/">
+    <Project Path="APM.ConTaxi/APM.ConTaxi.csproj" />
+    <Project Path="APM.DbEntities/APM.DbEntities.csproj" Id="3663f328-cc49-42eb-a923-efd01f2647bc" />
+    <Project Path="APM.Extension/APM.Extensions.csproj" Id="b13c0b7d-6be8-4581-8131-8d3329c97dbb" />
+    <Project Path="APM.UtilEntities/APM.UtilEntities.csproj" Id="4370de8b-6443-4016-8dab-18150462fa5f" />
+  </Folder>
+  <Folder Name="/APM.Service/">
+    <Project Path="APM.IServices/APM.IServices.csproj" />
+    <Project Path="APM.Services/APM.Services.csproj" />
+  </Folder>
+</Solution>
