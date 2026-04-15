@@ -16,7 +16,7 @@ namespace APM.DbEntities
         public string? Username { get; set; }
 
         [Required, Description("存储加密后的密码"), JsonIgnore]
-        public string? PasswordHash { get; set; }
+        public string? PasswordHash { get; set; } = string.Empty;
 
         [StringLength(50), Description("真实姓名")]
         public string? RealName { get; set; }
@@ -27,6 +27,6 @@ namespace APM.DbEntities
         [NotMapped, Description("明文密码，仅用于注册和登录时传输，存储时不保存"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Password { get; set; }
 
-        public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public virtual ICollection<UserRole>? UserRoles { get; set; } = new List<UserRole>();
     }
 }

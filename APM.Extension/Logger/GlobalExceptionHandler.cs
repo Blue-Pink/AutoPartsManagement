@@ -70,7 +70,7 @@ namespace APM.Extensions.Logger
                     var body = JsonSerializer.Serialize(new UsualApiData<dynamic>()
                     {
                         StateCode = UsualStateCode.Error,
-                        Message = $"遇到了一点问题，请联系系统管理员。",
+                        Message = $"遇到了一点问题，请联系系统管理员",
                     },
                     new JsonSerializerOptions()
                     {

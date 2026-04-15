@@ -66,13 +66,13 @@ namespace APM.ConTaxi.Permission
                 }
                 else
                 {
-                    throw new APMException($"实体记录中未找到该实体：{typeof(T).FullName}。");
+                    throw new APMException($"实体记录中未找到该实体：{typeof(T).FullName}");
                 }
 
             }
             else
             {
-                throw new APMException($"系统权限相关缓存丢失！");
+                throw new APMException($"系统权限相关缓存丢失");
             }
 
 

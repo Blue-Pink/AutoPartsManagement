@@ -14,7 +14,7 @@ namespace APM.IBusiness
         /// <param name="userId"></param>
         /// <param name="roles"></param>
         /// <returns></returns>
-        public UserRole AsignRolesForUser(Guid userId, IEnumerable<Guid> roles);
+        public List<UserRole> AsignRolesForUser(Guid userId, IEnumerable<Guid> roles);
 
         /// <summary>
         /// 获取所有角色

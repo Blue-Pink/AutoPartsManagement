@@ -19,20 +19,20 @@ namespace APM.Extensions
     public static class ServiceExtension
     {
         /// <summary>
-        /// 为指定的接口与实现类型使用 Castle DynamicProxy 创建一个带拦截器的 scoped 代理并注册到依赖注入容器。
+        /// 为指定的接口与实现类型使用 Castle DynamicProxy 创建一个带拦截器的 scoped 代理并注册到依赖注入容器
         /// </summary>
-        /// <typeparam name="TInterface">要注册的接口类型（必须为引用类型）。</typeparam>
-        /// <typeparam name="TImplementation">接口的具体实现类型（必须为引用类型并实现 <typeparamref name="TInterface"/>）。</typeparam>
-        /// <param name="service">要扩展的 <see cref="IServiceCollection"/> 实例。</param>
+        /// <typeparam name="TInterface">要注册的接口类型（必须为引用类型）</typeparam>
+        /// <typeparam name="TImplementation">接口的具体实现类型（必须为引用类型并实现 <typeparamref name="TInterface"/>）</typeparam>
+        /// <param name="service">要扩展的 <see cref="IServiceCollection"/> 实例</param>
         /// <remarks>
         /// 本方法执行以下步骤：
-        /// 1. 将 <typeparamref name="TImplementation"/> 以 scoped 方式注册为真实实现。 
+        /// 1. 将 <typeparamref name="TImplementation"/> 以 scoped 方式注册为真实实现 
         /// 2. 将 <typeparamref name="TInterface"/> 注册为一个 scoped 工厂，工厂从容器解析 <see cref="ProxyGenerator"/>, 
         ///    <typeparamref name="TImplementation"/> 和 <see cref="IInterceptor"/>，并调用
-        ///    <see cref="ProxyGenerator.CreateInterfaceProxyWithTarget(Type, object, IInterceptor)"/> 为接口创建代理。
+        ///    <see cref="ProxyGenerator.CreateInterfaceProxyWithTarget(Type, object, IInterceptor)"/> 为接口创建代理
         /// 
         /// 重要：容器必须先注册好 <see cref="ProxyGenerator"/>（通常为 singleton）和对应的 <see cref="IInterceptor"/>（通常为 scoped），
-        /// 否则在解析时会由 <c>GetRequiredService</c> 抛出异常。
+        /// 否则在解析时会由 <c>GetRequiredService</c> 抛出异常
         /// </remarks>
         /// <example>
         /// services.AddSingleton<ProxyGenerator>();
@@ -54,17 +54,17 @@ namespace APM.Extensions
         }
 
         /// <summary>
-        /// 为具体实现类型创建一个带拦截器的 scoped 代理并注册到依赖注入容器（按类型注册）。
+        /// 为具体实现类型创建一个带拦截器的 scoped 代理并注册到依赖注入容器（按类型注册）
         /// </summary>
-        /// <typeparam name="TImplementation">要注册并代理的实现类型（必须为引用类型）。</typeparam>
-        /// <param name="service">要扩展的 <see cref="IServiceCollection"/> 实例。</param>
+        /// <typeparam name="TImplementation">要注册并代理的实现类型（必须为引用类型）</typeparam>
+        /// <param name="service">要扩展的 <see cref="IServiceCollection"/> 实例</param>
         /// <remarks>
         /// 本方法会将 <typeparamref name="TImplementation"/> 按类型注册为 scoped，工厂解析 <see cref="ProxyGenerator"/>,
         /// <typeparamref name="TImplementation"/>（真实实现）和 <see cref="IInterceptor"/>,
-        /// 并通过 <see cref="ProxyGenerator.CreateInterfaceProxyWithTarget(object, IInterceptor)"/> 创建代理实例返回。
+        /// 并通过 <see cref="ProxyGenerator.CreateInterfaceProxyWithTarget(object, IInterceptor)"/> 创建代理实例返回
         /// 
         /// 注意：当前实现的工厂在解析真实实现时调用了 <c>provider.GetRequiredService<TImplementation>()</c>，如果未先以其他方式注册该实现，
-        /// 可能导致循环解析或异常。通常应先显式注册真实实现，再使用本方法，或调整注册逻辑以避免自引用解析。
+        /// 可能导致循环解析或异常通常应先显式注册真实实现，再使用本方法，或调整注册逻辑以避免自引用解析
         /// </remarks>
         /// <example>
         /// services.AddSingleton<ProxyGenerator>();

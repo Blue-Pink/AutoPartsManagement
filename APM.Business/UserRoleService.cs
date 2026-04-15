@@ -23,17 +23,14 @@ namespace APM.Services
 
         public User CreateUser(User user)
         {
-            //检查用户数据
-            if (user is null)
-                throw new APMException("未找到此用户");
+            if (taxi.FirstOrDefault<User>(u => u.Username == user.Username) != null)
+                throw new APMException($"用户名 {user.Username} 已存在");
 
             if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) || string.IsNullOrEmpty(user.RealName))
                 throw new APMException("用户名、真名、密码不可为空");
 
-            user.Id = Guid.NewGuid();
             user.PasswordHash = EncryptUserPassword(user.Password);
-            taxi.Transaction(user, EntityState.Added);
-
+            user = taxi.Create(user);
             return user;
         }
 
@@ -79,9 +76,19 @@ namespace APM.Services
             return token;
         }
 
-        public UserRole AsignRolesForUser(Guid userId, IEnumerable<Guid> roles)
+        public List<UserRole> AsignRolesForUser(Guid userId, IEnumerable<Guid> roles)
         {
-            throw new NotImplementedException();
+            var user = taxi.FirstOrDefault<User>(u => u.Id == userId) ?? throw new APMException($"用户不存在");
+
+            //先删除用户的所有角色
+            taxi.Delete<UserRole>(ur => ur.UserId == userId);
+
+            //重新分派角色至用户
+            roles = taxi.GetDataSetQuery<Role>(where: r => roles.Contains(r.Id), paging: false).Select(r => r.Id).ToList();
+
+            var userRoles = roles.Select(r => new UserRole { UserId = user.Id, RoleId = r }).ToList();
+            taxi.Create(userRoles);
+            return taxi.GetDataSetQuery<UserRole>(where: ur => ur.UserId == userId, paging: false).ToList();
         }
 
         public IEnumerable<Role> GetAllRoles()
