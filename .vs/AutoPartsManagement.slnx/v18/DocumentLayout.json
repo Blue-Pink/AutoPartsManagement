@@ -3,68 +3,83 @@
   "WorkspaceRootPath": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\permission\\taxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\permission\\taxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\taxi\\contaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\taxi\\contaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.dbentities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|solutionrelative:apm.dbentities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E885B3A1-AA79-4638-BB2F-7A88A1F36D29}|APM.Business\\APM.Business.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.business\\userroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E885B3A1-AA79-4638-BB2F-7A88A1F36D29}|APM.Business\\APM.Business.csproj|solutionrelative:apm.business\\userroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\taxi\\icontaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\taxi\\icontaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7A80F213-1BEE-03D0-E571-D551072A2540}|APM.Services\\APM.Services.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.services\\redisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7A80F213-1BEE-03D0-E571-D551072A2540}|APM.Services\\APM.Services.csproj|solutionrelative:apm.services\\redisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\controllers\\entitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\controllers\\entitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\controllers\\apmcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\controllers\\apmcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1543F51E-D52D-D2A8-935F-C875D50FFA0F}|APM.IServices\\APM.IServices.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.iservices\\iredisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1543F51E-D52D-D2A8-935F-C875D50FFA0F}|APM.IServices\\APM.IServices.csproj|solutionrelative:apm.iservices\\iredisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.dbentities\\entityrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|solutionrelative:apm.dbentities\\entityrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B13C0B7D-6BE8-4581-8131-8D3329C97DBB}|APM.Extension\\APM.Extensions.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.extension\\serviceextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B13C0B7D-6BE8-4581-8131-8D3329C97DBB}|APM.Extension\\APM.Extensions.csproj|solutionrelative:apm.extension\\serviceextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\permission\\itaxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\permission\\itaxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\apmdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\apmdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.ibusiness\\iuserroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|solutionrelative:apm.ibusiness\\iuserroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.ibusiness\\iuserroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|solutionrelative:apm.ibusiness\\iuserroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\permission\\taxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\permission\\taxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.dbentities\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|solutionrelative:apm.dbentities\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\taxi\\contaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\taxi\\contaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\BluePink\\AppData\\Local\\SourceServer\\65bf3e6d0989f2f8cc2b8eb70b7646521020aa33cbca086b06dddfa652792d4f\\OpenApiSecurityRequirement.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\controllers\\testcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.ibusiness\\apm.ibusiness.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|solutionrelative:apm.ibusiness\\apm.ibusiness.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\taxi\\icontaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\taxi\\icontaxiservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.dbentities\\entityrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3663F328-CC49-42EB-A923-EFD01F2647BC}|APM.DbEntities\\APM.DbEntities.csproj|solutionrelative:apm.dbentities\\entityrecord.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\controllers\\apmcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\controllers\\apmcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.application\\controllers\\entitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\controllers\\entitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\permission\\itaxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\permission\\itaxipermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7A80F213-1BEE-03D0-E571-D551072A2540}|APM.Services\\APM.Services.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.services\\redisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7A80F213-1BEE-03D0-E571-D551072A2540}|APM.Services\\APM.Services.csproj|solutionrelative:apm.services\\redisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1543F51E-D52D-D2A8-935F-C875D50FFA0F}|APM.IServices\\APM.IServices.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.iservices\\iredisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1543F51E-D52D-D2A8-935F-C875D50FFA0F}|APM.IServices\\APM.IServices.csproj|solutionrelative:apm.iservices\\iredisservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B13C0B7D-6BE8-4581-8131-8D3329C97DBB}|APM.Extension\\APM.Extensions.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.extension\\serviceextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B13C0B7D-6BE8-4581-8131-8D3329C97DBB}|APM.Extension\\APM.Extensions.csproj|solutionrelative:apm.extension\\serviceextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.contaxi\\apmdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{38095F74-3B6F-2A23-1CB3-8DDF0443A9CB}|APM.ConTaxi\\APM.ConTaxi.csproj|solutionrelative:apm.contaxi\\apmdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4370DE8B-6443-4016-8DAB-18150462FA5F}|APM.UtilEntities\\APM.UtilEntities.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.utilentities\\constdictionary.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -87,10 +102,6 @@
       "RelativeMoniker": "D:0:0:{732171DC-A543-4F22-973B-B1370D530C53}|APM.Application\\APM.Application.csproj|solutionrelative:apm.application\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.ibusiness\\apm.ibusiness.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{71B2BC72-2603-4E34-9ED0-0DB0DE5923A6}|APM.IBusiness\\APM.IBusiness.csproj|solutionrelative:apm.ibusiness\\apm.ibusiness.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B13C0B7D-6BE8-4581-8131-8D3329C97DBB}|APM.Extension\\APM.Extensions.csproj|d:\\workspace\\\u6BD5\u4E1A\u8BBE\u8BA1\\autopartsmanagement\\apm.extension\\apm.extensions.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{B13C0B7D-6BE8-4581-8131-8D3329C97DBB}|APM.Extension\\APM.Extensions.csproj|solutionrelative:apm.extension\\apm.extensions.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
@@ -105,24 +116,58 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 14,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 5,
+              "Title": "UserRole.cs",
+              "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.DbEntities\\UserRole.cs",
+              "RelativeDocumentMoniker": "APM.DbEntities\\UserRole.cs",
+              "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.DbEntities\\UserRole.cs",
+              "RelativeToolTip": "APM.DbEntities\\UserRole.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABgAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T07:36:49.904Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "User.cs",
+              "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.DbEntities\\User.cs",
+              "RelativeDocumentMoniker": "APM.DbEntities\\User.cs",
+              "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.DbEntities\\User.cs",
+              "RelativeToolTip": "APM.DbEntities\\User.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAuwBcAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T07:31:27.166Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "OpenApiSecurityRequirement.cs",
+              "DocumentMoniker": "C:\\Users\\BluePink\\AppData\\Local\\SourceServer\\65bf3e6d0989f2f8cc2b8eb70b7646521020aa33cbca086b06dddfa652792d4f\\OpenApiSecurityRequirement.cs",
+              "ToolTip": "C:\\Users\\BluePink\\AppData\\Local\\SourceServer\\65bf3e6d0989f2f8cc2b8eb70b7646521020aa33cbca086b06dddfa652792d4f\\OpenApiSecurityRequirement.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAAA4AAAA4AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-15T07:31:38.085Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
               "Title": "EntityController.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Controllers\\EntityController.cs",
               "RelativeDocumentMoniker": "APM.Application\\Controllers\\EntityController.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Controllers\\EntityController.cs",
               "RelativeToolTip": "APM.Application\\Controllers\\EntityController.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T12:46:03.098Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T12:46:03.098Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 13,
               "Title": "APMController.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Controllers\\APMController.cs",
               "RelativeDocumentMoniker": "APM.Application\\Controllers\\APMController.cs",
@@ -130,12 +175,11 @@
               "RelativeToolTip": "APM.Application\\Controllers\\APMController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T12:46:01.36Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T12:46:01.36Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "EntityRecord.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.DbEntities\\EntityRecord.cs",
               "RelativeDocumentMoniker": "APM.DbEntities\\EntityRecord.cs",
@@ -143,12 +187,11 @@
               "RelativeToolTip": "APM.DbEntities\\EntityRecord.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T12:30:17.369Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T12:30:17.369Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 19,
               "Title": "APMDbContext.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\APMDbContext.cs",
               "RelativeDocumentMoniker": "APM.ConTaxi\\APMDbContext.cs",
@@ -156,12 +199,11 @@
               "RelativeToolTip": "APM.ConTaxi\\APMDbContext.cs",
               "ViewState": "AgIAABQAAAAAAAAAAAAiwBcAAABBAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T11:42:37.372Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T11:42:37.372Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 20,
               "Title": "ConstDictionary.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.UtilEntities\\ConstDictionary.cs",
               "RelativeDocumentMoniker": "APM.UtilEntities\\ConstDictionary.cs",
@@ -169,51 +211,48 @@
               "RelativeToolTip": "APM.UtilEntities\\ConstDictionary.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:55:02.153Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:55:02.153Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "UserRoleService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Business\\UserRoleService.cs",
               "RelativeDocumentMoniker": "APM.Business\\UserRoleService.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Business\\UserRoleService.cs",
               "RelativeToolTip": "APM.Business\\UserRoleService.cs",
-              "ViewState": "AgIAADUAAAAAAAAAAAAywEcAAAAbAAAAAAAAAA==",
+              "ViewState": "AgIAAEoAAAAAAAAAAAAywFAAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-14T09:46:27.585Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 2,
               "Title": "IUserRoleService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.IBusiness\\IUserRoleService.cs",
               "RelativeDocumentMoniker": "APM.IBusiness\\IUserRoleService.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.IBusiness\\IUserRoleService.cs",
               "RelativeToolTip": "APM.IBusiness\\IUserRoleService.cs",
-              "ViewState": "AgIAACgAAAAAAAAAAAAjwDkAAAApAAAAAAAAAA==",
+              "ViewState": "AgIAABsAAAAAAAAAAAD4vysAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:45:57.517Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:45:57.517Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 11,
               "Title": "IConTaxiService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Taxi\\IConTaxiService.cs",
               "RelativeDocumentMoniker": "APM.ConTaxi\\Taxi\\IConTaxiService.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Taxi\\IConTaxiService.cs",
               "RelativeToolTip": "APM.ConTaxi\\Taxi\\IConTaxiService.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAASwBYAAABJAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAIwBsAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:39:57.769Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:39:57.769Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 21,
               "Title": "APMDbBridger.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Bridger\\APMDbBridger.cs",
               "RelativeDocumentMoniker": "APM.ConTaxi\\Bridger\\APMDbBridger.cs",
@@ -221,25 +260,23 @@
               "RelativeToolTip": "APM.ConTaxi\\Bridger\\APMDbBridger.cs",
               "ViewState": "AgIAABIAAAAAAAAAAAAjwCMAAABuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:37:55.822Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:37:55.822Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Program.cs",
               "RelativeDocumentMoniker": "APM.Application\\Program.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Program.cs",
               "RelativeToolTip": "APM.Application\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEEAAAAwAAAAAAAAAA==",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAIwFIAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:30:19.15Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:30:19.15Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 22,
               "Title": "JsonWebTokenService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Services\\JsonWebTokenService.cs",
               "RelativeDocumentMoniker": "APM.Services\\JsonWebTokenService.cs",
@@ -247,12 +284,11 @@
               "RelativeToolTip": "APM.Services\\JsonWebTokenService.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAAuwBAAAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:21:06.458Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:21:06.458Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 23,
               "Title": "IJsonWebTokenService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.IServices\\IJsonWebTokenService.cs",
               "RelativeDocumentMoniker": "APM.IServices\\IJsonWebTokenService.cs",
@@ -260,12 +296,11 @@
               "RelativeToolTip": "APM.IServices\\IJsonWebTokenService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAuwAgAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:21:04.272Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:21:04.272Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 16,
               "Title": "RedisService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Services\\RedisService.cs",
               "RelativeDocumentMoniker": "APM.Services\\RedisService.cs",
@@ -273,64 +308,60 @@
               "RelativeToolTip": "APM.Services\\RedisService.cs",
               "ViewState": "AgIAAGYAAAAAAAAAAAAwwHEAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:12:30.71Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:12:30.71Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 15,
               "Title": "ITaxiPermission.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Permission\\ITaxiPermission.cs",
               "RelativeDocumentMoniker": "APM.ConTaxi\\Permission\\ITaxiPermission.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Permission\\ITaxiPermission.cs",
               "RelativeToolTip": "APM.ConTaxi\\Permission\\ITaxiPermission.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAwAAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:08:31.818Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:08:31.818Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "TaxiPermission.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Permission\\TaxiPermission.cs",
               "RelativeDocumentMoniker": "APM.ConTaxi\\Permission\\TaxiPermission.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Permission\\TaxiPermission.cs",
               "RelativeToolTip": "APM.ConTaxi\\Permission\\TaxiPermission.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAAIwEMAAAARAAAAAAAAAA==",
+              "ViewState": "AgIAADAAAAAAAAAAAAAIwEoAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:06:37.998Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:06:37.998Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 3,
               "Title": "UserController.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Controllers\\UserController.cs",
               "RelativeDocumentMoniker": "APM.Application\\Controllers\\UserController.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Controllers\\UserController.cs",
               "RelativeToolTip": "APM.Application\\Controllers\\UserController.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAA0wCcAAABBAAAAAAAAAA==",
+              "ViewState": "AgIAADEAAAAAAAAAAAAuwEMAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-14T09:04:15.428Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 8,
               "Title": "TestController.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Controllers\\TestController.cs",
               "RelativeDocumentMoniker": "APM.Application\\Controllers\\TestController.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\Controllers\\TestController.cs",
               "RelativeToolTip": "APM.Application\\Controllers\\TestController.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAB8AAABHAAAAAAAAAA==",
+              "ViewState": "AgIAABEAAAAAAAAAAAAYwBcAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:03:33.417Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:03:33.417Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 24,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Application\\appsettings.json",
               "RelativeDocumentMoniker": "APM.Application\\appsettings.json",
@@ -338,12 +369,11 @@
               "RelativeToolTip": "APM.Application\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-04-14T09:01:01.489Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:01:01.489Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 17,
               "Title": "IRedisService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.IServices\\IRedisService.cs",
               "RelativeDocumentMoniker": "APM.IServices\\IRedisService.cs",
@@ -351,25 +381,23 @@
               "RelativeToolTip": "APM.IServices\\IRedisService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAuwAoAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T09:00:12.81Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T09:00:12.81Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "ConTaxiService.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Taxi\\ConTaxiService.cs",
               "RelativeDocumentMoniker": "APM.ConTaxi\\Taxi\\ConTaxiService.cs",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.ConTaxi\\Taxi\\ConTaxiService.cs",
               "RelativeToolTip": "APM.ConTaxi\\Taxi\\ConTaxiService.cs",
-              "ViewState": "AgIAACoAAAAAAAAAAAAnwDsAAAA8AAAAAAAAAA==",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAewFIAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T08:59:11.207Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T08:59:11.207Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 18,
               "Title": "ServiceExtension.cs",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Extension\\ServiceExtension.cs",
               "RelativeDocumentMoniker": "APM.Extension\\ServiceExtension.cs",
@@ -377,45 +405,41 @@
               "RelativeToolTip": "APM.Extension\\ServiceExtension.cs",
               "ViewState": "AgIAANAAAAAAAAAAAADwvwABAABMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-14T08:57:06.635Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T08:57:06.635Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "APM.IBusiness",
+              "DocumentIndex": 10,
+              "Title": "APM.IBusiness.csproj",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.IBusiness\\APM.IBusiness.csproj",
               "RelativeDocumentMoniker": "APM.IBusiness\\APM.IBusiness.csproj",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.IBusiness\\APM.IBusiness.csproj",
               "RelativeToolTip": "APM.IBusiness\\APM.IBusiness.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-04-14T08:56:44.789Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T08:56:44.789Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
-              "Title": "APM.Extensions",
+              "DocumentIndex": 25,
+              "Title": "APM.Extensions.csproj",
               "DocumentMoniker": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Extension\\APM.Extensions.csproj",
               "RelativeDocumentMoniker": "APM.Extension\\APM.Extensions.csproj",
               "ToolTip": "D:\\WorkSpace\\\u6BD5\u4E1A\u8BBE\u8BA1\\AutoPartsManagement\\APM.Extension\\APM.Extensions.csproj",
               "RelativeToolTip": "APM.Extension\\APM.Extensions.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-04-14T08:56:41.865Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T08:56:41.865Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 26,
               "Title": "Microsoft.Common.CurrentVersion.targets",
               "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
               "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\18\\Enterprise\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
               "ViewState": "AgIAAIYIAAAAAAAAAAAIwI4IAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
-              "WhenOpened": "2026-04-14T08:56:08.963Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-14T08:56:08.963Z"
             }
           ]
         }
