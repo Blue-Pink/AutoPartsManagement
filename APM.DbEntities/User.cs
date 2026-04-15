@@ -16,7 +16,7 @@ namespace APM.DbEntities
         public string? Username { get; set; }
 
         [Required, Description("存储加密后的密码"), JsonIgnore]
-        public string? PasswordHash { get; set; } = string.Empty;
+        public string? PasswordHash { get; set; }
 
         [StringLength(50), Description("真实姓名")]
         public string? RealName { get; set; }

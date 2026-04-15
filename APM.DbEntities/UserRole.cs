@@ -16,13 +16,13 @@ namespace APM.DbEntities
         public Guid UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User? User { get; set; } = null!;
+        public virtual User? User { get; set; }
 
         [Description("角色")]
         public Guid RoleId { get; set; }
 
         [ForeignKey(nameof(RoleId))]
-        public virtual Role? Role { get; set; } = null!;
+        public virtual Role? Role { get; set; }
 
         [Description("角色分配时间")]
         public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
