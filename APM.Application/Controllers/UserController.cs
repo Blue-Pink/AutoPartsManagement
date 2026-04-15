@@ -4,6 +4,7 @@ using APM.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using APM.IBusiness;
+using System.ComponentModel.DataAnnotations;
 
 namespace APM.Application.Controllers
 {
@@ -53,6 +54,20 @@ namespace APM.Application.Controllers
         {
             var token = _userRoleService.AuthenticateUser(username, password);
             return UsualResult(token);
+        }
+
+        /// <summary>
+        /// 创建新用户
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        [HttpPost, Route("[action]"), AllowAnonymous]
+        public UsualApiData<List<UserRole>> CreateUser(User user)
+        {
+            user = _userRoleService.CreateUser(user);
+
+            return UsualResult(_userRoleService.AsignRolesForUser(user.Id, user.UserRoles.Select(ur => ur.RoleId).ToList()));
         }
     }
 }
