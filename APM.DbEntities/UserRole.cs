@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace APM.DbEntities
 {
@@ -15,13 +16,13 @@ namespace APM.DbEntities
         [Description("用户")]
         public Guid UserId { get; set; }
 
-        [ForeignKey(nameof(UserId))]
+        [ForeignKey(nameof(UserId)), JsonIgnore]
         public virtual User? User { get; set; }
 
         [Description("角色")]
         public Guid RoleId { get; set; }
 
-        [ForeignKey(nameof(RoleId))]
+        [ForeignKey(nameof(RoleId)), JsonIgnore]
         public virtual Role? Role { get; set; }
 
         [Description("角色分配时间")]

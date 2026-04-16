@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using APM.IBusiness;
 using System.ComponentModel.DataAnnotations;
+using APM.DbEntities.DTOs;
 
 namespace APM.Application.Controllers
 {
@@ -63,11 +64,26 @@ namespace APM.Application.Controllers
         /// <param name="roles"></param>
         /// <returns></returns>
         [HttpPost, Route("[action]"), AllowAnonymous]
-        public UsualApiData<List<UserRole>> CreateUser(User user)
+        public UsualApiData<List<UserRole>> CreateUser(UserDTO userDTO)
         {
+            if (userDTO is null
+                || string.IsNullOrEmpty(userDTO.Username)
+                || string.IsNullOrEmpty(userDTO.Realname)
+                || string.IsNullOrEmpty(userDTO.Password)
+                || userDTO.UserRoleIds is null
+                || !userDTO.UserRoleIds.Any())
+                throw new APMException($"请保证用户信息完整并为其分配角色");
+
+            var user = new User
+            {
+                Username = userDTO.Username,
+                RealName = userDTO.Realname,
+                PasswordHash = userDTO.Password,
+            };
+
             user = _userRoleService.CreateUser(user);
 
-            return UsualResult(_userRoleService.AsignRolesForUser(user.Id, user.UserRoles.Select(ur => ur.RoleId).ToList()));
+            return UsualResult(_userRoleService.AsignRolesForUser(user.Id, userDTO.UserRoleIds));
         }
     }
 }

@@ -119,7 +119,7 @@ namespace APM.Services
             {
                 return JsonSerializer.Deserialize<List<T>>(value, _jsonOptions);
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
                 //_logger.LogError(ex.ToString());
                 //反序列化失败，返回默认值
