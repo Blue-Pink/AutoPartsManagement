@@ -17,8 +17,18 @@ namespace APM.Application
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var allowedHosts = builder.Configuration.GetSection("AllowedHosts").Value ?? "";
             // Add services to the container.
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: allowedHosts,
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5173") // Vue 的默认端口
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -79,6 +89,8 @@ namespace APM.Application
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors(allowedHosts);
 
             app.UseAuthorization();
 
