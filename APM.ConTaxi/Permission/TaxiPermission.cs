@@ -12,21 +12,13 @@ using System.Text.Json;
 
 namespace APM.ConTaxi.Permission
 {
-    internal class TaxiPermission : ITaxiPermission
+    internal class TaxiPermission(IRedisService redis, IHttpContextAccessor httpContextAccessor)
+        : ITaxiPermission
     {
-        private readonly IRedisService _redis;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public TaxiPermission(IRedisService redis, IHttpContextAccessor httpContextAccessor)
-        {
-            _redis = redis;
-            _httpContextAccessor = httpContextAccessor;
-        }
-
         public void CheckPermission<T>(PermissionType type) where T : APMBaseEntity
         {
-            var permissions = _redis.GetList<RolePermission>(ConstDictionary.RedisCacheRolePermission);
-            var entityRecords = _redis.GetList<EntityRecord>(ConstDictionary.RedisCacheEntityRecord);
+            var permissions = redis.GetList<RolePermission>(ConstDictionary.RedisCacheRolePermission);
+            var entityRecords = redis.GetList<EntityRecord>(ConstDictionary.RedisCacheEntityRecord);
             var roles = GetCurrentUserRoles();
 
             if (permissions != null && permissions.Any() && entityRecords != null && entityRecords.Any() && roles.Any())
@@ -108,18 +100,18 @@ namespace APM.ConTaxi.Permission
 
         public void CacheUserTokenRoles(string jwtoken, List<UserRole> roles)
         {
-            _redis.Set(jwtoken, JsonSerializer.Serialize(roles.Select(r => new { r.UserId, r.RoleId })), TimeSpan.FromDays(30));
+            redis.Set(jwtoken, JsonSerializer.Serialize(roles.Select(r => new { r.UserId, r.RoleId })), TimeSpan.FromDays(30));
         }
 
         private Guid GetCurrentUserId()
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+            var claim = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
             return claim != null ? Guid.Parse(claim.Value) : Guid.Empty;
         }
 
         private List<Guid> GetCurrentUserRoles()
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("Roles");
+            var claim = httpContextAccessor.HttpContext?.User?.FindFirst("Roles");
             var roles = JsonSerializer.Deserialize<List<Guid>>(claim?.Value ?? "[]");
             return roles ?? new List<Guid>();
         }

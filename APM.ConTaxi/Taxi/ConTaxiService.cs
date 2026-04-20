@@ -11,24 +11,16 @@ using System.Text;
 
 namespace APM.ConTaxi.Taxi
 {
-	internal class ConTaxiService : IConTaxiService
-	{
+	internal class ConTaxiService(APMDbContext context, ITaxiPermission permission) : IConTaxiService
+    {
 		internal bool UseAdministration { get; set; }
-		private readonly APMDbContext _context;
-		private readonly ITaxiPermission _permission;
 
-		public ConTaxiService(APMDbContext context, ITaxiPermission permission)
-		{
-			_context = context;
-			_permission = permission;
-		}
-
-		public dynamic? Get(string entityName, Guid id)
+        public dynamic? Get(string entityName, Guid id)
 		{
 			// 程序集中所有继承自 BaseEntity 的非抽象类
 			var type = EntityDriver.GetType(entityName);
 
-			var entity = _context.Find(type, id);
+			var entity = context.Find(type, id);
 
 			return entity;
 		}
@@ -36,15 +28,15 @@ namespace APM.ConTaxi.Taxi
 		public T? Get<T>(Guid id) where T : APMBaseEntity
 		{
 			if (!UseAdministration)
-				_permission.CheckPermission<T>(PermissionType.Read);
-			return _context.Find<T>(id);
+				permission.CheckPermission<T>(PermissionType.Read);
+			return context.Find<T>(id);
 		}
 
 		public T? FirstOrDefault<T>(Func<T, bool>? where = null) where T : APMBaseEntity
 		{
 			if (!UseAdministration)
-				_permission.CheckPermission<T>(PermissionType.Read);
-			var query = _context.Set<T>().AsEnumerable();
+				permission.CheckPermission<T>(PermissionType.Read);
+			var query = context.Set<T>().AsEnumerable();
 			if (where != null)
 				query = query.Where(where).AsEnumerable();
 
@@ -60,8 +52,8 @@ namespace APM.ConTaxi.Taxi
 			bool descending = false) where T : APMBaseEntity
 		{
 			if (!UseAdministration)
-				_permission.CheckPermission<T>(PermissionType.Read);
-			var query = _context.Set<T>().AsEnumerable();
+				permission.CheckPermission<T>(PermissionType.Read);
+			var query = context.Set<T>().AsEnumerable();
 			if (where != null)
 				query = query.Where(where).AsEnumerable();
 			if (paging)
@@ -75,15 +67,15 @@ namespace APM.ConTaxi.Taxi
 		public int Transaction<T>(T entity, EntityState entityState) where T : BaseEntity
 		{
 			if (!UseAdministration)
-				_permission.CheckPermission<T>(entityState);
+				permission.CheckPermission<T>(entityState);
 			var result = 0;
-			using var transaction = _context.Database.BeginTransaction();
+			using var transaction = context.Database.BeginTransaction();
 			try
 			{
 				UpdateTimestamps(entity, entityState);
 
-				_context.Entry(entity).State = entityState;
-				result = _context.SaveChanges();
+				context.Entry(entity).State = entityState;
+				result = context.SaveChanges();
 				transaction.Commit();
 			}
 			catch (Exception)
@@ -97,18 +89,18 @@ namespace APM.ConTaxi.Taxi
 		public int Transaction<T>(IEnumerable<T> entities, EntityState entityState) where T : BaseEntity
 		{
 			if (!UseAdministration)
-				_permission.CheckPermission<T>(entityState);
+				permission.CheckPermission<T>(entityState);
 			var result = 0;
-			using var transaction = _context.Database.BeginTransaction();
+			using var transaction = context.Database.BeginTransaction();
 			try
 			{
 				foreach (var entity in entities)
 				{
 					UpdateTimestamps(entity, entityState);
-					_context.Entry(entity).State = entityState;
+					context.Entry(entity).State = entityState;
 				}
 
-				result = _context.SaveChanges();
+				result = context.SaveChanges();
 				transaction.Commit();
 			}
 			catch (Exception)
@@ -122,10 +114,10 @@ namespace APM.ConTaxi.Taxi
 		public int Transaction<T>(IEnumerable<T> entities, IDictionary<Guid, EntityState> entitiesState) where T : BaseEntity
 		{
 			if (!UseAdministration)
-				_permission.CheckPermission<T>(entitiesState.Select(es => es.Value).Distinct().ToList());
+				permission.CheckPermission<T>(entitiesState.Select(es => es.Value).Distinct().ToList());
 
 			var result = 0;
-			using var transaction = _context.Database.BeginTransaction();
+			using var transaction = context.Database.BeginTransaction();
 			try
 			{
 				foreach (var entity in entities)
@@ -135,10 +127,10 @@ namespace APM.ConTaxi.Taxi
 						continue;
 
 					UpdateTimestamps(entity, entityState);
-					_context.Entry(entity).State = entityState;
+					context.Entry(entity).State = entityState;
 				}
 
-				result = _context.SaveChanges();
+				result = context.SaveChanges();
 				transaction.Commit();
 			}
 			catch (Exception)
@@ -151,7 +143,7 @@ namespace APM.ConTaxi.Taxi
 
 		public void Migrate()
 		{
-			_context.Database.Migrate();
+			context.Database.Migrate();
 		}
 
 		private void UpdateTimestamps<T>(T entity, EntityState entityState) where T : BaseEntity
@@ -167,10 +159,10 @@ namespace APM.ConTaxi.Taxi
 
 		public Dictionary<User, List<UserRole>> UserLogin(string username)
 		{
-			var user = _context.User.FirstOrDefault(u => u.Username == username);
+			var user = context.User.FirstOrDefault(u => u.Username == username);
 			if (user is null)
 				throw new APMException("用户名不存在或密码错误");
-			var userRole = _context.UserRole.Where(ur => ur.UserId == user.Id).ToList();
+			var userRole = context.UserRole.Where(ur => ur.UserId == user.Id).ToList();
 			if (!userRole.Any())
 				throw new APMException("请联系管理员设置该用户所属角色");
 			var dic = new Dictionary<User, List<UserRole>>

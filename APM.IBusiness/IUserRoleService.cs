@@ -3,6 +3,7 @@ using APM.Extensions.Interceptor;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace APM.IBusiness
 {
@@ -57,6 +58,13 @@ namespace APM.IBusiness
         [APMExtensionInterceptor.Monitor]
         public IEnumerable<UserRoleView> GetAllUserRole();
 
+        /// <summary>
+        /// 检查前端传入的 token 是否仍然有效（未过期且与服务器端 Redis 中保存的 token 一致）
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public bool CheckUserToken(string token);
 
+        public User? GetCurrentUser(string token);
     }
 }

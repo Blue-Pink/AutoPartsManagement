@@ -16,10 +16,10 @@ namespace APM.DbEntities
         public required string Username { get; set; }
 
         [Required, Description("存储加密后的密码"), JsonIgnore]
-        public string PasswordHash { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
 
         [StringLength(50), Description("真实姓名")]
-        public required string RealName { get; set; }
+        public required string Realname { get; set; }
 
         [Description("账号是否启用")]
         public bool IsActive { get; set; } = true;

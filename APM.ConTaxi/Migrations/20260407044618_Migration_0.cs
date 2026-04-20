@@ -84,7 +84,7 @@ namespace APM.ConTaxi.Migrations
 
             migrationBuilder.InsertData(
                 table: "User",
-                columns: new[] { "Id", "CreatedAt", "IsActive", "ModifiedAt", "PasswordHash", "RealName", "Username" },
+                columns: new[] { "Id", "CreatedAt", "IsActive", "ModifiedAt", "PasswordHash", "Realname", "Username" },
                 values: new object[] { new Guid("f1a89d52-1c0f-4070-a6dd-761a04fcf7f4"), new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified), true, new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified), "$2a$11$ToqAlthCo6lbu4j6kAb8m.7XIP9gCOUgQRCBsSorupnn88xK9S5ee", "Administrator", "Administrator" });
 
             migrationBuilder.InsertData(
@@ -114,7 +114,7 @@ SELECT
     u.Id AS UserId,
     r.Id AS RoleId,
     u.Username, 
-    u.RealName, 
+    u.Realname, 
     r.RoleName, 
     r.Description AS RoleDescription,
     ur.AssignedAt

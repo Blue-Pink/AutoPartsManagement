@@ -33,7 +33,7 @@ namespace APM.Application.Controllers
         }
 
         [HttpGet, Route("[action]"), Authorize(AuthenticationSchemes = ConstDictionary.Bearer)]
-        public UsualApiData<UserRole> Test1()
+        public UsualApiData<UserRole?> Test1()
         {
             return UsualResult(_taxi.FirstOrDefault<UserRole>());
         }

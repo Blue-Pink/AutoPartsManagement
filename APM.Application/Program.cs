@@ -8,6 +8,7 @@ using Castle.DynamicProxy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using APM.IBusiness;
+using APM.Extensions.Filter;
 
 namespace APM.Application
 {
@@ -69,6 +70,8 @@ namespace APM.Application
             builder.Services.AddJsonWebTokenService(builder.Configuration);
 
             builder.Services.AddProxiedScoped<IJsonWebTokenService, JsonWebTokenService>();
+
+            builder.Services.AddScoped<APMActionFilter>();
 
             builder.Services.AddProxiedScoped<IUserRoleService, UserRoleService>();
 

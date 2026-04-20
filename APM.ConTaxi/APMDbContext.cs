@@ -79,12 +79,12 @@ namespace APM.ConTaxi
                     Id = new Guid("f1a89d52-1c0f-4070-a6dd-761a04fcf7f4"),
                     Username = "Administrator",
                     PasswordHash = "$2a$11$ToqAlthCo6lbu4j6kAb8m.7XIP9gCOUgQRCBsSorupnn88xK9S5ee",
-                    RealName = "Administrator",
+                    Realname = "Administrator",
                     CreatedAt = now,
                     ModifiedAt = now
                 },
             };
-            var basciUserRole = new List<UserRole> {
+            var basicUserRole = new List<UserRole> {
                 new() {
                     Id= new Guid("8b006bae-2330-4b7e-a6b5-e3defe6e92ef"),
                     UserId = basicUsers.First().Id,
@@ -97,7 +97,7 @@ namespace APM.ConTaxi
 
             modelBuilder.Entity<Role>().HasData(basicRoles);
             modelBuilder.Entity<User>().HasData(basicUsers);
-            modelBuilder.Entity<UserRole>().HasData(basciUserRole);
+            modelBuilder.Entity<UserRole>().HasData(basicUserRole);
 
             //映射视图
             modelBuilder.Entity<UserRoleView>(entity =>
@@ -113,7 +113,7 @@ namespace APM.ConTaxi
             //    u.Id AS UserId,
             //    r.Id AS RoleId,
             //    u.Username, 
-            //    u.RealName, 
+            //    u.Realname, 
             //    r.RoleName, 
             //    r.Description AS RoleDescription,
             //    ur.AssignedAt

@@ -1,16 +1,17 @@
 ﻿using APM.DbEntities;
+using APM.Extensions.Filter;
 using APM.UtilEntities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APM.Application.Controllers
 {
-    [Authorize(AuthenticationSchemes = ConstDictionary.Bearer)]
+    [Authorize(AuthenticationSchemes = ConstDictionary.Bearer), ServiceFilter(typeof(APMActionFilter))]
     public class APMController : ControllerBase
     {
-        public UsualApiData<T> UsualResult<T>(T data, string? message = null, dynamic? customData = null)
+        public UsualApiData<T?> UsualResult<T>(T? data, string? message = null, dynamic? customData = null)
         {
-            return new UsualApiData<T>
+            return new UsualApiData<T?>
             {
                 Data = data,
                 StateCode = UsualStateCode.Success,
@@ -27,5 +28,9 @@ namespace APM.Application.Controllers
                 Message = message,
             };
         }
+
+        protected string UserToken => Request?.Headers["Authorization"].FirstOrDefault()?.Substring(ConstDictionary.Bearer.Length).Trim() ?? "";
+
+
     }
 }

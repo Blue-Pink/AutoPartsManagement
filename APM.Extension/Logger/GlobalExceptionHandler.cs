@@ -9,24 +9,18 @@ using System.Text.Unicode;
 
 namespace APM.Extensions.Logger
 {
-    public class GlobalExceptionHandler
+    public class GlobalExceptionHandler(
+        RequestDelegate next,
+        ILoggerFactory loggerFactory,
+        IHostEnvironment hostEnvironment)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger _logger;
-        private readonly IHostEnvironment _hostEnvironment;
-
-        public GlobalExceptionHandler(RequestDelegate next, ILoggerFactory loggerFactory, IHostEnvironment hostEnvironment)
-        {
-            _next = next;
-            _logger = loggerFactory.CreateLogger<GlobalExceptionHandler>();
-            _hostEnvironment = hostEnvironment;
-        }
+        private readonly ILogger _logger = loggerFactory.CreateLogger<GlobalExceptionHandler>();
 
         public async Task Invoke(HttpContext context)
         {
             try
             {
-                await _next(context);
+                await next(context);
             }
             catch (APMException ex)
             {
@@ -49,7 +43,7 @@ namespace APM.Extensions.Logger
                 context.Response.Headers["server"] = "Kestrel";
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-                if (_hostEnvironment.IsDevelopment())
+                if (hostEnvironment.IsDevelopment())
                 {
                     var body = JsonSerializer.Serialize(new UsualApiData<dynamic>()
                     {

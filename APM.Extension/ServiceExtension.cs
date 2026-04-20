@@ -137,7 +137,7 @@ namespace APM.Extensions
 
                //通过反射获取当前程序集中所有继承自BaseEntity的非抽象类
                var entityAssembly = typeof(APMBaseEntity).Assembly;
-               var AssemblyEntities = entityAssembly
+               var assemblyEntities = entityAssembly
                     .GetTypes()
                     .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(APMBaseEntity))
                                 && t != typeof(EntityRecord))
@@ -151,7 +151,7 @@ namespace APM.Extensions
                var entityRecords = taxi.GetDataSetQuery<EntityRecord>(paging: false).ToList();
 
                //处理新增或重新启用的实体
-               foreach (var entity in AssemblyEntities)
+               foreach (var entity in assemblyEntities)
                {
                    var record = entityRecords.FirstOrDefault(r => r.FullName == entity.FullName);
                    if (record == null)
@@ -196,7 +196,7 @@ namespace APM.Extensions
                //处理被删除或不再继承的实体
                foreach (var record in entityRecords)
                {
-                   if (!AssemblyEntities.Any(e => e.FullName == record.FullName))
+                   if (!assemblyEntities.Any(e => e.FullName == record.FullName))
                    {
                        record.IsActive = false;
                        updateEntityRecords.Add(record);

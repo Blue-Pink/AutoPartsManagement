@@ -18,7 +18,7 @@ namespace APM.UtilEntities
         /// <summary>
         /// 操作异常
         /// </summary>
-        Error = -1,
+        Error,
         /// <summary>
         /// 访问成功
         /// </summary>

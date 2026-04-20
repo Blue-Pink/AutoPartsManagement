@@ -5,22 +5,18 @@ using APM.IBusiness;
 using APM.IServices;
 using APM.UtilEntities;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Linq;
 
 namespace APM.Services;
 
-public class UserRoleService : IUserRoleService
+public class UserRoleService(
+    IConTaxiService taxi,
+    IJsonWebTokenService jsonWebTokenService,
+    IRedisService redis)
+    : IUserRoleService
 {
-    private readonly IConTaxiService taxi;
-    private readonly IJsonWebTokenService _jsonWebTokenService;
-    private readonly ITaxiPermission _permission;
-
-    public UserRoleService(IConTaxiService context, IJsonWebTokenService jsonWebTokenService,
-        ITaxiPermission permission)
-    {
-        taxi = context;
-        _jsonWebTokenService = jsonWebTokenService;
-        _permission = permission;
-    }
 
     public User CreateUser(User user)
     {
@@ -34,7 +30,7 @@ public class UserRoleService : IUserRoleService
 
     public IEnumerable<UserRoleView> GetAllUserRole()
     {
-        var userRoleView = taxi.GetDataSetQuery<UserRoleView>();
+        var userRoleView = taxi.GetDataSetQuery<UserRoleView>(paging: false).ToList();
 
         return userRoleView;
     }
@@ -56,8 +52,8 @@ public class UserRoleService : IUserRoleService
         if (user is null || string.IsNullOrEmpty(user.PasswordHash) || !VerifyUserPassword(password, user.PasswordHash))
             throw new APMException($"用户信息验证失败");
         var roles = dic[user].Select(role => role.RoleId).ToList();
-        var token = _jsonWebTokenService.GetUserToken(user, roles);
-
+        var token = jsonWebTokenService.GetUserToken(user, roles);
+        redis.Set(user.Id.ToString(), token, TimeSpan.FromDays(30));
         return token;
     }
 
@@ -84,6 +80,22 @@ public class UserRoleService : IUserRoleService
     public Role CreateRole(Role role)
     {
         throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// 检查 token 是否有效：解析 JWT 检查过期时间 && 与 Redis 中保存的 token 一致
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public bool CheckUserToken(string token)
+    {
+        return jsonWebTokenService.CheckUserToken(token);
+    }
+
+    public User? GetCurrentUser(string token)
+    {
+        var userId = jsonWebTokenService.GetCurrentUserId(token);
+        return taxi.Get<User>(userId);
     }
 
     private string EncryptUserPassword(string password)

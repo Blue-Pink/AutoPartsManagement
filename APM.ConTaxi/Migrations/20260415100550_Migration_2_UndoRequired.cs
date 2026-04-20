@@ -11,7 +11,7 @@ namespace APM.ConTaxi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "RealName",
+                name: "Realname",
                 table: "User",
                 type: "nvarchar(50)",
                 maxLength: 50,
@@ -39,7 +39,7 @@ namespace APM.ConTaxi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<string>(
-                name: "RealName",
+                name: "Realname",
                 table: "User",
                 type: "nvarchar(50)",
                 maxLength: 50,

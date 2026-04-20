@@ -13,18 +13,19 @@ namespace APM.Services
         private readonly IConfiguration _configuration;
         private readonly ConfigurationOptions _redisConfigurationOptions;
         private volatile ConnectionMultiplexer _redisConnectionMultiplexer;
-        private readonly object _redisConnectionLock = new();
-        //private readonly ILogger _logger;
-        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+        private readonly Lock _redisConnectionLock = new();
+        private readonly ILogger<IRedisService> _logger;
+        private static readonly JsonSerializerOptions JsonOptions = new()
         {
             //允许不转义特殊字符（如引号、大于号等）
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             PropertyNameCaseInsensitive = true // 读取时忽略大小写
         };
 
-        public RedisService(IConfiguration configuration)
+        public RedisService(IConfiguration configuration, ILogger<IRedisService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
             _redisConfigurationOptions = GetRedisConfiguration();
             _redisConnectionMultiplexer = ConnectionRedis();
             //_logger = logger;
@@ -47,9 +48,10 @@ namespace APM.Services
                 {
                     _redisConnectionMultiplexer = ConnectionMultiplexer.Connect(_redisConfigurationOptions);
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
-                    throw;
+                    _logger.Log(LogLevel.Error, exception, "Error occurred while connecting to Redis.");
+                    throw new APMException("连接Redis时发生异常");
                 }
             }
 
@@ -63,12 +65,12 @@ namespace APM.Services
                 var sections = _configuration.GetSection("RedisConfiguration");
                 var redisConfiguration = new RedisConfiguration()
                 {
-                    Name = sections.GetSection("Name").Value?.ToString() ?? "",
-                    IP = sections.GetSection("IP").Value?.ToString() ?? "",
-                    Port = Convert.ToInt32(sections.GetSection("Port").Value?.ToString() ?? "0"),
-                    Password = sections.GetSection("Password").Value?.ToString() ?? "",
-                    Timeout = Convert.ToInt32(sections.GetSection("Timeout").Value?.ToString() ?? "0"),
-                    Db = Convert.ToInt32(sections.GetSection("Db").Value?.ToString() ?? "0"),
+                    Name = sections.GetSection("Name").Value ?? "",
+                    IP = sections.GetSection("IP").Value ?? "",
+                    Port = Convert.ToInt32(sections.GetSection("Port").Value ?? "0"),
+                    Password = sections.GetSection("Password").Value ?? "",
+                    Timeout = Convert.ToInt32(sections.GetSection("Timeout").Value ?? "0"),
+                    Db = Convert.ToInt32(sections.GetSection("Db").Value ?? "0"),
                 };
 
                 var options = new ConfigurationOptions
@@ -83,9 +85,10 @@ namespace APM.Services
 
                 return options;
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                throw;
+                _logger.Log(LogLevel.Error, exception, "Error occurred while getting Redis configuration.");
+                throw new APMException("获取Redis配置时发生异常");
             }
         }
 
@@ -101,7 +104,7 @@ namespace APM.Services
                 return default;
             try
             {
-                return JsonSerializer.Deserialize<T>(value, _jsonOptions);
+                return JsonSerializer.Deserialize<T>(value, JsonOptions);
             }
             catch (JsonException)
             {
@@ -114,16 +117,16 @@ namespace APM.Services
         {
             var value = Get(key);
             if (string.IsNullOrEmpty(value))
-                return default;
+                return null;
             try
             {
-                return JsonSerializer.Deserialize<List<T>>(value, _jsonOptions);
+                return JsonSerializer.Deserialize<List<T>>(value, JsonOptions);
             }
-            catch (JsonException)
+            catch (JsonException exception)
             {
-                //_logger.LogError(ex.ToString());
+                _logger.Log(LogLevel.Error, exception, "Error occurred while deserializing Redis value.");
                 //反序列化失败，返回默认值
-                return default;
+                return null;
             }
         }
 
@@ -132,7 +135,7 @@ namespace APM.Services
             var db = _redisConnectionMultiplexer.GetDatabase();
             db.Ping();
             if (value != null)
-                _redisConnectionMultiplexer.GetDatabase().StringSet(key, JsonSerializer.SerializeToUtf8Bytes(value, _jsonOptions), timeSpan);
+                _redisConnectionMultiplexer.GetDatabase().StringSet(key, JsonSerializer.SerializeToUtf8Bytes(value, JsonOptions), timeSpan);
         }
     }
 }
