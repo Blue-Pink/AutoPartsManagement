@@ -23,13 +23,20 @@ namespace APM.ConTaxi
 
         public DbSet<RolePermission> RolePermission { get; set; }
 
+        public DbSet<Category> Category { get; set; }
+
+        public DbSet<Unit> Unit { get; set; }
+
+        public DbSet<Part> Part { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var now = new DateTime(2026, 3, 25, 6, 20, 21);
 
             base.OnModelCreating(modelBuilder);
 
-            //配置唯一索引
+            #region 索引
+
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
@@ -46,7 +53,20 @@ namespace APM.ConTaxi
                 .HasIndex(rp => new { rp.RoleId, rp.EntityId })
                 .IsUnique();
 
-            // 配置多对多关系
+            modelBuilder.Entity<Part>(entity =>
+            {
+                // OE码唯一索引，防止重复录入
+                entity.HasIndex(p => p.OECode).IsUnique();
+
+                // 设置价格精度
+                entity.Property(p => p.CostPrice).HasPrecision(18, 2);
+                entity.Property(p => p.SellingPrice).HasPrecision(18, 2);
+            });
+
+            #endregion
+
+            #region 关系
+
             modelBuilder.Entity<UserRole>()
                 .HasOne(user => user.User)
                 .WithMany(userRole => userRole.UserRoles)
@@ -57,7 +77,10 @@ namespace APM.ConTaxi
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(user => user.RoleId);
 
-            // 种子数据
+            #endregion
+
+            #region 种子数据
+
             var basicRoles = new List<Role> {
                 new() {
                     Id = new Guid("7035810c-ede3-4ffc-ab72-14cf85061a04"),
@@ -94,6 +117,8 @@ namespace APM.ConTaxi
                     AssignedAt = now,
                 }
             };
+
+            #endregion
 
             modelBuilder.Entity<Role>().HasData(basicRoles);
             modelBuilder.Entity<User>().HasData(basicUsers);

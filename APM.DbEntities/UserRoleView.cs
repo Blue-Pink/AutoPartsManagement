@@ -1,10 +1,12 @@
 ﻿using APM.DbEntities.Base;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace APM.DbEntities
 {
+    [Description("用户角色联查视图")]
     public class UserRoleView : BaseView
     {
         public Guid UserId { get; set; }
