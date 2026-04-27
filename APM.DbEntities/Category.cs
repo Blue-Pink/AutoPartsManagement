@@ -6,6 +6,8 @@ namespace APM.DbEntities;
 [Description("配件分类")]
 public class Category : BaseEntity
 {
-    public required string Name { get; set; } // 如：发动机系统、制动系统
+    [Description("名称")]
+    public required string Name { get; set; }
+    [Description("备注")]
     public string? Description { get; set; }
 }

@@ -17,11 +17,13 @@ onMounted(() => {
           userAuth.setLoginState(true)
           if (router.currentRoute.value.fullPath.includes('/login')) router.push('/')
         } else {
+          localStorage.removeItem('token')
           userAuth.setLoginState(false)
           router.push('/login')
         }
       })
       .catch(() => {
+        localStorage.removeItem('token')
         userAuth.setLoginState(false)
         router.push('/login')
       })
@@ -46,7 +48,7 @@ onMounted(() => {
           <div class="header-title"></div>
           <HeaderUser v-if="userAuth.loginState" />
         </el-header>
-        <el-main>
+        <el-main class="app-main">
           <router-view />
         </el-main>
       </el-container>
@@ -60,5 +62,8 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
+}
+.el-main.app-main {
+  padding-bottom: 0;
 }
 </style>

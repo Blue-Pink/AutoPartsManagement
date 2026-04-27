@@ -11,6 +11,9 @@ namespace APM.UtilEntities
         public string? Message { get; set; }
         public dynamic? CustomData { get; set; }
         public UsualStateCode StateCode { get; set; } = UsualStateCode.Success;
+        public int PageIndex { get; set; }
+        public int PageSize { get; set; }
+        public int Total { get; set; }
     }
 
     public enum UsualStateCode

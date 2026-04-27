@@ -12,6 +12,7 @@ namespace APM.ConTaxi.Permission
         public void CheckPermission<T>(PermissionType type) where T : APMBaseEntity;
         public void CheckPermission<T>(EntityState state) where T : APMBaseEntity;
         public void CheckPermission<T>(List<EntityState> status) where T : APMBaseEntity;
+        public void CheckPermission(string entityName, PermissionType type);
         public void CacheUserTokenRoles(string jwtoken, List<UserRole> roles);
 
 

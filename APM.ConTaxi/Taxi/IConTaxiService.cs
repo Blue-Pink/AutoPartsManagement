@@ -10,15 +10,16 @@ namespace APM.ConTaxi.Taxi
 {
     public interface IConTaxiService
     {
-        public dynamic? Get(string entityName, Guid id);
+        public object? Get(string entityName, Guid id);
         public T? Get<T>(Guid id) where T : APMBaseEntity;
         public T? FirstOrDefault<T>(Func<T, bool>? selector = null) where T : APMBaseEntity;
+        public int Total<T>() where T : APMBaseEntity;
         public IEnumerable<T> GetDataSetQuery<T>(
             Func<T, bool>? where = null,
             int pageIndex = 1,
             int pageSize = 10,
             bool paging = true,
-            Func<T, T>? orderby = null,
+            Func<T, T>? orderBy = null,
             bool descending = false) where T : APMBaseEntity;
         public Dictionary<User, List<UserRole>> UserLogin(string username);
         public int Transaction<T>(T entity, EntityState entityState) where T : BaseEntity;
@@ -29,6 +30,7 @@ namespace APM.ConTaxi.Taxi
         public int Create<T>(IEnumerable<T> entities) where T : BaseEntity;
         public T Update<T>(T entity) where T : BaseEntity;
         public int Delete<T>(Guid id) where T : BaseEntity;
+        public int Delete<T>(IEnumerable<Guid> ids) where T : BaseEntity;
         public int Delete<T>(Func<T, bool> where) where T : BaseEntity;
     }
 }

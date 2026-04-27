@@ -8,19 +8,19 @@ namespace APM.DbEntities
 {
     public static class EntityDriver
     {
-        private static IDictionary<string, Type>? baseEntityChildren = null;
-        public static IDictionary<string, Type> GetBascEntityChildren()
+        private static IDictionary<string, Type>? _baseEntityChildren;
+        public static IDictionary<string, Type> GetBasicEntityChildren()
         {
-            if (baseEntityChildren is null)
-                baseEntityChildren = Assembly.GetExecutingAssembly().GetTypes()
-                    .Where(t => t.IsClass && !t.IsAbstract && typeof(BaseEntity).IsAssignableFrom(t))
-                    .ToDictionary(t => t.Name, t => t);
-            return baseEntityChildren;
+            _baseEntityChildren ??= Assembly.GetExecutingAssembly().GetTypes()
+                .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(BaseEntity).IsAssignableFrom(t))
+                .ToDictionary(t => t.Name, t => t);
+
+            return _baseEntityChildren;
         }
 
         public static Type GetType(string entityName)
         {
-            return GetBascEntityChildren().FirstOrDefault(kv => kv.Key.Equals(entityName, StringComparison.CurrentCultureIgnoreCase)).Value;
+            return GetBasicEntityChildren().FirstOrDefault(kv => kv.Key.Equals(entityName, StringComparison.CurrentCultureIgnoreCase)).Value;
         }
 
     }

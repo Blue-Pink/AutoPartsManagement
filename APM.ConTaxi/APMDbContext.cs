@@ -1,4 +1,5 @@
 ﻿using APM.DbEntities;
+using APM.DbEntities.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
@@ -17,8 +18,6 @@ namespace APM.ConTaxi
 
         public DbSet<UserRole> UserRole { get; set; }
 
-        public DbSet<UserRoleView> UserRoleView { get; set; }
-
         public DbSet<EntityRecord> EntityRecord { get; set; }
 
         public DbSet<RolePermission> RolePermission { get; set; }
@@ -28,6 +27,10 @@ namespace APM.ConTaxi
         public DbSet<Unit> Unit { get; set; }
 
         public DbSet<Part> Part { get; set; }
+
+        public DbSet<UserRoleView> UserRoleView { get; set; }
+
+        public DbSet<PartView> PartView { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -124,12 +127,21 @@ namespace APM.ConTaxi
             modelBuilder.Entity<User>().HasData(basicUsers);
             modelBuilder.Entity<UserRole>().HasData(basicUserRole);
 
-            //映射视图
+            #region 映射视图
+
             modelBuilder.Entity<UserRoleView>(entity =>
             {
                 entity.HasNoKey();
                 entity.ToView("vw_UserRoleView");
             });
+
+            modelBuilder.Entity<PartView>(eb =>
+            {
+                eb.HasNoKey(); // 视图无主键
+                eb.ToView("vw_PartView"); // 映射到数据库视图名称
+            });
+
+            #endregion
 
             #region Migration Sql
             //            migrationBuilder.Sql("DROP VIEW IF EXISTS vw_UserRoleView");

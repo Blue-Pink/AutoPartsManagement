@@ -29,6 +29,19 @@ namespace APM.Application.Controllers
             };
         }
 
+        public UsualApiData<T> UsualResult<T>(PagingData<T> data, string? message = null, dynamic? customData = null)
+        {
+            return new UsualApiData<T>
+            {
+                DataList = data.Data,
+                StateCode = UsualStateCode.Success,
+                Message = message,
+                PageSize = data.PageSize,
+                PageIndex = data.PageIndex,
+                Total = data.Total,
+            };
+        }
+
         protected string UserToken => Request?.Headers["Authorization"].FirstOrDefault()?.Substring(ConstDictionary.Bearer.Length).Trim() ?? "";
 
 

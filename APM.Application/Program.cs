@@ -1,3 +1,4 @@
+using APM.Business;
 using APM.ConTaxi.Bridger;
 using APM.UtilEntities;
 using APM.Extensions;
@@ -65,7 +66,7 @@ namespace APM.Application
             builder.Services.AddSingleton<IRedisService, RedisService>();
             builder.Services.AddScoped<IInterceptor, APMExtensionInterceptor>();
 
-            builder.Services.AddLogging(builder => builder.AddLogger());
+            builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddLogger());
 
             builder.Services.AddJsonWebTokenService(builder.Configuration);
 
@@ -73,7 +74,9 @@ namespace APM.Application
 
             builder.Services.AddScoped<APMActionFilter>();
 
+            builder.Services.AddProxiedScoped<IUsualEntityService, UsualEntityService>();
             builder.Services.AddProxiedScoped<IUserRoleService, UserRoleService>();
+            builder.Services.AddProxiedScoped<IPartService, PartService>();
 
             var app = builder.Build();
 
@@ -106,6 +109,8 @@ namespace APM.Application
             app.CreateAdministratorPromission(builder.Configuration);
 
             app.RedisCacheRolePermission();
+
+            app.CreateParts();
 
             app.Run();
         }

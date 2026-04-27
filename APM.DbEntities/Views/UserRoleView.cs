@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
-namespace APM.DbEntities
+namespace APM.DbEntities.Views
 {
     [Description("用户角色联查视图")]
     public class UserRoleView : BaseView

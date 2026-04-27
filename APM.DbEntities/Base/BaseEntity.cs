@@ -10,10 +10,8 @@ namespace APM.DbEntities.Base
         [Key, Required]
         public Guid Id { get; set; }
 
-        [Required]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Required]
         public DateTime? ModifiedAt { get; set; } = DateTime.UtcNow;
     }
 }

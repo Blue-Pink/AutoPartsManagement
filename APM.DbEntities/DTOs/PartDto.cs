@@ -4,8 +4,9 @@ using System.Text;
 
 namespace APM.DbEntities.DTOs
 {
-    public class PartDto
+    public class PartDTO
     {
+        public Guid? Id { get; set; } = Guid.Empty;
         public required string PartName { get; set; }
         public required string OECode { get; set; }
         public string? Model { get; set; }

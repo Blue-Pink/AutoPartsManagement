@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using APM.DbEntities.Views;
 
 namespace APM.IBusiness
 {
@@ -15,7 +16,7 @@ namespace APM.IBusiness
         /// <param name="userId"></param>
         /// <param name="roles"></param>
         /// <returns></returns>
-        public List<UserRole> AsignRolesForUser(Guid userId, IEnumerable<Guid> roles);
+        public IEnumerable<UserRole> AsignRolesForUser(Guid userId, IEnumerable<Guid> roles);
 
         /// <summary>
         /// 获取所有角色

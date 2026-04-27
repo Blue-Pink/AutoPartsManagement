@@ -6,7 +6,7 @@ import { ElMessage } from 'element-plus';
 // 创建 Axios 实例
 const service: AxiosInstance = axios.create({
     // 根据你后端 .NET 项目的启动端口修改
-    baseURL: 'https://localhost:32769/api',
+    baseURL: 'https://172.23.99.139:8081/api/',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json'

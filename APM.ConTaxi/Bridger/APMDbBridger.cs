@@ -1,6 +1,7 @@
 ﻿using APM.ConTaxi.Permission;
 using APM.ConTaxi.Taxi;
 using APM.IServices;
+using APM.UtilEntities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +42,9 @@ namespace APM.ConTaxi.Bridger
             var redis = serviceProvider.GetService<IRedisService>();
             if (taxi is ConTaxiService conTaxiService)
                 conTaxiService.UseAdministration = true;
+
             action?.Invoke(taxi, redis);
+
         }
 
     }

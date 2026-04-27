@@ -12,5 +12,9 @@ namespace APM.UtilEntities
         {
             Message = message;
         }
+        public APMException(string message, Exception innerException) : base(message, innerException)
+        {
+            Message = message;
+        }
     }
 }

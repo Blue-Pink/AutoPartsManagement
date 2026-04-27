@@ -1,26 +1,18 @@
 import type { User } from "@/interfaces/DTOEntities";
 import $ from "../utils/request";
+import type { UsualApiData } from "@/interfaces/HttpReponse";
 
 class PlayerService {
-    UserLogin(user: User): Promise<any> {
-        return $.post(`/User/UserLogin`, user).then(res => {
-            const token = res.data
-            if (token)
-                localStorage.setItem("token", token)
-            return res;
-        });
+    UserLogin(user: User): Promise<UsualApiData<string>> {
+        return $.post(`User/UserLogin`, user);
     }
 
-    CheckUserToken(): Promise<any> {
-        return $.get('/User/CheckUserToken').then(res => {
-            if (!res.data)
-                localStorage.removeItem("token")
-            return res;
-        });
+    CheckUserToken(): Promise<UsualApiData<boolean>> {
+        return $.get('User/CheckUserToken')
     }
 
-    GetCurrentUser(): Promise<any> {
-        return $.get('/User/GetCurrentUser');
+    GetCurrentUser(): Promise<UsualApiData<User>> {
+        return $.get('User/GetCurrentUser');
     }
 }
 

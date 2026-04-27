@@ -17,13 +17,56 @@ namespace APM.ConTaxi.Permission
     {
         public void CheckPermission<T>(PermissionType type) where T : APMBaseEntity
         {
+            var entityName = typeof(T).FullName;
+            if (string.IsNullOrEmpty(entityName))
+                throw new APMException($"异常数据: {entityName}");
+            CheckPermission(entityName, type);
+        }
+
+        public void CheckPermission<T>(EntityState state) where T : APMBaseEntity
+        {
+            PermissionType? permissionType = null;
+            switch (state)
+            {
+                case EntityState.Deleted:
+                    permissionType = PermissionType.Delete;
+                    break;
+                case EntityState.Modified:
+                    permissionType = PermissionType.Update;
+                    break;
+                case EntityState.Added:
+                    permissionType = PermissionType.Create;
+                    break;
+            }
+            if (permissionType == null)
+                throw new APMException("Only can do Deleted/Modified/Added.");
+            CheckPermission<T>(permissionType.Value);
+        }
+
+        public void CheckPermission<T>(List<EntityState> status) where T : APMBaseEntity
+        {
+            foreach (var state in status)
+            {
+                CheckPermission<T>(state);
+            }
+        }
+
+        public void CheckPermission(string entityName, PermissionType type)
+        {
+            if (string.IsNullOrEmpty(entityName))
+                throw new APMException("缺少实体的名称");
+
             var permissions = redis.GetList<RolePermission>(ConstDictionary.RedisCacheRolePermission);
             var entityRecords = redis.GetList<EntityRecord>(ConstDictionary.RedisCacheEntityRecord);
+            var assembly = typeof(APMBaseEntity)?.FullName?.Replace(nameof(APMBaseEntity), "")?.Replace("Base", "").Replace("..", ".") ?? "";
             var roles = GetCurrentUserRoles();
 
-            if (permissions != null && permissions.Any() && entityRecords != null && entityRecords.Any() && roles.Any())
+            if (!string.IsNullOrEmpty(assembly) && permissions != null && permissions.Any() && entityRecords != null && entityRecords.Any() && roles.Any())
             {
-                var currentEntityRecord = entityRecords?.FirstOrDefault(er => er?.FullName?.Equals(typeof(T).FullName) ?? false);
+                if (!entityName.Contains(assembly))
+                    entityName = assembly + entityName;
+
+                var currentEntityRecord = entityRecords?.FirstOrDefault(er => er?.FullName?.Equals(entityName) ?? false);
                 if (currentEntityRecord != null)
                 {
                     var rolePermissions = permissions?.Where(p => p.EntityId == currentEntityRecord.Id && roles.Contains(p.RoleId)).ToList();
@@ -58,43 +101,13 @@ namespace APM.ConTaxi.Permission
                 }
                 else
                 {
-                    throw new APMException($"实体记录中未找到该实体：{typeof(T).FullName}");
+                    throw new APMException($"实体记录中未找到该实体: {entityName}");
                 }
 
             }
             else
             {
                 throw new APMException($"系统权限相关缓存丢失");
-            }
-
-
-        }
-
-        public void CheckPermission<T>(EntityState state) where T : APMBaseEntity
-        {
-            PermissionType? permissionType = null;
-            switch (state)
-            {
-                case EntityState.Deleted:
-                    permissionType = PermissionType.Delete;
-                    break;
-                case EntityState.Modified:
-                    permissionType = PermissionType.Update;
-                    break;
-                case EntityState.Added:
-                    permissionType = PermissionType.Create;
-                    break;
-            }
-            if (permissionType == null)
-                throw new APMException("Only can do Deleted/Modified/Added.");
-            CheckPermission<T>(permissionType.Value);
-        }
-
-        public void CheckPermission<T>(List<EntityState> status) where T : APMBaseEntity
-        {
-            foreach (var state in status)
-            {
-                CheckPermission<T>(state);
             }
         }
 

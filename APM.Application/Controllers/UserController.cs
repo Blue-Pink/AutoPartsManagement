@@ -9,6 +9,7 @@ using APM.DbEntities.DTOs;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
+using APM.DbEntities.Views;
 
 namespace APM.Application.Controllers
 {
@@ -66,7 +67,7 @@ namespace APM.Application.Controllers
         /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost, Route("[action]"), AllowAnonymous]
-        public UsualApiData<List<UserRole>?> CreateUser(UserDTO user)
+        public UsualApiData<IEnumerable<UserRole>?> CreateUser(UserDTO user)
         {
             if (user is null
                 || string.IsNullOrEmpty(user.Username)
@@ -85,7 +86,7 @@ namespace APM.Application.Controllers
 
             createUser = userRoleService.CreateUser(createUser);
 
-            return UsualResult(userRoleService.AsignRolesForUser(createUser.Id, user.UserRoleIds));
+            return UsualResult<IEnumerable<UserRole>>(userRoleService.AsignRolesForUser(createUser.Id, user.UserRoleIds));
         }
 
         /// <summary>

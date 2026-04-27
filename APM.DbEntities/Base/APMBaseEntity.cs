@@ -4,7 +4,7 @@ using System.Text;
 
 namespace APM.DbEntities.Base
 {
-    public class APMBaseEntity
+    public abstract class APMBaseEntity
     {
     }
 }

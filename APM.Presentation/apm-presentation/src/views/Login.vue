@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue'
 import UserRoleService from '@/services/UserRoleService'
 import type { User } from '@/interfaces/DTOEntities'
 import { userAuthStore } from '@/stores/auth'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElLoading, type FormInstance, type FormRules } from 'element-plus'
 import router from '@/router'
 
 const userAuth = userAuthStore()
@@ -33,12 +33,14 @@ const rules = reactive<FormRules>({
 })
 
 const login = async (userForm: FormInstance | undefined) => {
+  const loadingInst = ElLoading.service({ lock: true, text: '登录中...' })
   if (!userForm) return
   await userForm.validate((valid, fields) => {
     if (valid) {
       UserRoleService.UserLogin(user)
         .then((res) => {
-          if (res.stateCode) {
+          if (res.stateCode && res.data) {
+            localStorage.setItem('token', res.data)
             userAuth.setLoginState(true)
             ElMessage({
               message: '登录成功',
@@ -55,8 +57,10 @@ const login = async (userForm: FormInstance | undefined) => {
           }
         })
         .catch((err) => {
-          debugger
           console.warn('登录失败:', err)
+        })
+        .finally(() => {
+          loadingInst && loadingInst.close && loadingInst.close()
         })
     } else {
       console.warn('表单验证失败:', fields)
@@ -67,6 +71,7 @@ const login = async (userForm: FormInstance | undefined) => {
 
 <template>
   <div class="login-container">
+    <h1 class="login-container-title">正在登录APM</h1>
     <el-form ref="userFormRef" :model="user" :rules="rules" label-position="top">
       <el-form-item label="用户名" prop="username">
         <el-input v-model="user.username" placeholder="请输入用户名" />
@@ -88,7 +93,12 @@ const login = async (userForm: FormInstance | undefined) => {
   background-color: var(--basic-color-white);
   padding: 50px;
   border-radius: 10px;
-  margin-top: 20%;
+  margin-top: 10%;
+  box-shadow: var(--basic-box-shadow);
+}
+
+.login-container .login-container-title {
+  margin: 0 0 45px 0;
 }
 
 :deep(.login-button-container .el-form-item__content) {

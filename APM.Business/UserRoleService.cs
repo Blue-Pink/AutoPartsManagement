@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Linq;
+using APM.DbEntities.Views;
 
 namespace APM.Services;
 
@@ -57,7 +58,7 @@ public class UserRoleService(
         return token;
     }
 
-    public List<UserRole> AsignRolesForUser(Guid userId, IEnumerable<Guid> roles)
+    public IEnumerable<UserRole> AsignRolesForUser(Guid userId, IEnumerable<Guid> roles)
     {
         var user = taxi.FirstOrDefault<User>(u => u.Id == userId) ?? throw new APMException($"用户不存在");
 

@@ -1,30 +1,21 @@
-﻿using APM.ConTaxi.Taxi;
+﻿using APM.IBusiness;
+using APM.UtilEntities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APM.Application.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EntityController : APMController
+    public class EntityController(IUsualEntityService entityService) : APMController
     {
-        private readonly IConTaxiService _taxi;
-
-        public EntityController(IConTaxiService taxi)
-        {
-            _taxi = taxi;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        [HttpGet, Route("{entityName}/Get/{id}")]
+        [HttpGet, Route("[action]/{entityName}/{id}")]
         public dynamic Get(string entityName, Guid id)
         {
-            var entity = _taxi.Get(entityName, id);
-            return UsualResult(entity);
-        }
+            if (id == Guid.Empty)
+                throw new APMException($"{entityName} 中 {id} 是无效数据");
 
+            return UsualResult(entityService.Get(entityName, id));
+        }
     }
 }

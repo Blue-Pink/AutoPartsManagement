@@ -4,4 +4,7 @@ export interface UsualApiData<T> {
     message: string | null;
     customData: object | null;
     stateCode: number;
+    pageIndex?: number;
+    pageSize?: number;
+    total?: number;
 }
