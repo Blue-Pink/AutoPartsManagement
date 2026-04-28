@@ -10,7 +10,7 @@ namespace APM.IBusiness
 {
     public interface IPartService
     {
-        public PagingData<PartView> GetParts(int pageIndex, int pageSize);
+        public PagingData<PartView> GetParts(int pageIndex, int pageSize, string sortField = "", bool sortDesc = false);
         int DeleteParts(IEnumerable<Guid> ids);
         Part EditPart(PartDTO partDTO);
         IEnumerable<Category> GetCategories();

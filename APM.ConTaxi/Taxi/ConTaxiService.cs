@@ -3,11 +3,6 @@ using APM.DbEntities;
 using APM.DbEntities.Base;
 using APM.UtilEntities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 
 namespace APM.ConTaxi.Taxi
 {
@@ -58,7 +53,7 @@ namespace APM.ConTaxi.Taxi
             int pageIndex = 1,
             int pageSize = 10,
             bool paging = true,
-            Func<T, T>? orderBy = null,
+            Func<T, object>? orderBy = null,
             bool descending = false) where T : APMBaseEntity
         {
             if (!UseAdministration)

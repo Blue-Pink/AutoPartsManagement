@@ -12,9 +12,26 @@ namespace APM.Business
 {
     public class PartService(IConTaxiService taxi) : IPartService
     {
-        public PagingData<PartView> GetParts(int pageIndex, int pageSize)
+        public PagingData<PartView> GetParts(int pageIndex, int pageSize, string sortField = "", bool sortDesc = false)
         {
-            var parts = taxi.GetDataSetQuery<PartView>(pageIndex: pageIndex, pageSize: pageSize).ToList();
+            Func<PartView, object>? orderBy = null;
+            if (!string.IsNullOrEmpty(sortField))
+            {
+                orderBy = sortField switch
+                {
+                    "partName" => x => x.PartName,
+                    "createdAt" => x => x.CreatedAt,
+                    "modifiedAt" => x => x.ModifiedAt,
+                    "maxStock" => x => x.MaxStock,
+                    "minStock" => x => x.MinStock,
+                    "costPrice" => x => x.CostPrice,
+                    "sellingPrice" => x => x.SellingPrice,
+                    "oeCode" => x => x.OECode,
+                    _ => null
+                };
+            }
+            var query = taxi.GetDataSetQuery(pageIndex: pageIndex, pageSize: pageSize, orderBy: orderBy, descending: sortDesc);
+            var parts = query.ToList();
             var total = taxi.Total<PartView>();
             return new PagingData<PartView>(parts, total, pageIndex, pageSize);
         }

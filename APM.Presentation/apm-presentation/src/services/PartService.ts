@@ -3,8 +3,11 @@ import $ from "../utils/request";
 import type { UsualApiData } from "@/interfaces/HttpReponse";
 
 class PartService {
-    GetParts(pageIndex: number, pageSize: number): Promise<UsualApiData<PartView>> {
-        return $.get(`Part/GetParts?pageIndex=${pageIndex}&pageSize=${pageSize}`);
+    GetParts(pageIndex: number, pageSize: number, sortField?: string, sortDesc: boolean = false): Promise<UsualApiData<PartView>> {
+        let url = `Part/GetParts?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+        if (sortField) url += `&sortField=${encodeURIComponent(sortField)}`;
+        url += `&sortDesc=${sortDesc}`;
+        return $.get(url);
     }
 
     DeleteParts(ids: string[]): Promise<UsualApiData<number>> {

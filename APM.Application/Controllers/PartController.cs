@@ -12,9 +12,9 @@ namespace APM.Application.Controllers
     public class PartController(IPartService partService) : APMController
     {
         [HttpGet, Route("[action]")]
-        public UsualApiData<PartView> GetParts(int pageIndex, int pageSize)
+        public UsualApiData<PartView> GetParts(int pageIndex, int pageSize, string sortField = "", bool sortDesc = false)
         {
-            return UsualResult(partService.GetParts(pageIndex, pageSize));
+            return UsualResult(partService.GetParts(pageIndex, pageSize, sortField, sortDesc));
         }
 
         [HttpDelete, Route("[action]")]

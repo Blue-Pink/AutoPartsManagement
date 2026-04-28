@@ -11,7 +11,7 @@ namespace APM.ConTaxi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-        CREATE VIEW vw_PartView AS
+         CREATE VIEW vw_PartView AS
         SELECT 
             p.Id,
             p.PartName,
@@ -23,6 +23,7 @@ namespace APM.ConTaxi.Migrations
             p.MinStock,
             p.MaxStock,
             p.CreatedAt,
+            p.ModifiedAt,
             p.CategoryId,
             p.UnitId,
             c.Name AS CategoryName,

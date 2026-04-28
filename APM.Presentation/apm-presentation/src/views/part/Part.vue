@@ -13,11 +13,18 @@ const total = ref(0)
 const selectedParts = ref<PartView[]>([])
 const editVisible = ref(false)
 const editingPart = ref<PartView | null>(null)
+const sortField = ref<string | null>(null)
+const sortDesc = ref<boolean>(false)
 
 const loadParts = async () => {
   const loadingInst = ElLoading.service({ lock: true, text: '加载中...' })
   try {
-    const res = await PartService.GetParts(pageIndex.value, pageSize.value)
+    const res = await PartService.GetParts(
+      pageIndex.value,
+      pageSize.value,
+      sortField.value || undefined,
+      sortDesc.value,
+    )
     if (res.dataList) {
       parts.value = res.dataList || []
       total.value = res.total || 0
@@ -114,6 +121,26 @@ const handleSelectionChange = (selection: PartView[]) => {
   selectedParts.value = selection
 }
 
+const handleSortChange = (options: {
+  column: any
+  prop: string
+  order: 'ascending' | 'descending' | null
+}) => {
+  if (!options || !options.prop) return
+  if (options.order === 'ascending') {
+    sortField.value = options.prop
+    sortDesc.value = false
+  } else if (options.order === 'descending') {
+    sortField.value = options.prop
+    sortDesc.value = true
+  } else {
+    sortField.value = null
+    sortDesc.value = false
+  }
+  pageIndex.value = 1
+  loadParts()
+}
+
 onMounted(loadParts)
 
 watch([pageIndex, pageSize], loadParts)
@@ -137,21 +164,39 @@ watch([pageIndex, pageSize], loadParts)
       height="82vh"
       border="true"
       @selection-change="handleSelectionChange"
+      @sort-change="handleSortChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="partName" label="名称" width="180" />
-      <el-table-column prop="oeCode" label="OE代码" width="180" />
+      <el-table-column prop="partName" label="名称" width="180" sortable="custom" />
+      <el-table-column prop="oeCode" label="OE代码" width="180" sortable="custom" />
       <el-table-column prop="model" label="型号" width="180" />
       <el-table-column prop="brand" label="品牌" width="180" />
       <el-table-column prop="categoryName" label="分类" width="180" />
       <el-table-column prop="unitName" label="单位" width="100" />
-      <el-table-column prop="costPrice" label="成本价" width="120" />
-      <el-table-column prop="sellingPrice" label="售价" width="120" />
-      <el-table-column prop="minStock" label="最小库存" width="120" />
-      <el-table-column prop="maxStock" label="最大库存" width="120" />
-      <el-table-column label="创建时间" width="auto" min-width="180">
+      <el-table-column prop="costPrice" label="成本价" width="120" sortable="custom" />
+      <el-table-column prop="sellingPrice" label="售价" width="120" sortable="custom" />
+      <el-table-column prop="minStock" label="最小库存" width="120" sortable="custom" />
+      <el-table-column prop="maxStock" label="最大库存" width="120" sortable="custom" />
+      <el-table-column
+        prop="createdAt"
+        label="创建时间"
+        width="auto"
+        min-width="180"
+        sortable="custom"
+      >
         <template #default="{ row }">
           {{ ConvertDateTime(row.createdAt, 'yyyy-mm-dd hh:mm:ss') }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="modifiedAt"
+        label="修改时间"
+        width="auto"
+        min-width="180"
+        sortable="custom"
+      >
+        <template #default="{ row }">
+          {{ ConvertDateTime(row.modifiedAt, 'yyyy-mm-dd hh:mm:ss') }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">

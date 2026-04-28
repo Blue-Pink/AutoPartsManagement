@@ -10,8 +10,9 @@ export function ConvertDateTime(dateString: string, format: string = 'yyyy-mm-dd
     }
 
     try {
+        //将UTC字符串转换成Date对象, 且转换成UTC+8时间
         const date = new Date(dateString)
-
+        date.setHours(date.getHours() + 8)
         // 检查日期是否有效
         if (isNaN(date.getTime())) {
             return '-'

@@ -20,6 +20,7 @@ namespace APM.DbEntities.Views
         public int MinStock { get; set; }
         public int MaxStock { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
 
         // 联查得到的名称（关键展示字段）
         public string? CategoryName { get; set; }
