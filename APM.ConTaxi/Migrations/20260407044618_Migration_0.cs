@@ -117,7 +117,9 @@ SELECT
     u.Realname, 
     r.RoleName, 
     r.Description AS RoleDescription,
-    ur.AssignedAt
+    ur.AssignedAt,
+    ur.CreatedAt,
+    ur.ModifiedAt
 FROM [User] u
 JOIN UserRole ur ON u.Id = ur.UserId
 JOIN Role r ON r.Id = ur.RoleId");

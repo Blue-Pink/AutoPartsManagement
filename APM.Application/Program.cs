@@ -64,19 +64,21 @@ namespace APM.Application
             builder.Services.AddSingleton(new ProxyGenerator());
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddSingleton<IRedisService, RedisService>();
+            builder.Services.AddSingleton<IJsonWebTokenService, JsonWebTokenService>();
+
             builder.Services.AddScoped<IInterceptor, APMExtensionInterceptor>();
 
             builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddLogger());
 
             builder.Services.AddJsonWebTokenService(builder.Configuration);
 
-            builder.Services.AddProxiedScoped<IJsonWebTokenService, JsonWebTokenService>();
-
             builder.Services.AddScoped<APMActionFilter>();
 
             builder.Services.AddProxiedScoped<IUsualEntityService, UsualEntityService>();
             builder.Services.AddProxiedScoped<IUserRoleService, UserRoleService>();
             builder.Services.AddProxiedScoped<IPartService, PartService>();
+            builder.Services.AddProxiedScoped<ISupplierService, SupplierService>();
+            builder.Services.AddProxiedScoped<IInboundOrderService, InboundOrderService>();
 
             var app = builder.Build();
 
@@ -104,6 +106,8 @@ namespace APM.Application
 
             app.MapControllers();
 
+            #region InitailData
+
             app.MigrationAndSyncEntities();
 
             app.CreateAdministratorPromission(builder.Configuration);
@@ -111,6 +115,10 @@ namespace APM.Application
             app.RedisCacheRolePermission();
 
             app.CreateParts();
+
+            app.CreateSuppliers();
+
+            #endregion
 
             app.Run();
         }

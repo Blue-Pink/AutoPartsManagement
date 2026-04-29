@@ -16,29 +16,10 @@ namespace APM.Application.Controllers
     [ApiController, Route("api/[controller]")]
     public class UserController(IUserRoleService userRoleService) : APMController
     {
-        /// <summary>
-        /// 获取指定用户的角色信息
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        [HttpGet, Route("[action]/{userId:guid}")]
-        public UsualApiData<UserRoleView> GetUserRoles(Guid userId)
-        {
-            var userRoles = userRoleService.GetUserRoles(userId);
-
-            return UsualResult(userRoles);
-        }
-
-        /// <summary>
-        /// 获取所有用户的角色信息
-        /// </summary>
-        /// <returns></returns>
         [HttpGet, Route("[action]")]
-        public UsualApiData<UserRoleView> GetAllUserRole()
+        public UsualApiData<UserDTO> GetUsers(int pageIndex, int pageSize, string sortField = "", bool sortDesc = false, string search = "")
         {
-            var userRoleView = userRoleService.GetAllUserRole();
-
-            return UsualResult(userRoleView);
+            return UsualResult(userRoleService.GetUsers(pageIndex, pageSize, sortField, sortDesc, search));
         }
 
         /// <summary>
@@ -49,44 +30,21 @@ namespace APM.Application.Controllers
         [HttpPost, Route("[action]"), AllowAnonymous]
         public UsualApiData<string?> UserLogin(UserDTO user)
         {
-            //用户名必填8-20为仅字母数字与-的组合,密码必填8-20为字母数字英文标点符的组合
-            if (string.IsNullOrEmpty(user.Username)
-                || !new Regex(@"^[a-zA-Z0-9\-]{8,20}$").IsMatch(user.Username)
-                || string.IsNullOrEmpty(user.Password)
-                || !new Regex(@"^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]{8,20}$").IsMatch(user.Password))
-                throw new APMException($"用户名必填8-20为仅字母数字与-的组合,密码必填8-20为字母数字英文标点符的组合");
-
-
-            var token = userRoleService.AuthenticateUser(user.Username, user.Password);
+            userRoleService.MatchUserInfo(user.Username ?? "", user.Password ?? "");
+            var token = userRoleService.AuthenticateUser(user.Username ?? "", user.Password ?? "");
             return UsualResult(token);
         }
 
         /// <summary>
         /// 创建新用户
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="userDTO"></param>
         /// <returns></returns>
         [HttpPost, Route("[action]"), AllowAnonymous]
-        public UsualApiData<IEnumerable<UserRole>?> CreateUser(UserDTO user)
+        public UsualApiData<UserDTO?> EditUser(UserDTO userDTO)
         {
-            if (user is null
-                || string.IsNullOrEmpty(user.Username)
-                || string.IsNullOrEmpty(user.Realname)
-                || string.IsNullOrEmpty(user.Password)
-                || user.UserRoleIds is null
-                || !user.UserRoleIds.Any())
-                throw new APMException($"请保证用户信息完整并为其分配角色");
-
-            var createUser = new User
-            {
-                Username = user.Username,
-                Realname = user.Realname,
-                PasswordHash = user.Password,
-            };
-
-            createUser = userRoleService.CreateUser(createUser);
-
-            return UsualResult<IEnumerable<UserRole>>(userRoleService.AsignRolesForUser(createUser.Id, user.UserRoleIds));
+            var user = userRoleService.EditUser(userDTO);
+            return UsualResult(user);
         }
 
         /// <summary>
@@ -104,10 +62,16 @@ namespace APM.Application.Controllers
         /// 获取当前已认证用户的信息
         /// </summary>
         [HttpGet, Route("[action]")]
-        public UsualApiData<User?> GetCurrentUser()
+        public UsualApiData<UserDTO?> GetCurrentUser()
         {
             var user = userRoleService.GetCurrentUser(UserToken);
             return UsualResult(user);
+        }
+
+        [HttpGet, Route("[action]")]
+        public UsualApiData<RoleDTO> GetRoles(int pageIndex, int pageSize, string sortField = "", bool sortDesc = false, string search = "")
+        {
+            return UsualResult(userRoleService.GetRoles(pageIndex, pageSize, sortField, sortDesc, search));
         }
 
     }

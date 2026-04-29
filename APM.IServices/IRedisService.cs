@@ -10,6 +10,8 @@ namespace APM.IServices
         public T? Get<T>(string key);
         public List<T>? GetList<T>(string key);
         void Set(string key, dynamic value, TimeSpan timeSpan);
+        public void Delete(string key);
+        public string AutoNumber(string entityName, string prefix, int digit = 4);
 
     }
 }

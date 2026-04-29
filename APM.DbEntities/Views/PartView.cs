@@ -10,7 +10,6 @@ namespace APM.DbEntities.Views
     public class PartView : BaseView
     {
         // 配件基础信息
-        public Guid Id { get; set; }
         public required string PartName { get; set; }
         public required string OECode { get; set; }
         public string? Model { get; set; }
@@ -19,8 +18,6 @@ namespace APM.DbEntities.Views
         public decimal SellingPrice { get; set; }
         public int MinStock { get; set; }
         public int MaxStock { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime ModifiedAt { get; set; }
 
         // 联查得到的名称（关键展示字段）
         public string? CategoryName { get; set; }

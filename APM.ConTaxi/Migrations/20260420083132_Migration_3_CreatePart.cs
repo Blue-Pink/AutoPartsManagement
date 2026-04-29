@@ -12,7 +12,7 @@ namespace APM.ConTaxi.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Category",
+                name: "PartCategory",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -27,7 +27,7 @@ namespace APM.ConTaxi.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Unit",
+                name: "PartUnit",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -65,13 +65,13 @@ namespace APM.ConTaxi.Migrations
                     table.ForeignKey(
                         name: "FK_Part_Category_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "Category",
+                        principalTable: "PartCategory",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Part_Unit_UnitId",
                         column: x => x.UnitId,
-                        principalTable: "Unit",
+                        principalTable: "PartUnit",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -100,10 +100,10 @@ namespace APM.ConTaxi.Migrations
                 name: "Part");
 
             migrationBuilder.DropTable(
-                name: "Category");
+                name: "PartCategory");
 
             migrationBuilder.DropTable(
-                name: "Unit");
+                name: "PartUnit");
         }
     }
 }

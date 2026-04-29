@@ -1,46 +1,30 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, reactive } from 'vue'
-import { ElMessage, ElMessageBox, ElLoading, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import PartService from '@/services/PartService'
-import type { Category, Part, PartView, Unit } from '@/interfaces/DTOEntities'
+import type { Category, Part, Unit } from '@/interfaces/DTOEntities'
 import UsualEntityService from '@/services/UsualEntityService'
 import type { UsualApiData } from '@/interfaces/HttpReponse'
+import { _initialPart } from '@/utils/initialEntity'
 
 const props = defineProps<{
   modelValue: boolean
-  part: PartView | null
+  part: Part | null
 }>()
-
 const emit = defineEmits(['update:modelValue', 'saved'])
-
 const visible = ref(props.modelValue)
 const userFormRef = ref<FormInstance>()
-const part = ref<Part>({
-  id: null,
-  model: null,
-  brand: null,
-  categoryId: null,
-  unitId: null,
-  costPrice: 0,
-  sellingPrice: 0,
-  minStock: 0,
-  maxStock: 0,
-  remark: null,
-  createdAt: null,
-  modifiedAt: null,
-  partName: null,
-  oeCode: null,
-} as Part)
+const part = ref<Part>({ ..._initialPart })
 const categories = ref<Category[]>([])
 const units = ref<Unit[]>([])
 const rules = reactive<FormRules>({
   partName: [
     { required: true, message: '请输入名称', trigger: 'blur' },
-    { min: 2, max: 100, message: '名称长度必须在 2-100 之间', trigger: 'blur' },
+    { min: 2, max: 50, message: '名称长度必须在 2-50 之间', trigger: 'blur' },
   ],
   oeCode: [
     { required: true, message: '请输入OE代码', trigger: 'blur' },
-    { min: 2, max: 100, message: 'OE代码长度必须在 2-100 之间', trigger: 'blur' },
+    { min: 2, max: 50, message: 'OE代码长度必须在 2-50 之间', trigger: 'blur' },
   ],
   model: [
     { required: true, message: '请输入型号', trigger: 'blur' },
@@ -58,60 +42,8 @@ const rules = reactive<FormRules>({
   maxStock: [{ required: true, message: '请输入最大库存', trigger: 'blur' }],
 })
 
-watch(
-  () => props.modelValue,
-  (val: boolean) => {
-    visible.value = val
-  },
-)
-
-watch(visible, (val: boolean) => {
-  emit('update:modelValue', val)
-})
-
-watch(
-  () => props.part,
-  (p: PartView | null) => {
-    if (p && p.id) {
-      UsualEntityService.Get<Part>('Part', p.id)
-        .then((res: UsualApiData<Part>) => {
-          if (res.stateCode && res.data) {
-            part.value = res.data as Part
-          } else {
-            ElMessage.error('加载配件数据失败')
-            console.error('加载配件数据失败', res.message)
-          }
-        })
-        .catch((error) => {
-          ElMessage.error('加载配件数据失败')
-          console.error('加载配件数据失败', error)
-        })
-    } else {
-      part.value = {
-        id: null,
-        model: null,
-        brand: null,
-        categoryId: null,
-        unitId: null,
-        costPrice: 0,
-        sellingPrice: 0,
-        minStock: 0,
-        maxStock: 0,
-        remark: null,
-        createdAt: null,
-        modifiedAt: null,
-        partName: null,
-        oeCode: null,
-      }
-    }
-  },
-  { immediate: true },
-)
-
 const loadOptions = async () => {
-  let loadingInst: any = null
   try {
-    loadingInst = ElLoading.service({ lock: true, text: '加载中...' })
     const c = await PartService.GetCategories()
     categories.value = c.dataList || []
     part.value.categoryId = part.value.categoryId || categories.value[0]?.id || null
@@ -120,55 +52,68 @@ const loadOptions = async () => {
     part.value.unitId = part.value.unitId || units.value[0]?.id || null
   } catch (e) {
     console.error(e)
-  } finally {
-    loadingInst && loadingInst.close && loadingInst.close()
   }
 }
 
-onMounted(() => {
-  loadOptions()
-})
-
-const close = () => {
-  emit('update:modelValue', false)
-}
+const close = () => emit('update:modelValue', false)
 
 const handleSave = async () => {
-  let loadingInst: any = null
   try {
     await userFormRef.value?.validate()
-    loadingInst = ElLoading.service({ lock: true, text: '保存中...' })
     await PartService.EditPart(part.value)
     ElMessage.success('保存成功')
     emit('saved')
-    part.value = {
-      id: null,
-      model: null,
-      brand: null,
-      categoryId: null,
-      unitId: null,
-      costPrice: 0,
-      sellingPrice: 0,
-      minStock: 0,
-      maxStock: 0,
-      remark: null,
-      createdAt: null,
-      modifiedAt: null,
-      partName: null,
-      oeCode: null,
-    }
     close()
   } catch (error) {
-    ElMessage.error('保存失败')
     console.error('EditPart failed', error)
-  } finally {
-    loadingInst && loadingInst.close && loadingInst.close()
   }
 }
+
+onMounted(loadOptions)
+
+watch(
+  () => props.modelValue,
+  (val: boolean) => {
+    visible.value = val
+  },
+)
+
+watch(visible, (val: boolean) => {
+  if (part.value && !part.value.id) {
+    part.value.categoryId = part.value.categoryId || categories.value[0]?.id || null
+    part.value.unitId = part.value.unitId || units.value[0]?.id || null
+  }
+  emit('update:modelValue', val)
+})
+
+watch(
+  () => props.part,
+  (p: Part | null) => {
+    if (p && p.id) {
+      UsualEntityService.Get<Part>('Part', p.id)
+        .then((res: UsualApiData<Part>) => {
+          if (res.data) {
+            part.value = res.data as Part
+          }
+        })
+        .catch((error) => {
+          console.error('加载配件数据失败', error)
+        })
+    } else {
+      part.value = { ..._initialPart }
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <el-dialog v-model="visible" title="配件编辑" width="35vw" @close="close">
+  <el-dialog
+    v-model="visible"
+    :title="part.id ? '配件编辑' : '配件新增'"
+    width="35vw"
+    @close="close"
+  >
     <el-form :model="part" :rules="rules" label-width="100px" ref="userFormRef">
       <el-form-item label="名称" prop="partName">
         <el-input v-model="part.partName" />
@@ -193,16 +138,16 @@ const handleSave = async () => {
         </el-select>
       </el-form-item>
       <el-form-item label="成本价">
-        <el-input-number v-model="part.costPrice" :min="0" />
+        <el-input-number v-model="part.costPrice" :min="0.01" />
       </el-form-item>
       <el-form-item label="售价">
-        <el-input-number v-model="part.sellingPrice" :min="0" />
+        <el-input-number v-model="part.sellingPrice" :min="0.01" />
       </el-form-item>
       <el-form-item label="最小库存">
-        <el-input-number v-model="part.minStock" :min="0" />
+        <el-input-number v-model="part.minStock" :min="1" />
       </el-form-item>
       <el-form-item label="最大库存">
-        <el-input-number v-model="part.maxStock" :min="0" />
+        <el-input-number v-model="part.maxStock" :min="1" />
       </el-form-item>
       <el-form-item label="备注">
         <el-input type="textarea" v-model="part.remark" />

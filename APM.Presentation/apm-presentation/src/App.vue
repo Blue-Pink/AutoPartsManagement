@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import UserRoleService from './services/UserRoleService'
+import UserService from './services/UserService'
 import router from './router'
 import { userAuthStore } from '@/stores/auth'
 import SideMenu from '@/components/side-menu/SideMenu.vue'
@@ -10,7 +10,7 @@ const userAuth = userAuthStore()
 
 onMounted(() => {
   const checkToken = () => {
-    UserRoleService.CheckUserToken()
+    UserService.CheckUserToken()
       .then((res) => {
         if (res.data) {
           //判断路由是否在login页面,跳转到首页
@@ -23,7 +23,6 @@ onMounted(() => {
         }
       })
       .catch(() => {
-        localStorage.removeItem('token')
         userAuth.setLoginState(false)
         router.push('/login')
       })
@@ -45,7 +44,6 @@ onMounted(() => {
       </el-aside>
       <el-container>
         <el-header class="app-header">
-          <div class="header-title"></div>
           <HeaderUser v-if="userAuth.loginState" />
         </el-header>
         <el-main class="app-main">
@@ -64,6 +62,7 @@ onMounted(() => {
   padding: 0 20px;
 }
 .el-main.app-main {
+  padding-top: 0;
   padding-bottom: 0;
 }
 </style>

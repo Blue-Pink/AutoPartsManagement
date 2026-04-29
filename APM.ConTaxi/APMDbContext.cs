@@ -9,7 +9,7 @@ using System.Text;
 
 namespace APM.ConTaxi
 {
-    internal class APMDbContext : DbContext
+    internal class APMDbContext(DbContextOptions options) : DbContext(options)
     {
 
         public DbSet<User> User { get; set; }
@@ -22,15 +22,22 @@ namespace APM.ConTaxi
 
         public DbSet<RolePermission> RolePermission { get; set; }
 
-        public DbSet<Category> Category { get; set; }
+        public DbSet<PartCategory> PartCategory { get; set; }
 
-        public DbSet<Unit> Unit { get; set; }
+        public DbSet<PartUnit> PartUnit { get; set; }
 
         public DbSet<Part> Part { get; set; }
 
         public DbSet<UserRoleView> UserRoleView { get; set; }
 
         public DbSet<PartView> PartView { get; set; }
+
+        public DbSet<Supplier> Supplier { get; set; }
+
+        public DbSet<InboundOrder> InboundOrder { get; set; }
+
+        public DbSet<InboundItem> InboundItem { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,19 +73,53 @@ namespace APM.ConTaxi
                 entity.Property(p => p.SellingPrice).HasPrecision(18, 2);
             });
 
+            modelBuilder.Entity<InboundOrder>(entity =>
+            {
+                entity.Property(i => i.TotalAmount).HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<InboundItem>(entity =>
+            {
+                entity.Property(i => i.Price).HasPrecision(18, 2);
+                entity.Property(i => i.TotalAmount).HasPrecision(18, 2);
+            });
             #endregion
 
             #region 关系
 
             modelBuilder.Entity<UserRole>()
-                .HasOne(user => user.User)
+                .HasOne(userRole => userRole.User)
                 .WithMany(userRole => userRole.UserRoles)
-                .HasForeignKey(user => user.UserId);
+                .HasForeignKey(userRole => userRole.UserId);
 
             modelBuilder.Entity<UserRole>()
                 .HasOne(user => user.Role)
                 .WithMany(r => r.UserRoles)
                 .HasForeignKey(user => user.RoleId);
+
+            modelBuilder.Entity<InboundItem>()
+                .HasOne(i => i.InboundOrder)
+                .WithMany(o => o.InboundItems)
+                .HasForeignKey(i => i.InboundOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<InboundOrder>()
+                .HasOne(o => o.Supplier)
+                .WithMany()
+                .HasForeignKey(o => o.SupplierId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InboundOrder>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InboundItem>()
+                .HasOne(i => i.Part)
+                .WithMany()
+                .HasForeignKey(i => i.PartId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #endregion
 
@@ -142,26 +183,6 @@ namespace APM.ConTaxi
             });
 
             #endregion
-
-            #region Migration Sql
-            //            migrationBuilder.Sql("DROP VIEW IF EXISTS vw_UserRoleView");
-            //            migrationBuilder.Sql(@"CREATE VIEW vw_UserRoleView AS
-            //SELECT 
-            //    u.Id AS UserId,
-            //    r.Id AS RoleId,
-            //    u.Username, 
-            //    u.Realname, 
-            //    r.RoleName, 
-            //    r.Description AS RoleDescription,
-            //    ur.AssignedAt
-            //FROM [User] u
-            //JOIN UserRole ur ON u.Id = ur.UserId
-            //JOIN Role r ON r.Id = ur.RoleId");
-            #endregion
-        }
-
-        public APMDbContext(DbContextOptions options) : base(options)
-        {
 
         }
     }

@@ -15,9 +15,9 @@ namespace APM.DbEntities
         public required string RoleName { get; set; }
 
         [StringLength(100), Description("角色描述")]
-        public required string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [JsonIgnore]
-        public virtual ICollection<UserRole>? UserRoles { get; set; } = new List<UserRole>();
+        public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

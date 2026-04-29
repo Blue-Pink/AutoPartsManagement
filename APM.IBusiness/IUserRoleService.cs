@@ -1,10 +1,10 @@
 ﻿using APM.DbEntities;
-using APM.Extensions.Interceptor;
+using APM.UtilEntities;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using APM.DbEntities.Views;
+using APM.DbEntities.DTOs;
 
 namespace APM.IBusiness
 {
@@ -16,20 +16,7 @@ namespace APM.IBusiness
         /// <param name="userId"></param>
         /// <param name="roles"></param>
         /// <returns></returns>
-        public IEnumerable<UserRole> AsignRolesForUser(Guid userId, IEnumerable<Guid> roles);
-
-        /// <summary>
-        /// 获取所有角色
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Role> GetAllRoles();
-
-        /// <summary>
-        /// 创建角色
-        /// </summary>
-        /// <param name="role"></param>
-        /// <returns></returns>
-        public Role CreateRole(Role role);
+        public void AsignRolesForUser(Guid userId, IEnumerable<Guid> roles);
 
         /// <summary>
         /// 验证用户身份
@@ -43,21 +30,7 @@ namespace APM.IBusiness
         /// 创建用户
         /// </summary>
         /// <returns></returns>
-        public User CreateUser(User user);
-
-        /// <summary>
-        /// 获取指定用户的角色信息
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public IEnumerable<UserRoleView> GetUserRoles(Guid userId);
-
-        /// <summary>
-        /// 获取所有用户的角色信息
-        /// </summary>
-        /// <returns></returns>
-        [APMExtensionInterceptor.Monitor]
-        public IEnumerable<UserRoleView> GetAllUserRole();
+        public UserDTO EditUser(UserDTO userDTO);
 
         /// <summary>
         /// 检查前端传入的 token 是否仍然有效（未过期且与服务器端 Redis 中保存的 token 一致）
@@ -66,6 +39,18 @@ namespace APM.IBusiness
         /// <returns></returns>
         public bool CheckUserToken(string token);
 
-        public User? GetCurrentUser(string token);
+        public UserDTO GetCurrentUser(string token);
+
+        public PagingData<UserDTO> GetUsers(int pageIndex, int pageSize, string sortField = "", bool sortDesc = false, string search = "");
+
+        public PagingData<RoleDTO> GetRoles(int pageIndex, int pageSize, string sortField = "", bool sortDesc = false,
+            string search = "");
+
+        /// <summary>
+        /// 用户名必填8-30位仅字母数字与-的组合,密码必填8-30位字母数字英文标点符的组合
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        public void MatchUserInfo(string username, string password);
     }
 }

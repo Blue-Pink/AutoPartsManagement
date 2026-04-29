@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import PartService from '@/services/PartService'
-import type { PartView } from '@/interfaces/DTOEntities'
-import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
+import type { Part } from '@/interfaces/DTOEntities'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { ConvertDateTime } from '@/utils/converter'
 import PartEdit from '@/components/part/PartEdit.vue'
+import UsualEntityService from '@/services/UsualEntityService'
+import { _initialPart } from '@/utils/initialEntity'
 
-const parts = ref<PartView[] | null>([])
+const parts = ref<Part[] | null>([])
 const pageIndex = ref(1)
 const pageSize = ref(25)
 const total = ref(0)
-const selectedParts = ref<PartView[]>([])
+const selectedParts = ref<Part[]>([])
 const editVisible = ref(false)
-const editingPart = ref<PartView | null>(null)
+const editingPart = ref<Part>({ ..._initialPart })
 const sortField = ref<string | null>(null)
 const sortDesc = ref<boolean>(false)
 
 const loadParts = async () => {
-  const loadingInst = ElLoading.service({ lock: true, text: '加载中...' })
   try {
     const res = await PartService.GetParts(
       pageIndex.value,
@@ -30,10 +31,7 @@ const loadParts = async () => {
       total.value = res.total || 0
     }
   } catch (error) {
-    ElMessage.error('加载配件列表失败')
     console.error('加载配件列表失败', error)
-  } finally {
-    loadingInst && loadingInst.close && loadingInst.close()
   }
 }
 
@@ -49,16 +47,16 @@ const handlePageSizeChange = (size: number) => {
 }
 
 const handleAddPart = () => {
-  editingPart.value = null
+  editingPart.value = { ..._initialPart }
   editVisible.value = true
 }
 
-const handleEditPart = (row: PartView) => {
+const handleEditPart = (row: Part) => {
   editingPart.value = { ...row }
   editVisible.value = true
 }
 
-const handleDeleteSingle = async (row: PartView) => {
+const handleDeleteSingle = async (row: Part) => {
   try {
     await ElMessageBox.confirm(`确定要删除配件 ${row.model} 吗？`, '警告', {
       confirmButtonText: '确定',
@@ -66,14 +64,9 @@ const handleDeleteSingle = async (row: PartView) => {
       type: 'warning',
     })
     const ids = [row.id!]
-    const loadingInst = ElLoading.service({ lock: true, text: '删除中...' })
-    try {
-      await PartService.DeleteParts(ids)
-      ElMessage.success('删除成功')
-      loadParts()
-    } finally {
-      loadingInst && loadingInst.close && loadingInst.close()
-    }
+    await UsualEntityService.Delete('Part', ids)
+    ElMessage.success('删除成功')
+    loadParts()
   } catch (error: any) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败')
@@ -100,15 +93,10 @@ const handleBatchDelete = async () => {
     )
 
     const ids = selectedParts.value.map((part) => part.id!)
-    const loadingInst = ElLoading.service({ lock: true, text: '删除中...' })
-    try {
-      await PartService.DeleteParts(ids)
-      ElMessage.success('删除成功')
-      selectedParts.value = []
-      loadParts()
-    } finally {
-      loadingInst && loadingInst.close && loadingInst.close()
-    }
+    await UsualEntityService.Delete('Part', ids)
+    ElMessage.success('删除成功')
+    selectedParts.value = []
+    loadParts()
   } catch (error: any) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败')
@@ -117,7 +105,7 @@ const handleBatchDelete = async () => {
   }
 }
 
-const handleSelectionChange = (selection: PartView[]) => {
+const handleSelectionChange = (selection: Part[]) => {
   selectedParts.value = selection
 }
 
@@ -147,10 +135,10 @@ watch([pageIndex, pageSize], loadParts)
 </script>
 
 <template>
-  <div class="part-container">
+  <div class="apm-container">
     <div class="toolbar">
       <div class="toolbar-left">
-        <h2>配件列表</h2>
+        <h2>配件管理</h2>
       </div>
       <div class="toolbar-right">
         <el-button type="primary" @click="handleAddPart">新增</el-button>
@@ -158,11 +146,9 @@ watch([pageIndex, pageSize], loadParts)
       </div>
     </div>
     <el-table
+      class="apm-table"
       :data="parts"
       stripe="true"
-      style="width: 100%"
-      height="82vh"
-      border="true"
       @selection-change="handleSelectionChange"
       @sort-change="handleSortChange"
     >
@@ -208,7 +194,6 @@ watch([pageIndex, pageSize], loadParts)
         </template>
       </el-table-column>
     </el-table>
-    <PartEdit v-model="editVisible" :part="editingPart" @saved="loadParts" />
 
     <div class="pagination">
       <el-pagination
@@ -221,38 +206,9 @@ watch([pageIndex, pageSize], loadParts)
         @page-size-change="handlePageSizeChange"
       />
     </div>
+
+    <PartEdit v-model="editVisible" :part="editingPart" @saved="loadParts" />
   </div>
 </template>
 
-<style scoped>
-.part-container {
-  box-shadow: var(--basic-box-shadow);
-  background-color: var(--basic-color-white);
-  padding: 20px;
-  border-radius: 4px;
-}
-
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.toolbar-left h2 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.toolbar-right {
-  display: flex;
-  gap: 10px;
-}
-
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-}
-</style>
+<style scoped></style>

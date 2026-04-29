@@ -6,7 +6,10 @@
     <el-menu default-active="1" class="side-menu-list" router="false" unique-opened>
       <el-menu-item index="/">首页</el-menu-item>
       <el-menu-item index="/Part">配件管理</el-menu-item>
+      <el-menu-item index="/Supplier">供应商管理</el-menu-item>
+      <el-menu-item index="/InboundOrder">入库单管理</el-menu-item>
       <el-menu-item index="/Orders">订单管理</el-menu-item>
+      <el-menu-item index="/User">用户管理</el-menu-item>
       <el-menu-item index="/Settings">系统设置</el-menu-item>
     </el-menu>
   </div>

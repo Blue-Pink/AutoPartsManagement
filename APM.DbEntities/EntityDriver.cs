@@ -18,9 +18,10 @@ namespace APM.DbEntities
             return _baseEntityChildren;
         }
 
-        public static Type GetType(string entityName)
+        public static Type? GetType(string entityName)
         {
-            return GetBasicEntityChildren().FirstOrDefault(kv => kv.Key.Equals(entityName, StringComparison.CurrentCultureIgnoreCase)).Value;
+            GetBasicEntityChildren().TryGetValue(entityName,out var type);
+            return type;
         }
 
     }

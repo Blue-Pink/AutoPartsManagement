@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import UserRoleService from '@/services/UserRoleService'
+import UserService from '@/services/UserService'
 import type { User } from '@/interfaces/DTOEntities'
 import { userAuthStore } from '@/stores/auth'
-import { ElMessage, ElLoading, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import router from '@/router'
 
 const userAuth = userAuthStore()
@@ -23,7 +23,7 @@ const rules = reactive<FormRules>({
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 8, max: 20, message: '密码长度必须在 8-20 之间', trigger: 'blur' },
+    { min: 8, max: 30, message: '密码长度必须在 8-30 之间', trigger: 'blur' },
     {
       pattern: /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+$/,
       message: '密码只能包含字母、数字和英文标点符号',
@@ -33,13 +33,12 @@ const rules = reactive<FormRules>({
 })
 
 const login = async (userForm: FormInstance | undefined) => {
-  const loadingInst = ElLoading.service({ lock: true, text: '登录中...' })
   if (!userForm) return
   await userForm.validate((valid, fields) => {
     if (valid) {
-      UserRoleService.UserLogin(user)
+      UserService.UserLogin(user)
         .then((res) => {
-          if (res.stateCode && res.data) {
+          if (res.data) {
             localStorage.setItem('token', res.data)
             userAuth.setLoginState(true)
             ElMessage({
@@ -49,18 +48,11 @@ const login = async (userForm: FormInstance | undefined) => {
             })
             router.push('/')
           } else {
-            ElMessage({
-              message: res.message || '登录失败',
-              type: 'error',
-              plain: true,
-            })
+            throw new Error('登录失败，未返回token')
           }
         })
         .catch((err) => {
           console.warn('登录失败:', err)
-        })
-        .finally(() => {
-          loadingInst && loadingInst.close && loadingInst.close()
         })
     } else {
       console.warn('表单验证失败:', fields)
@@ -92,7 +84,7 @@ const login = async (userForm: FormInstance | undefined) => {
   margin: 40px auto;
   background-color: var(--basic-color-white);
   padding: 50px;
-  border-radius: 10px;
+  border-radius: var(--basic-border-radius);
   margin-top: 10%;
   box-shadow: var(--basic-box-shadow);
 }

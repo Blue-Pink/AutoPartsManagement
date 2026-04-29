@@ -25,6 +25,6 @@ namespace APM.DbEntities
         public bool IsActive { get; set; } = true;
 
         [JsonIgnore]
-        public virtual ICollection<UserRole>? UserRoles { get; set; } = new List<UserRole>();
+        public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

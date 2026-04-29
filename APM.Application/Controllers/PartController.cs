@@ -17,12 +17,6 @@ namespace APM.Application.Controllers
             return UsualResult(partService.GetParts(pageIndex, pageSize, sortField, sortDesc));
         }
 
-        [HttpDelete, Route("[action]")]
-        public UsualApiData<int> DeleteParts(IEnumerable<Guid> ids)
-        {
-            return UsualResult(partService.DeleteParts(ids));
-        }
-
         /// <summary>
         /// 更新单个零件信息
         /// </summary>
@@ -40,7 +34,7 @@ namespace APM.Application.Controllers
         /// 获取所有分类
         /// </summary>
         [HttpGet, Route("[action]")]
-        public UsualApiData<Category> GetCategories()
+        public UsualApiData<PartCategory> GetCategories()
         {
             var categories = partService.GetCategories();
             return UsualResult(categories);
@@ -50,7 +44,7 @@ namespace APM.Application.Controllers
         /// 获取所有单位
         /// </summary>
         [HttpGet, Route("[action]")]
-        public UsualApiData<Unit> GetUnits()
+        public UsualApiData<PartUnit> GetUnits()
         {
             var units = partService.GetUnits();
             return UsualResult(units);

@@ -3,6 +3,9 @@ using APM.DbEntities;
 using APM.DbEntities.Base;
 using APM.UtilEntities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Reflection;
+using APM.DbEntities.DTOs;
 
 namespace APM.ConTaxi.Taxi
 {
@@ -17,9 +20,26 @@ namespace APM.ConTaxi.Taxi
 
             var type = EntityDriver.GetType(entityName);
 
+            if (type is null)
+                throw new APMException($"未找到实体 {entityName}");
+
             var entity = context.Find(type, id);
 
             return entity;
+        }
+
+        public int Delete(string entityName, IEnumerable<Guid> ids)
+        {
+            var type = EntityDriver.GetType(entityName);
+            if (type is null)
+                throw new APMException($"未找到实体 {entityName}");
+
+            var method = GetType().GetMethod(nameof(Delete), [ids.GetType()]);
+            if (method == null)
+                throw new APMException($"未找到方法 {nameof(Delete)}");
+            var genericMethod = method.MakeGenericMethod(type);
+            var result = genericMethod.Invoke(this, [ids]);
+            return result != null ? (int)result : 0;
         }
 
         public T? Get<T>(Guid id) where T : APMBaseEntity
@@ -29,51 +49,50 @@ namespace APM.ConTaxi.Taxi
             return context.Find<T>(id);
         }
 
-        public T? FirstOrDefault<T>(Func<T, bool>? where = null) where T : APMBaseEntity
+        public T? FirstOrDefault<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity
         {
             if (!UseAdministration)
                 permission.CheckPermission<T>(PermissionType.Read);
-            var query = context.Set<T>().AsEnumerable();
+            var query = context.Set<T>().AsQueryable();
             if (where != null)
-                query = query.Where(where).AsEnumerable();
+                query = query.Where(where).AsQueryable();
 
             return query.FirstOrDefault();
         }
 
-        public int Total<T>() where T : APMBaseEntity
+        public int Total<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity
         {
             if (!UseAdministration)
                 permission.CheckPermission<T>(PermissionType.Read);
 
-            return context.Set<T>().Count();
+            return where != null ? context.Set<T>().Where(where).Count() : context.Set<T>().Count();
         }
 
-        public IEnumerable<T> GetDataSetQuery<T>(
-            Func<T, bool>? where = null,
+        public IQueryable<T> GetDataSetQuery<T>(
+            Expression<Func<T, bool>>? where = null,
             int pageIndex = 1,
             int pageSize = 10,
             bool paging = true,
-            Func<T, object>? orderBy = null,
-            bool descending = false) where T : APMBaseEntity
+            Expression<Func<T, object?>>? orderBy = null,
+            bool descending = false,
+            Expression<Func<T, object?>>[]? includes = null) where T : APMBaseEntity
         {
             if (!UseAdministration)
                 permission.CheckPermission<T>(PermissionType.Read);
 
-            var query = context.Set<T>().AsEnumerable();
+            IQueryable<T> query = context.Set<T>();
+
+            if (includes != null)
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
 
             if (where != null)
-                query = query.Where(where).AsEnumerable();
+                query = query.Where(where);
 
             if (orderBy != null)
-                query = (descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy)).AsEnumerable();
+                query = (descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy)).AsQueryable();
             else
             {
-                //默认创建时间倒序
-                var createdAtProp = typeof(T).GetProperty("CreatedAt");
-                if (createdAtProp != null && createdAtProp.PropertyType == typeof(DateTime))
-                {
-                    query = query.OrderByDescending(x => (DateTime)createdAtProp.GetValue(x)!);
-                }
+                query = query.OrderByDescending(t => t.CreatedAt);
             }
 
             if (paging)
@@ -185,9 +204,9 @@ namespace APM.ConTaxi.Taxi
 
         public Dictionary<User, List<UserRole>> UserLogin(string username)
         {
-            var user = context.User.FirstOrDefault(u => u.Username == username);
+            var user = context.User.FirstOrDefault(u => u.Username == username && u.IsActive);
             if (user is null)
-                throw new APMException("用户名不存在或密码错误");
+                throw new APMException("用户名不存在或该用户已停用");
             var userRole = context.UserRole.Where(ur => ur.UserId == user.Id).ToList();
             if (!userRole.Any())
                 throw new APMException("请联系管理员设置该用户所属角色");
@@ -196,6 +215,32 @@ namespace APM.ConTaxi.Taxi
                 { user, userRole }
             };
             return dic;
+        }
+
+        public UserDTO GetCurrentUser(Guid userId)
+        {
+            var user = context.User.Find(userId);
+
+            if (user is null)
+                throw new APMException("未找到当前用户");
+
+            var roles = context.UserRole.Where(ur => ur.UserId == userId)
+                .Include(ur => ur.Role)
+                .Select(ur => new RoleDTO()
+                {
+
+                    RoleName = ur.Role == null ? "" : ur.Role.RoleName,
+                    Description = ur.Role == null ? "" : ur.Role.Description,
+                    Id = ur.RoleId
+                });
+            return new UserDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Realname = user.Realname,
+                Roles = roles
+            };
+
         }
 
         public T Create<T>(T entity) where T : BaseEntity
@@ -235,9 +280,9 @@ namespace APM.ConTaxi.Taxi
             return 0;
         }
 
-        public int Delete<T>(Func<T, bool> where) where T : BaseEntity
+        public int Delete<T>(Expression<Func<T, bool>>? where) where T : BaseEntity
         {
-            var entities = GetDataSetQuery(where);
+            var entities = GetDataSetQuery(where, paging: false);
             if (entities.Any())
                 return Transaction(entities, EntityState.Deleted);
             return 0;

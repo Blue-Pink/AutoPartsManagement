@@ -216,36 +216,34 @@ namespace APM.Extensions
 
         public static void CreateAdministratorPromission(this IApplicationBuilder app, IConfiguration configuration)
         {
-            if (bool.TryParse(configuration.GetSection("AdministratorPermissionInitail").Value, out var isInitial) && isInitial)
+            if (bool.TryParse(configuration.GetSection("AdministratorPermissionInitial").Value, out var isInitial) && isInitial)
             {
                 app.TaxiInvokeAdmin((taxi, _) =>
                 {
-                    var adminRole = taxi.FirstOrDefault<Role>(role => role.RoleName?.Equals("Administrator", StringComparison.CurrentCultureIgnoreCase) ?? false);
+                    var adminRole = taxi.FirstOrDefault<Role>(role => role.RoleName.ToLower() == "Administrator".ToLower());
                     //为初始管理员创建所有实体的权限
-                    if (adminRole != null)
+                    if (adminRole == null) return;
+                    //管理员现有权限
+                    var adminPermissionEntities = taxi.GetDataSetQuery<RolePermission>(rp => rp.RoleId == adminRole.Id, paging: false).Select(rp => rp.EntityId).ToList();
+                    //所有实体记录
+                    var entities = taxi.GetDataSetQuery<EntityRecord>(where: er => er.IsActive, paging: false).ToList();
+                    var updatePermissions = new List<RolePermission>();
+                    foreach (var entity in entities)
                     {
-                        //管理员现有权限
-                        var adminPermissionEntities = taxi.GetDataSetQuery<RolePermission>(rp => rp.RoleId == adminRole.Id, paging: false).Select(rp => rp.EntityId).ToList();
-                        //所有实体记录
-                        var entities = taxi.GetDataSetQuery<EntityRecord>(where: er => er.IsActive, paging: false).ToList();
-                        var updatePermissions = new List<RolePermission>();
-                        foreach (var entity in entities)
-                        {
-                            if (!adminPermissionEntities.Contains(entity.Id))
-                                updatePermissions.Add(new RolePermission
-                                {
-                                    RoleId = adminRole.Id,
-                                    EntityId = entity.Id,
-                                    CanCreate = true,
-                                    CanRead = true,
-                                    CanUpdate = true,
-                                    CanDelete = true,
-                                });
-                        }
-
-                        if (updatePermissions.Any())
-                            taxi.Transaction(updatePermissions, EntityState.Added);
+                        if (!adminPermissionEntities.Contains(entity.Id))
+                            updatePermissions.Add(new RolePermission
+                            {
+                                RoleId = adminRole.Id,
+                                EntityId = entity.Id,
+                                CanCreate = true,
+                                CanRead = true,
+                                CanUpdate = true,
+                                CanDelete = true,
+                            });
                     }
+
+                    if (updatePermissions.Any())
+                        taxi.Transaction(updatePermissions, EntityState.Added);
                 });
             }
         }
@@ -258,41 +256,41 @@ namespace APM.Extensions
                 var createCount = 250 - count;
                 var createLine = 250;
                 if (createCount < createLine) return;
-                //var categories = new List<Category>()
+                //var categories = new List<PartCategory>()
                 //{
-                //    new Category()
+                //    new PartCategory()
                 //    {
                 //        Name = "发动机系统",
                 //        Description = "发动机系统",
                 //    },
-                //    new Category()
+                //    new PartCategory()
                 //    {
                 //        Name = "制动系统",
                 //        Description = "制动系统",
                 //    },
-                //    new Category()
+                //    new PartCategory()
                 //    {
                 //        Name = "悬挂系统",
                 //        Description = "悬挂系统",
                 //    },
-                //    new Category()
+                //    new PartCategory()
                 //    {
                 //        Name = "外饰",
                 //        Description = "外饰",
                 //    },
 
                 //};
-                //var units = new List<Unit>()
+                //var units = new List<PartUnit>()
                 //{
-                //    new Unit()
+                //    new PartUnit()
                 //    {
                 //        Name = "个",
                 //    },
-                //    new Unit()
+                //    new PartUnit()
                 //    {
                 //        Name = "片",
                 //    },
-                //    new Unit()
+                //    new PartUnit()
                 //    {
                 //        Name = "台",
                 //    },
@@ -300,8 +298,8 @@ namespace APM.Extensions
                 //taxi.Transaction(categories, EntityState.Added);
                 //taxi.Transaction(units, EntityState.Added);
 
-                var categories = taxi.GetDataSetQuery<Category>(paging: false).ToList();
-                var units = taxi.GetDataSetQuery<Unit>(paging: false).ToList();
+                var categories = taxi.GetDataSetQuery<PartCategory>(paging: false).ToList();
+                var units = taxi.GetDataSetQuery<PartUnit>(paging: false).ToList();
 
                 if (!categories.Any() || !units.Any()) return;
 
@@ -337,6 +335,27 @@ namespace APM.Extensions
             {
                 var permissions = taxi.GetDataSetQuery<RolePermission>(paging: false).Select(rp => new { rp.RoleId, rp.EntityId, rp.CanRead, rp.CanCreate, rp.CanUpdate, rp.CanDelete }).ToList();
                 redis?.Set(ConstDictionary.RedisCacheRolePermission, permissions, TimeSpan.FromDays(365));
+            });
+        }
+
+        public static void CreateSuppliers(this IApplicationBuilder app)
+        {
+            app.TaxiInvokeAdmin((taxi, _) =>
+            {
+                var count = taxi.Total<Supplier>();
+                var createCount = 20 - count;
+                if (createCount <= 0) return;
+
+                var supplierFaker = new Bogus.Faker<Supplier>("zh_CN")
+                    .RuleFor(s => s.Id, f => Guid.NewGuid())
+                    .RuleFor(s => s.Name, f => f.Company.CompanyName())
+                    .RuleFor(s => s.Contact, f => f.Name.FullName())
+                    .RuleFor(s => s.Phone, f => f.Phone.PhoneNumber("1##########"))
+                    .RuleFor(s => s.Address, f => f.Address.FullAddress())
+                    .RuleFor(s => s.CreatedAt, f => f.Date.Past(1));
+
+                var suppliers = supplierFaker.Generate((int)createCount);
+                taxi.Transaction(suppliers, EntityState.Added);
             });
         }
     }

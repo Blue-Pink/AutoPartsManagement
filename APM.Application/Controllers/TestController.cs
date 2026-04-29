@@ -1,6 +1,5 @@
 ﻿using APM.ConTaxi.Taxi;
 using APM.DbEntities;
-using APM.IServices;
 using APM.Services;
 using APM.UtilEntities;
 using Bogus;
@@ -13,7 +12,6 @@ namespace APM.Application.Controllers
 {
     [ApiController, Route("api/[controller]"), AllowAnonymous]
     public class TestController(
-        IJsonWebTokenService tokenService,
         IConTaxiService taxi,
         IHttpContextAccessor httpContextAccessor)
         : APMController
@@ -27,44 +25,44 @@ namespace APM.Application.Controllers
             //return BCrypt.Net.BCrypt.HashPassword(@$"Administrator@01", BCrypt.Net.BCrypt.GenerateSalt());
         }
 
-        [HttpGet, Route("[action]"), Authorize(AuthenticationSchemes = ConstDictionary.Bearer)]
+        [HttpGet, Route("[action]")]
         public UsualApiData<Part?> Test1()
         {
-            //var categories = new List<Category>()
+            //var categories = new List<PartCategory>()
             //{
-            //    new Category()
+            //    new PartCategory()
             //    {
             //        Name = "发动机系统",
             //        Description = "发动机系统",
             //    },
-            //    new Category()
+            //    new PartCategory()
             //    {
             //        Name = "制动系统",
             //        Description = "制动系统",
             //    },
-            //    new Category()
+            //    new PartCategory()
             //    {
             //        Name = "悬挂系统",
             //        Description = "悬挂系统",
             //    },
-            //    new Category()
+            //    new PartCategory()
             //    {
             //        Name = "外饰",
             //        Description = "外饰",
             //    },
 
             //};
-            //var units = new List<Unit>()
+            //var units = new List<PartUnit>()
             //{
-            //    new Unit()
+            //    new PartUnit()
             //    {
             //        Name = "个",
             //    },
-            //    new Unit()
+            //    new PartUnit()
             //    {
             //        Name = "片",
             //    },
-            //    new Unit()
+            //    new PartUnit()
             //    {
             //        Name = "台",
             //    },
@@ -72,8 +70,8 @@ namespace APM.Application.Controllers
             //taxi.Transaction(categories, EntityState.Added);
             //taxi.Transaction(units, EntityState.Added);
 
-            var categories = taxi.GetDataSetQuery<Category>(paging: false).ToList();
-            var units = taxi.GetDataSetQuery<Unit>(paging: false).ToList();
+            var categories = taxi.GetDataSetQuery<PartCategory>(paging: false).ToList();
+            var units = taxi.GetDataSetQuery<PartUnit>(paging: false).ToList();
 
             // 2. 定义配件名称的随机池，让数据看起来更像汽配
             var partNames = new[] { "滤清器", "制动片", "火花塞", "减震器", "雨刮片", "蓄电池", "正时皮带", "控制臂", "点火线圈", "发电机" };

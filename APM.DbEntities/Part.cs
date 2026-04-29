@@ -25,16 +25,14 @@ namespace APM.DbEntities
         [Description("分类 Id")]
         public Guid CategoryId { get; set; }
 
-        [Description("分类")]
-        [JsonIgnore]
-        public virtual Category? Category { get; set; }
+        [Description("分类"), JsonIgnore]
+        public virtual PartCategory? Category { get; set; }
 
         [Description("单位 Id")]
         public Guid UnitId { get; set; }
 
-        [Description("单位")]
-        [JsonIgnore]
-        public virtual Unit? Unit { get; set; }
+        [Description("单位"), JsonIgnore]
+        public virtual PartUnit? Unit { get; set; }
 
         [Description("参考进价")]
         public decimal CostPrice { get; set; }

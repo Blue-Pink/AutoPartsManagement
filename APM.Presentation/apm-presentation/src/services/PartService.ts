@@ -1,17 +1,13 @@
-import type { Category, Part, PartView, Unit } from "@/interfaces/DTOEntities";
-import $ from "../utils/request";
+import type { Category, Part, Unit } from "@/interfaces/DTOEntities";
+import $ from "../utils/requestor";
 import type { UsualApiData } from "@/interfaces/HttpReponse";
 
 class PartService {
-    GetParts(pageIndex: number, pageSize: number, sortField?: string, sortDesc: boolean = false): Promise<UsualApiData<PartView>> {
+    GetParts(pageIndex: number, pageSize: number, sortField?: string, sortDesc: boolean = false): Promise<UsualApiData<Part>> {
         let url = `Part/GetParts?pageIndex=${pageIndex}&pageSize=${pageSize}`;
         if (sortField) url += `&sortField=${encodeURIComponent(sortField)}`;
         url += `&sortDesc=${sortDesc}`;
         return $.get(url);
-    }
-
-    DeleteParts(ids: string[]): Promise<UsualApiData<number>> {
-        return $.delete("Part/DeleteParts", { data: ids });
     }
 
     EditPart(part: Part | undefined): Promise<UsualApiData<Part>> {

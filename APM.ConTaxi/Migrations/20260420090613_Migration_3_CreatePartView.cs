@@ -29,8 +29,8 @@ namespace APM.ConTaxi.Migrations
             c.Name AS CategoryName,
             u.Name AS UnitName
         FROM Part p
-        LEFT JOIN Category c ON p.CategoryId = c.Id
-        LEFT JOIN Unit u ON p.UnitId = u.Id
+        LEFT JOIN PartCategory c ON p.CategoryId = c.Id
+        LEFT JOIN PartUnit u ON p.UnitId = u.Id
     ");
         }
 

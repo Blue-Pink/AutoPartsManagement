@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace APM.Services
 {
@@ -136,6 +137,36 @@ namespace APM.Services
             db.Ping();
             if (value != null)
                 _redisConnectionMultiplexer.GetDatabase().StringSet(key, JsonSerializer.SerializeToUtf8Bytes(value, JsonOptions), timeSpan);
+        }
+
+        public void Delete(string key)
+        {
+            var db = _redisConnectionMultiplexer.GetDatabase();
+            db.KeyDelete(key);
+        }
+
+        public string AutoNumber(string entityName, string prefix, int digit = 4)
+        {
+            var db = _redisConnectionMultiplexer.GetDatabase();
+            // 1. 生成基于日期的 Key，例如 "AutoNumber:InboundOrder:20260428"
+            // 这样做的好处是：第二天日期变了，Key 自动变，计数器自动从 1 开始
+            string date = DateTime.UtcNow.AddHours(8).ToString("yyyyMMdd");
+            string key = $"AutoNumber:{entityName}:{date}";
+
+            // 2. 执行原子自增
+            // 如果 Key 不存在，Redis 会先创建并设为 0，然后加 1，返回 1
+            long count = db.StringIncrement(key);
+
+            // 3. 设置过期时间（可选，建议设置 24 小时以上，防止占用内存）
+            if (count == 1)
+            {
+                db.KeyExpire(key, TimeSpan.FromHours(25));
+            }
+
+            // 4. 格式化输出。D4 代表不足4位补0，例如 1 变成 0001
+            string sequence = count.ToString($"D{digit}");
+
+            return $"{prefix}{date}{sequence}";
         }
     }
 }
