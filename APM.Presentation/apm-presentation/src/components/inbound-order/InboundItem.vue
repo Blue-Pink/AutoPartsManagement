@@ -16,7 +16,11 @@ const editing = ref<InboundItem | null>(null)
 const load = async () => {
   if (!props.orderId) return
   try {
-    const res = await InboundOrderService.GetInboundItems(props.orderId)
+    const res = await UsualEntityService.GetChildrenDataSetQuery(
+      'InboundOrder',
+      'InboundItem',
+      props.orderId,
+    )
     items.value = res.dataList || []
   } catch (e) {
     console.error(e)
@@ -74,7 +78,7 @@ watch(
       <el-button type="primary" @click="handleAdd">添加明细</el-button>
     </div>
     <el-table :data="items" class="apm-table">
-      <el-table-column prop="part?.partName" label="配件" />
+      <el-table-column prop="partId" label="配件" />
       <el-table-column prop="quantity" label="数量" />
       <el-table-column prop="price" label="单价" />
       <el-table-column prop="totalAmount" label="合计" />

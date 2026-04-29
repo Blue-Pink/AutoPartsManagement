@@ -1,4 +1,5 @@
-﻿using APM.IBusiness;
+﻿using System.Text.Json;
+using APM.IBusiness;
 using APM.IServices;
 using APM.UtilEntities;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +24,19 @@ namespace APM.Application.Controllers
         public UsualApiData<int> Delete(string entityName, IEnumerable<Guid> ids)
         {
             return UsualResult(usualEntity.Delete(entityName, ids));
+        }
+
+        [HttpGet, Route("[action]/{parentEntityName}/{childEntityName}/{parentId}")]
+        public UsualApiData<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName,
+            Guid parentId)
+        {
+            return UsualResult(usualEntity.GetChildrenDataSetQuery(parentEntityName, childEntityName, parentId).AsEnumerable());
+        }
+
+        [HttpPost, Route("[action]/{entityName}")]
+        public UsualApiData<object?> Create(string entityName, [FromBody] JsonElement entity)
+        {
+            return UsualResult(usualEntity.Create(entityName, entity));
         }
 
         [HttpGet, Route("[action]")]

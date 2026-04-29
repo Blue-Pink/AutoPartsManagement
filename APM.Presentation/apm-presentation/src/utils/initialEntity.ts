@@ -6,9 +6,9 @@ import type { BaseEntity, InboundItem, InboundOrder, Part, Supplier, User } from
  */
 export function createDefaultEntity<T extends BaseEntity>(overrides?: Partial<T>): T {
     const base: BaseEntity = {
-        id: null,
-        createdAt: null,
-        modifiedAt: null,
+        id: "00000000-0000-0000-0000-000000000000",
+        createdAt: "2026-04-29 12:23:04",
+        modifiedAt: "2026-04-29 12:23:04",
     };
     return { ...base, ...(overrides || {}) } as T;
 }
@@ -53,9 +53,6 @@ export const _initialUser = {
 
 export const _initialInboundOrder = {
     ...createDefaultEntity<InboundOrder>({
-        id: null,
-        createdAt: null,
-        modifiedAt: null,
         orderNo: null,
         supplierId: null,
         totalAmount: 0,
@@ -66,9 +63,6 @@ export const _initialInboundOrder = {
 
 export const _initialInboundItem = {
     ...createDefaultEntity<InboundItem>({
-        id: null,
-        createdAt: null,
-        modifiedAt: null,
         inboundOrderId: null,
         partId: null,
         quantity: 0,

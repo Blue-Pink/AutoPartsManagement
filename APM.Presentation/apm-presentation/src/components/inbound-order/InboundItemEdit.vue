@@ -5,6 +5,7 @@ import InboundOrderService from '@/services/InboundOrderService'
 import PartService from '@/services/PartService'
 import type { InboundItem } from '@/interfaces/DTOEntities'
 import { _initialInboundItem } from '@/utils/initialEntity'
+import UsualEntityService from '@/services/UsualEntityService'
 
 const props = defineProps<{
   modelValue: boolean
@@ -36,7 +37,7 @@ const handleSave = async () => {
     await formRef.value?.validate?.()
     item.value.inboundOrderId = props.orderId || item.value.inboundOrderId
     item.value.totalAmount = (item.value.quantity || 0) * (item.value.price || 0)
-    await InboundOrderService.EditInboundItem(item.value)
+    await UsualEntityService.Create('InboundItem', item.value)
     ElMessage.success('保存成功')
     emit('saved')
     close()

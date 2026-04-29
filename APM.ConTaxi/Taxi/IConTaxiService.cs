@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.Json;
 using APM.DbEntities.DTOs;
 
 namespace APM.ConTaxi.Taxi
@@ -38,5 +39,8 @@ namespace APM.ConTaxi.Taxi
         public int Delete<T>(IEnumerable<Guid> ids) where T : BaseEntity;
         public int Delete<T>(Expression<Func<T, bool>>? where) where T : BaseEntity;
         public UserDTO GetCurrentUser(Guid userId);
+        public List<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName, Guid parentId);
+
+        public object Create(string entityName, JsonElement entity);
     }
 }

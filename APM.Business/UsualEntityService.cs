@@ -1,9 +1,11 @@
 ﻿using APM.ConTaxi.Taxi;
 using APM.IBusiness;
 using APM.IServices;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace APM.Business
 {
@@ -22,6 +24,16 @@ namespace APM.Business
         public int Delete(string entityName, IEnumerable<Guid> ids)
         {
             return !ids.Any() ? 0 : taxi.Delete(entityName, ids);
+        }
+
+        public List<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName, Guid parentId)
+        {
+            return taxi.GetChildrenDataSetQuery(parentEntityName, childEntityName, parentId);
+        }
+
+        public object Create(string entityName, JsonElement entity)
+        {
+            return taxi.Create(entityName, entity);
         }
     }
 }
