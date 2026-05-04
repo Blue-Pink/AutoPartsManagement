@@ -9,7 +9,7 @@ const loadingInst = ref({} as ReturnType<typeof ElLoading.service>);
 const service: AxiosInstance = axios.create({
     // 根据你后端 .NET 项目的启动端口修改
     baseURL: 'https://172.23.99.139:8081/api/',
-    timeout: 10000,
+    timeout: 60000,
     headers: {
         'Content-Type': 'application/json'
     }

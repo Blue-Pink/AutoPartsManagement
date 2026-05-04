@@ -1,4 +1,5 @@
 import type { BaseEntity, InboundItem, InboundOrder, Part, Supplier, User } from "../interfaces/DTOEntities";
+import { ConstDictionary } from "./const-dictionary";
 
 /**
  * 创建一个继承自 BaseEntity 的默认对象，可传入泛型以获得精确类型提示。
@@ -6,9 +7,9 @@ import type { BaseEntity, InboundItem, InboundOrder, Part, Supplier, User } from
  */
 export function createDefaultEntity<T extends BaseEntity>(overrides?: Partial<T>): T {
     const base: BaseEntity = {
-        id: "00000000-0000-0000-0000-000000000000",
-        createdAt: "2026-04-29 12:23:04",
-        modifiedAt: "2026-04-29 12:23:04",
+        id: ConstDictionary.EMPTY_GUID,
+        createdAt: ConstDictionary.CURRENT_DATETIME,
+        modifiedAt: ConstDictionary.CURRENT_DATETIME,
     };
     return { ...base, ...(overrides || {}) } as T;
 }

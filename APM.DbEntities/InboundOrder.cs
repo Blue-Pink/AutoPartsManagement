@@ -17,9 +17,6 @@ namespace APM.DbEntities
         public virtual Supplier? Supplier { get; set; }
         [Description("总金额")]
         public decimal TotalAmount { get; set; }
-        [Description("经办人")]
-        public Guid OperatorUserId { get; set; }
-        public virtual User? OperatorUser { get; set; }
         [Description("备注")]
         public string? Remark { get; set; }
         [JsonIgnore]

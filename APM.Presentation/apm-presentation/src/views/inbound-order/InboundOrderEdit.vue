@@ -9,10 +9,12 @@ import InboundItem from '@/components/inbound-order/InboundItem.vue'
 import UsualEntityService from '@/services/UsualEntityService'
 import { _initialInboundOrder } from '@/utils/initialEntity'
 import UserService from '@/services/UserService'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const route = useRoute()
 const router = useRouter()
 const id = route.params.id as string | undefined
+const emit = defineEmits(['saved'])
 
 const order = ref<InboundOrder>({ ..._initialInboundOrder })
 const suppliers = ref<Supplier[]>([])
@@ -27,9 +29,15 @@ const loadOptions = async () => {
   }
 }
 
-const loadOrder = async () => {
-  if (!id) {
-    //新建时调用自动编号
+const load = async () => {
+  if (id && id !== ConstDictionary.EMPTY_GUID) {
+    try {
+      const res = await UsualEntityService.Get<InboundOrder>('InboundOrder', id)
+      if (res.stateCode && res.data) order.value = res.data as InboundOrder
+    } catch (e) {
+      console.error(e)
+    }
+  } else {
     try {
       const orderNoRes = await UsualEntityService.AutoNumber('InboundOrder', 'RKD')
       const UserRes = await UserService.GetCurrentUser()
@@ -41,35 +49,34 @@ const loadOrder = async () => {
     } catch (e) {
       console.error(e)
     }
-  } else
-    try {
-      const res = await UsualEntityService.Get<InboundOrder>('InboundOrder', id)
-      if (res.stateCode && res.data) order.value = res.data as InboundOrder
-    } catch (e) {
-      console.error(e)
-    }
+  }
 }
 
 const handleSave = async () => {
   try {
     await formRef.value?.validate?.()
-    await InboundOrderService.EditInboundOrder(order.value)
+    await UsualEntityService.Edit<InboundOrder>('InboundOrder', order.value)
+    await load()
     ElMessage.success('保存成功')
-    router.back()
   } catch (e) {
     console.error(e)
   }
 }
 
+const handleSaved = async () => {
+  emit('saved')
+  await load()
+}
+
 onMounted(async () => {
   await loadOptions()
-  await loadOrder()
+  await load()
 })
 
 watch(
   () => route.params.id,
   async () => {
-    await loadOrder()
+    await load()
   },
 )
 </script>
@@ -112,12 +119,12 @@ watch(
       </el-form>
 
       <div class="button-group">
-        <el-button type="primary" size="normal" @click="handleSave">保存</el-button>
-        <el-button type="normal" size="normal" @click="router.back">返回</el-button>
+        <el-button type="primary" @click="handleSave">保存</el-button>
+        <el-button @click="router.back">返回</el-button>
       </div>
     </div>
     <div class="apm-container">
-      <InboundItem :orderId="order.id" />
+      <InboundItem :orderId="order.id" @saved="handleSaved" />
     </div>
   </div>
 </template>

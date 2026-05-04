@@ -9,7 +9,7 @@ namespace APM.Extensions.Interceptor
     public class APMExtensionInterceptor : StandardInterceptor
     {
         private static ILogger<APMExtensionInterceptor>? _logger;
-        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
             WriteIndented = false
@@ -116,7 +116,7 @@ namespace APM.Extensions.Interceptor
             if (args == null || args.Length == 0) return "[]";
             try
             {
-                return JsonSerializer.Serialize(args, _jsonOptions);
+                return JsonSerializer.Serialize(args, JsonOptions);
             }
             catch
             {
@@ -136,7 +136,7 @@ namespace APM.Extensions.Interceptor
             if (returnValue == null) return "null";
             try
             {
-                return JsonSerializer.Serialize(returnValue, _jsonOptions);
+                return JsonSerializer.Serialize(returnValue, JsonOptions);
             }
             catch
             {

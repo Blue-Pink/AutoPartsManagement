@@ -252,7 +252,7 @@ namespace APM.Extensions
         {
             app.TaxiInvokeAdmin((taxi, _) =>
             {
-                var count = taxi.Total<Part>();
+                var count = taxi.Count<Part>();
                 var createCount = 250 - count;
                 var createLine = 250;
                 if (createCount < createLine) return;
@@ -342,7 +342,7 @@ namespace APM.Extensions
         {
             app.TaxiInvokeAdmin((taxi, _) =>
             {
-                var count = taxi.Total<Supplier>();
+                var count = taxi.Count<Supplier>();
                 var createCount = 20 - count;
                 if (createCount <= 0) return;
 

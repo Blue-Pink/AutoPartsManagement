@@ -34,9 +34,9 @@ namespace APM.Application.Controllers
         }
 
         [HttpPost, Route("[action]/{entityName}")]
-        public UsualApiData<object?> Create(string entityName, [FromBody] JsonElement entity)
+        public UsualApiData<object?> Edit(string entityName, [FromBody] JsonElement entity)
         {
-            return UsualResult(usualEntity.Create(entityName, entity));
+            return UsualResult(usualEntity.Edit(entityName, entity));
         }
 
         [HttpGet, Route("[action]")]

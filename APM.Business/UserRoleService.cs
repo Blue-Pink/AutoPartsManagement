@@ -145,7 +145,7 @@ public partial class UserRoleService(
             CreatedAt = r.CreatedAt,
             ModifiedAt = r.ModifiedAt,
         }).ToList();
-        var total = taxi.Total<Role>();
+        var total = taxi.Count<Role>();
         return new PagingData<RoleDTO>(roles, total, pageIndex, pageSize);
     }
 
@@ -180,7 +180,7 @@ public partial class UserRoleService(
         Expression<Func<User, bool>> where = !string.IsNullOrEmpty(search)
             ? u => u.IsActive && (u.Username.Contains(search) || u.Realname.Contains(search))
             : u => u.IsActive;
-        var total = taxi.Total(where);
+        var total = taxi.Count(where);
         var users = taxi.GetDataSetQuery(where: where, pageIndex, pageSize)
             .Include(u => u.UserRoles!)
             .ThenInclude(ur => ur.Role)

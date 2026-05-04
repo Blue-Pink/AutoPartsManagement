@@ -3,7 +3,7 @@
 <template>
   <div class="side-menu">
     <div class="menu-title">APM 汽车配件管理系统</div>
-    <el-menu default-active="1" class="side-menu-list" router="false" unique-opened>
+    <el-menu default-active="1" class="side-menu-list" router>
       <el-menu-item index="/">首页</el-menu-item>
       <el-menu-item index="/Part">配件管理</el-menu-item>
       <el-menu-item index="/Supplier">供应商管理</el-menu-item>

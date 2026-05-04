@@ -14,7 +14,7 @@ namespace APM.Business
         public PagingData<Supplier> GetSuppliers(int pageIndex = 1, int pageSize = 10)
         {
             var list = taxi.GetDataSetQuery<Supplier>(pageIndex: pageIndex, pageSize: pageSize).ToList();
-            var total = taxi.Total<Supplier>();
+            var total = taxi.Count<Supplier>();
             return new PagingData<Supplier>(list, total, pageIndex, pageSize);
         }
 

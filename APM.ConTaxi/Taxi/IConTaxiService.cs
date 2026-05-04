@@ -17,7 +17,7 @@ namespace APM.ConTaxi.Taxi
         public int Delete(string entityName, IEnumerable<Guid> ids);
         public T? Get<T>(Guid id) where T : APMBaseEntity;
         public T? FirstOrDefault<T>(Expression<Func<T, bool>>? selector = null) where T : APMBaseEntity;
-        public int Total<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity;
+        public int Count<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity;
 
         public IQueryable<T> GetDataSetQuery<T>(
             Expression<Func<T, bool>>? where = null,
@@ -40,7 +40,6 @@ namespace APM.ConTaxi.Taxi
         public int Delete<T>(Expression<Func<T, bool>>? where) where T : BaseEntity;
         public UserDTO GetCurrentUser(Guid userId);
         public List<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName, Guid parentId);
-
-        public object Create(string entityName, JsonElement entity);
+        public object Edit(string entityName, JsonElement entity);
     }
 }

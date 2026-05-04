@@ -6,6 +6,7 @@ import type { Category, Part, Unit } from '@/interfaces/DTOEntities'
 import UsualEntityService from '@/services/UsualEntityService'
 import type { UsualApiData } from '@/interfaces/HttpReponse'
 import { _initialPart } from '@/utils/initialEntity'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const props = defineProps<{
   modelValue: boolean
@@ -13,7 +14,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits(['update:modelValue', 'saved'])
 const visible = ref(props.modelValue)
-const userFormRef = ref<FormInstance>()
+const formRef = ref<FormInstance>()
 const part = ref<Part>({ ..._initialPart })
 const categories = ref<Category[]>([])
 const units = ref<Unit[]>([])
@@ -55,11 +56,14 @@ const loadOptions = async () => {
   }
 }
 
-const close = () => emit('update:modelValue', false)
+const close = () => {
+  formRef.value?.clearValidate()
+  emit('update:modelValue', false)
+}
 
 const handleSave = async () => {
   try {
-    await userFormRef.value?.validate()
+    await formRef.value?.validate()
     await PartService.EditPart(part.value)
     ElMessage.success('保存成功')
     emit('saved')
@@ -89,7 +93,7 @@ watch(visible, (val: boolean) => {
 watch(
   () => props.part,
   (p: Part | null) => {
-    if (p && p.id) {
+    if (p && p.id && p.id != ConstDictionary.EMPTY_GUID) {
       UsualEntityService.Get<Part>('Part', p.id)
         .then((res: UsualApiData<Part>) => {
           if (res.data) {
@@ -114,7 +118,7 @@ watch(
     width="35vw"
     @close="close"
   >
-    <el-form :model="part" :rules="rules" label-width="100px" ref="userFormRef">
+    <el-form :model="part" :rules="rules" label-width="100px" ref="formRef">
       <el-form-item label="名称" prop="partName">
         <el-input v-model="part.partName" />
       </el-form-item>

@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\APM.ConTaxi\APM.ConTaxi.csproj" />
+    <ProjectReference Include="..\APM.DbEntities\APM.DbEntities.csproj" />
     <ProjectReference Include="..\APM.UtilEntities\APM.UtilEntities.csproj" />
   </ItemGroup>
 

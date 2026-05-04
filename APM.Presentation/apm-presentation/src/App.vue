@@ -19,12 +19,12 @@ onMounted(() => {
         } else {
           localStorage.removeItem('token')
           userAuth.setLoginState(false)
-          router.push('/login')
+          // router.push('/login')
         }
       })
       .catch(() => {
         userAuth.setLoginState(false)
-        router.push('/login')
+        // router.push('/login')
       })
   }
 

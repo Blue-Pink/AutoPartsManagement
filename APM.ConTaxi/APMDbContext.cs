@@ -87,6 +87,72 @@ namespace APM.ConTaxi
 
             #region 关系
 
+            modelBuilder.Entity<User>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Role>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserRole>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<EntityRecord>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PartCategory>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PartUnit>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Part>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Supplier>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InboundOrder>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InboundItem>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<UserRole>()
                 .HasOne(userRole => userRole.User)
                 .WithMany(userRole => userRole.UserRoles)

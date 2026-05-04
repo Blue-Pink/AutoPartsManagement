@@ -1,28 +1,46 @@
 import $ from '@/utils/requestor';
 import type { UsualApiData } from '@/interfaces/HttpReponse';
+import { ConstDictionary } from '@/utils/const-dictionary';
+import type { BaseEntity } from '@/interfaces/DTOEntities';
 
 class UsualEntityService {
     Get<T>(entityName: string, id: string): Promise<UsualApiData<T>> {
-        return $.get(`Entity/Get/${entityName}/${id}`);
+        if (entityName && id && id !== ConstDictionary.EMPTY_GUID) {
+            return $.get(`Entity/Get/${entityName}/${id}`);
+        }
+        throw new Error(`Get 需要有效的 entityName,id 参数，不能是空或全零 GUID`);
     }
 
     AutoNumber(entityName: string, prefix: string, digits: number = 4): Promise<UsualApiData<string>> {
-        return $.get(`Entity/AutoNumber?entityName=${encodeURIComponent(entityName)}&prefix=${encodeURIComponent(prefix)}&digits=${digits}`);
+        if (entityName && prefix && digits > 0) {
+            return $.get(`Entity/AutoNumber?entityName=${encodeURIComponent(entityName)}&prefix=${encodeURIComponent(prefix)}&digits=${digits}`);
+        }
+        throw new Error(`AutoNumber 需要有效的 entityName, prefix, digits 参数，不能是空或无效值`);
     }
 
     Delete(entityName: string, ids: string[]): Promise<UsualApiData<number>> {
-        return $.delete(`Entity/Delete/${entityName}`, { data: ids });
+        if (entityName && ids && ids.length > 0) {
+            return $.delete(`Entity/Delete/${entityName}`, { data: ids });
+        }
+        throw new Error(`Delete 需要有效的 entityName 和 ids 参数，ids 不能为空数组`);
     }
 
-    Create(entityName: string, entity: any): Promise<UsualApiData<any>> {
-        return $.post(`Entity/Create/${entityName}`, entity);
+    Edit<T>(entityName: string, entity: BaseEntity): Promise<UsualApiData<T>> {
+        if (entityName && entity) {
+            return $.post(`Entity/Edit/${entityName}`, entity);
+        }
+        throw new Error(`Edit 需要有效的 entityName 和 entity 参数`);
     }
 
-    GetChildrenDataSetQuery(parentEntityName: string, childEntityName: string, parentId: string, pageIndex?: number, pageSize?: number, sortField?: string, sortDesc: boolean = false): Promise<UsualApiData<any>> {
-        let url = `Entity/GetChildrenDataSetQuery/${encodeURIComponent(parentEntityName)}/${encodeURIComponent(childEntityName)}/${encodeURIComponent(parentId)}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
-        if (sortField) url += `&sortField=${encodeURIComponent(sortField)}`;
-        url += `&sortDesc=${sortDesc}`;
-        return $.get(url);
+    GetChildrenDataSetQuery<T>(parentEntityName: string, childEntityName: string, parentId: string, pageIndex: number = 1, pageSize: number = 10, sortField: string = "", sortDesc: boolean = false): Promise<UsualApiData<T>> {
+        if (parentEntityName && childEntityName && parentId && parentId !== ConstDictionary.EMPTY_GUID) {
+
+            let url = `Entity/GetChildrenDataSetQuery/${encodeURIComponent(parentEntityName)}/${encodeURIComponent(childEntityName)}/${encodeURIComponent(parentId)}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+            if (sortField) url += `&sortField=${encodeURIComponent(sortField)}`;
+            url += `&sortDesc=${sortDesc}`;
+            return $.get(url);
+        }
+        throw new Error(`GetChildrenDataSetQuery 需要有效的 parentEntityName, childEntityName, parentId 参数`);
     }
 }
 

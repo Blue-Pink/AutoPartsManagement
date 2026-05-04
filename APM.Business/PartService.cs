@@ -33,7 +33,7 @@ namespace APM.Business
             }
             var query = taxi.GetDataSetQuery(pageIndex: pageIndex, pageSize: pageSize, orderBy: orderBy, descending: sortDesc);
             var parts = query.ToList();
-            var total = taxi.Total<PartView>();
+            var total = taxi.Count<PartView>();
             return new PagingData<PartView>(parts, total, pageIndex, pageSize);
         }
 

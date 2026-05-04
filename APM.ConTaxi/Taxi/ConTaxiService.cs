@@ -19,37 +19,9 @@ namespace APM.ConTaxi.Taxi
         {
             var type = EntityDriver.GetType(entityName);
 
-            return type ?? throw new APMException($"未找到实体 {entityName}");
-        }
-        public object? Get(string entityName, Guid id)
-        {
-            if (!UseAdministration)
-                permission.CheckPermission(entityName, PermissionType.Read);
+            if (type is null)
+                throw new APMException($"未找到实体 {entityName}");
 
-            var type = CheckEntityName(entityName);
-
-            var entity = context.Find(type, id);
-
-            return entity;
-        }
-
-        public int Delete(string entityName, IEnumerable<Guid> ids)
-        {
-            var type = CheckEntityName(entityName);
-
-            var method = GetType().GetMethod(nameof(Delete), [ids.GetType()]);
-            if (method == null)
-                throw new APMException($"未找到方法 {nameof(Delete)}");
-            var genericMethod = method.MakeGenericMethod(type);
-            var result = genericMethod.Invoke(this, [ids]);
-            return result != null ? (int)result : 0;
-        }
-
-        public object Create(string entityName, JsonElement entity)
-        {
-            var type = CheckEntityName(entityName);
-
-            // 权限校验（与 Get/Delete 保持一致的风格）
             if (!UseAdministration)
                 permission.CheckPermission(entityName, PermissionType.Create);
 
@@ -59,24 +31,76 @@ namespace APM.ConTaxi.Taxi
             if (!typeof(BaseEntity).IsAssignableFrom(type))
                 throw new APMException($"实体 {entityName} 必须继承自 BaseEntity");
 
-            var options = new JsonSerializerOptions
+            return type;
+        }
+
+        private void UpdateIdAndTimestamps<T>(T entity, EntityState entityState) where T : BaseEntity
+        {
+            if (entityState == EntityState.Added)
             {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonDateTimeConverter("yyyy-MM-dd HH:mm:ss") }
-            };
-            var instance = JsonSerializer.Deserialize(entity.GetRawText(), type, options);
+                entity.Id = entity.Id == Guid.Empty ? Guid.NewGuid() : entity.Id;
+                entity.CreatedAt = DateTime.UtcNow;
+            }
+            if (entityState == EntityState.Modified)
+                entity.ModifiedAt = DateTime.UtcNow;
+        }
 
-            // 调用泛型 Create<T>(T entity)
-            var createMethod = GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .FirstOrDefault(m => m is { Name: nameof(Create), IsGenericMethodDefinition: true } && m.GetParameters().Length == 1);
+        /// <summary>
+        /// 动态获取实体中所有的导航属性类型（用于 Include）
+        /// </summary>
+        private IEnumerable<Type> GetNavigationPropertyTypes(Type entityType)
+        {
+            // 获取 EF Core 对该实体的元数据定义
+            var entityMetadata = context.Model.FindEntityType(entityType);
+            return entityMetadata == null ? Enumerable.Empty<Type>() :
+                entityMetadata.GetNavigations().Select(n => n.ClrType);
+        }
 
-            if (createMethod == null)
-                throw new APMException("未找到泛型 Create 方法");
+        #region 泛型
 
-            var generic = createMethod.MakeGenericMethod(type);
-            var created = generic.Invoke(this, [instance]);
+        public T Create<T>(T entity) where T : BaseEntity
+        {
+            Transaction(entity, EntityState.Added);
+            return Get<T>(entity.Id) ?? throw new APMException($"{typeof(T).Name} 创建失败");
+        }
 
-            return created ?? throw new APMException($"{entityName} 创建失败");
+        public int Create<T>(IEnumerable<T> entities) where T : BaseEntity
+        {
+            return Transaction(entities, EntityState.Added);
+        }
+
+        public T Update<T>(T entity) where T : BaseEntity
+        {
+            var tEntity = FirstOrDefault<T>(t => t.Id == entity.Id);
+            if (tEntity is null)
+                throw new APMException($"更新失败，未找到对应数据：{typeof(T).Name}({entity.Id})");
+            Transaction(entity, EntityState.Modified);
+
+            return Get<T>(tEntity.Id) ?? throw new APMException($"{typeof(T).Name}({tEntity.Id}) 更新失败");
+        }
+
+        public int Delete<T>(Guid id) where T : BaseEntity
+        {
+            var entity = FirstOrDefault<T>(t => t.Id == id);
+            if (entity is null)
+                return 0;
+            return Transaction(entity, EntityState.Deleted);
+        }
+
+        public int Delete<T>(IEnumerable<Guid> ids) where T : BaseEntity
+        {
+            var entities = context.Set<T>().Where(t => ids.Contains(t.Id));
+            if (entities.Any())
+                return Transaction(entities, EntityState.Deleted);
+            return 0;
+        }
+
+        public int Delete<T>(Expression<Func<T, bool>>? where) where T : BaseEntity
+        {
+            var entities = GetDataSetQuery(where, paging: false);
+            if (entities.Any())
+                return Transaction(entities, EntityState.Deleted);
+            return 0;
         }
 
         public T? Get<T>(Guid id) where T : APMBaseEntity
@@ -97,7 +121,7 @@ namespace APM.ConTaxi.Taxi
             return query.FirstOrDefault();
         }
 
-        public int Total<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity
+        public int Count<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity
         {
             if (!UseAdministration)
                 permission.CheckPermission<T>(PermissionType.Read);
@@ -215,30 +239,9 @@ namespace APM.ConTaxi.Taxi
             return result;
         }
 
-        public void Migrate()
-        {
-            try
-            {
-                context.Database.Migrate();
+        #endregion
 
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
-        private void UpdateIdAndTimestamps<T>(T entity, EntityState entityState) where T : BaseEntity
-        {
-            if (entityState == EntityState.Added)
-            {
-                entity.Id = entity.Id == Guid.Empty ? Guid.NewGuid() : entity.Id;
-                entity.CreatedAt = DateTime.UtcNow;
-            }
-            if (entityState == EntityState.Modified)
-                entity.ModifiedAt = DateTime.UtcNow;
-        }
-
+        #region 用户相关
         public Dictionary<User, List<UserRole>> UserLogin(string username)
         {
             var user = context.User.FirstOrDefault(u => u.Username == username && u.IsActive);
@@ -280,49 +283,115 @@ namespace APM.ConTaxi.Taxi
 
         }
 
-        public T Create<T>(T entity) where T : BaseEntity
+        #endregion
+
+        #region 实体名通用
+
+        public object? Get(string entityName, Guid id)
         {
-            Transaction(entity, EntityState.Added);
-            return Get<T>(entity.Id) ?? throw new APMException($"{typeof(T).Name} 创建失败");
+            if (!UseAdministration)
+                permission.CheckPermission(entityName, PermissionType.Read);
+
+            var type = CheckEntityName(entityName);
+
+            var entity = context.Find(type, id);
+
+            return entity;
         }
 
-        public int Create<T>(IEnumerable<T> entities) where T : BaseEntity
+        public int Delete(string entityName, IEnumerable<Guid> ids)
         {
-            return Transaction(entities, EntityState.Added);
+            var type = CheckEntityName(entityName);
+
+            var method = GetType().GetMethod(nameof(Delete), [ids.GetType()]);
+            if (method == null)
+                throw new APMException($"未找到方法 {nameof(Delete)}");
+
+            var genericMethod = method.MakeGenericMethod(type);
+            var result = genericMethod.Invoke(this, [ids]);
+            return result != null ? (int)result : 0;
         }
 
-        public T Update<T>(T entity) where T : BaseEntity
+        public object Edit(string entityName, JsonElement entity)
         {
-            var tEntity = FirstOrDefault<T>(t => t.Id == entity.Id);
-            if (tEntity is null)
-                throw new APMException($"更新失败，未找到对应数据：{typeof(T).Name}({entity.Id})");
-            Transaction(entity, EntityState.Modified);
+            var type = BuildRawTextEntity(entityName, entity, out var properties, out var instance, out var id);
 
-            return Get<T>(tEntity.Id) ?? throw new APMException($"{typeof(T).Name}({tEntity.Id}) 更新失败");
+            if (id is null || id == Guid.Empty)
+                return Create(type, instance) ?? throw new APMException($"{entityName} 创建失败");
+
+            return Update(entityName, type, id.Value, instance, properties) ?? throw new APMException($"{entityName} - [{id.Value}] 更新失败");
+
         }
 
-        public int Delete<T>(Guid id) where T : BaseEntity
+        public object? Create(Type entityType, object instance)
         {
-            var entity = FirstOrDefault<T>(t => t.Id == id);
-            if (entity is null)
-                return 0;
-            return Transaction(entity, EntityState.Deleted);
+            // 调用泛型 Create<T>(T entity)
+            var createMethod = GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(m => m is { Name: nameof(Create), IsGenericMethodDefinition: true } && m.GetParameters().Length == 1);
+
+            if (createMethod == null)
+                throw new APMException($"未找到泛型 {nameof(Create)} 方法");
+
+            var generic = createMethod.MakeGenericMethod(entityType);
+            var created = generic.Invoke(this, [instance]);
+
+            return created;
         }
 
-        public int Delete<T>(IEnumerable<Guid> ids) where T : BaseEntity
+        public object Update(string entityName, Type entityType, Guid id, object instance, IEnumerable<PropertyInfo> properties)
         {
-            var entities = context.Set<T>().Where(t => ids.Contains(t.Id));
-            if (entities.Any())
-                return Transaction(entities, EntityState.Deleted);
-            return 0;
+            var efInstance = Get(entityName, id);
+            if (efInstance is null)
+                throw new APMException($"更新失败, 未找到对应数据：{entityName}({id})");
+
+
+            foreach (var propertyInfo in properties)
+            {
+                var efValue = propertyInfo.GetValue(efInstance);
+                var value = propertyInfo.GetValue(instance);
+                if (efValue != value)
+                {
+                    propertyInfo.SetValue(efInstance, value);
+                }
+            }
+
+            var updateMethod = GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .FirstOrDefault(m => m is { Name: nameof(Update), IsGenericMethodDefinition: true } && m.GetParameters().Length == 1);
+
+            if (updateMethod == null)
+                throw new APMException($"未找到泛型 {nameof(Update)} 方法");
+
+            var generic = updateMethod.MakeGenericMethod(entityType);
+            var updated = generic.Invoke(this, [efInstance]);
+
+            return updated ?? throw new APMException($"{entityName} 创建失败");
         }
 
-        public int Delete<T>(Expression<Func<T, bool>>? where) where T : BaseEntity
+        private Type BuildRawTextEntity(string entityName, JsonElement entity, out IEnumerable<PropertyInfo> properties, out object instance, out Guid? id)
         {
-            var entities = GetDataSetQuery(where, paging: false);
-            if (entities.Any())
-                return Transaction(entities, EntityState.Deleted);
-            return 0;
+            var type = CheckEntityName(entityName);
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                Converters = { new JsonDateTimeConverter("yyyy-MM-dd HH:mm:ss") }
+            };
+
+            properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => !typeof(BaseEntity).GetProperties().Contains(p));
+
+            var valueProperties = properties.Where(p =>
+                p.PropertyType.IsValueType && Nullable.GetUnderlyingType(p.PropertyType) == null);
+
+            var nullProperty = valueProperties.FirstOrDefault(p => !entity.TryGetProperty(p.Name[0].ToString().ToLower() + p.Name[1..], out var value) || value.ValueKind == JsonValueKind.Null);
+            if (nullProperty is not null)
+                throw new APMException($"{nullProperty.Name}读取失败, {nullProperty.Name} 不可为 [NULL]");
+
+            var serializedInstance = JsonSerializer.Deserialize(entity.GetRawText(), type, options);
+
+            instance = serializedInstance ?? throw new APMException($"更新失败, 数据实例化失败");
+            id = (instance as BaseEntity)?.Id;
+            return type;
         }
 
         public List<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName, Guid parentId)
@@ -332,28 +401,30 @@ namespace APM.ConTaxi.Taxi
             if (!UseAdministration)
                 permission.CheckPermission(childEntityName, PermissionType.Read);
 
-            var parentType = EntityDriver.GetType(parentEntityName);
-            var childType = EntityDriver.GetType(childEntityName);
+            var parentType = CheckEntityName(parentEntityName);
+            var childType = CheckEntityName(childEntityName);
 
-            if (parentType == null || childType == null)
-                throw new Exception("指定的实体名称无效");
-
+            var navigateTypes = GetNavigationPropertyTypes(childType);
             var entityType = context.Model.FindEntityType(childType);
-            var foreignKey = entityType?.GetForeignKeys()
-                .FirstOrDefault(fk => fk.PrincipalEntityType.ClrType == parentType);
+            if (entityType is null)
+                throw new APMException($"Context 中未找到 {childEntityName}");
 
-            if (foreignKey == null)
-                throw new Exception($"{childEntityName} 中没有找到指向 {parentEntityName} 的关联字段");
+            var foreignKeys = entityType?.GetForeignKeys()
+                .Where(fk => navigateTypes.Contains(fk.PrincipalEntityType.ClrType));
+            if (foreignKeys is null)
+                throw new APMException($"{childEntityName} 缺少与任一表的关系");
 
-            var fkPropertyName = foreignKey.Properties[0].Name;
+            var parentForeignKey = foreignKeys.FirstOrDefault(fk => fk.PrincipalEntityType.ClrType == parentType);
+            if (parentForeignKey == null)
+                throw new APMException($"{childEntityName} 中没有找到指向 {parentEntityName} 的关联字段");
 
             //获取到子实体的 DbSet
             var query = context.GetType().GetMethod(nameof(context.Set), 1, Type.EmptyTypes)?.MakeGenericMethod(childType).Invoke(context, null) as IQueryable;
             if (query == null)
-                throw new Exception($"无法获取 {childEntityName} 的 DbSet");
+                throw new APMException($"无法获取 {childEntityName} 的 DbSet");
 
             var parameter = Expression.Parameter(childType, "e");
-            var property = Expression.Property(parameter, fkPropertyName);
+            var property = Expression.Property(parameter, parentForeignKey.Properties[0].Name);
             var constant = Expression.Constant(parentId);
             var equality = Expression.Equal(property, constant);
             var lambda = Expression.Lambda(equality, parameter);
@@ -362,18 +433,51 @@ namespace APM.ConTaxi.Taxi
             if (whereMethod == null)
                 throw new APMException("无法获取 Where 方法");
 
-            var filteredQuery = whereMethod.Invoke(null, [query, lambda]) as IQueryable;
+            query = whereMethod.Invoke(null, [query, lambda]) as IQueryable;
+
+            var includeMethod = typeof(EntityFrameworkQueryableExtensions)
+                .GetMethods()
+                .FirstOrDefault(m => m.Name == "Include"
+                                     && m.GetParameters().Length == 2
+                                     && m.GetParameters()[1].ParameterType == typeof(string));
+            if (includeMethod == null)
+                throw new APMException("无法获取 Include 方法");
+
+            if (navigateTypes.Any())
+            {
+                foreach (var navigateType in navigateTypes)
+                {
+                    var genericInclude = includeMethod.MakeGenericMethod(childType);
+                    query = (IQueryable)genericInclude.Invoke(null, [query, navigateType.Name])!;
+                }
+            }
 
             var toListMethod = typeof(Enumerable).GetMethod("ToList", BindingFlags.Public | BindingFlags.Static)?.MakeGenericMethod(childType);
             if (toListMethod == null)
                 throw new APMException("无法获取 ToList 方法");
 
-            var typedList = toListMethod.Invoke(null, [filteredQuery]);
+            var typedList = toListMethod.Invoke(null, [query]);
             var resultAsEnumerable = typedList as System.Collections.IEnumerable
                                      ?? throw new APMException("查询结果为空");
             var resultList = resultAsEnumerable.Cast<object>().ToList();
 
             return resultList;
         }
+
+        #endregion
+
+        public void Migrate()
+        {
+            try
+            {
+                context.Database.Migrate();
+
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+
     }
 }

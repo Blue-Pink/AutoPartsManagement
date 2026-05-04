@@ -11,6 +11,6 @@ namespace APM.IBusiness
         public string AutoNumber(string entityName, string prefix, int digit);
         int Delete(string entityName, IEnumerable<Guid> ids);
         public List<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName, Guid parentId);
-        public object Create(string entityName, JsonElement entity);
+        public object Edit(string entityName, JsonElement entity);
     }
 }

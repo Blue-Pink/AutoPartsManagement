@@ -6,6 +6,7 @@ import type { Supplier } from '@/interfaces/DTOEntities'
 import UsualEntityService from '@/services/UsualEntityService'
 import type { UsualApiData } from '@/interfaces/HttpReponse'
 import { _initialSupplier } from '@/utils/initialEntity'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const props = defineProps<{
   modelValue: boolean
@@ -24,6 +25,7 @@ const rules = reactive<FormRules>({
 })
 
 const close = () => {
+  formRef.value?.clearValidate()
   emit('update:modelValue', false)
 }
 
@@ -55,7 +57,7 @@ watch(visible, (val: boolean) => {
 watch(
   () => props.supplier,
   (s: Supplier | null) => {
-    if (s && s.id) {
+    if (s && s.id && s.id != ConstDictionary.EMPTY_GUID) {
       UsualEntityService.Get<Supplier>('Supplier', s.id)
         .then((res: UsualApiData<Supplier>) => {
           if (res.data) {

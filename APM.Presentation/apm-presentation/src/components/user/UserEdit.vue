@@ -5,6 +5,7 @@ import UserService from '@/services/UserService'
 import UsualEntityService from '@/services/UsualEntityService'
 import type { User, Role } from '@/interfaces/DTOEntities'
 import { _initialUser } from '@/utils/initialEntity'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const props = defineProps<{ modelValue: boolean; user: User | null }>()
 const emit = defineEmits(['update:modelValue', 'saved'])
@@ -54,12 +55,11 @@ const rules = ref<FormRules>({
     {
       required: true,
       validator: (rule, value, callback) => {
-        const val = value ?? []
-        if (!Array.isArray(val) || val.length === 0)
+        if (!Array.isArray(value) || value.length === 0)
           return callback(new Error('请至少指派一个角色'))
         callback()
       },
-      trigger: 'change',
+      trigger: 'blur',
     },
   ],
 })
@@ -74,18 +74,23 @@ watch(visible, (v) => emit('update:modelValue', v))
 watch(
   () => props.user,
   (u: User | null) => {
-    if (u && u.id) {
-      UsualEntityService.Get<User>('User', u.id ?? '').then((res) => {
-        if (res.data) {
-          user.value = res.data as User
-          user.value.roles = u.roles || []
-          user.value.roleIds = u.roles?.map((r) => r.id).filter((id): id is string => !!id) || []
-        } else {
-          visible.value = false
-        }
-      })
-    } else {
-      user.value = { ..._initialUser }
+    try {
+      if (u && u.id && u.id !== ConstDictionary.EMPTY_GUID) {
+        UsualEntityService.Get<User>('User', u.id ?? '').then((res) => {
+          if (res.data) {
+            user.value = res.data as User
+            user.value.roles = u.roles || []
+            user.value.roleIds = u.roles?.map((r) => r.id).filter((id): id is string => !!id) || []
+          } else {
+            visible.value = false
+          }
+        })
+      } else {
+        user.value = { ..._initialUser }
+      }
+    } catch (error) {
+      visible.value = false
+      console.log('加载用户数据失败', error)
     }
   },
   {
@@ -130,6 +135,7 @@ watch(
 )
 
 const close = () => {
+  formRef.value?.clearValidate()
   editPassword.value = false
   emit('update:modelValue', false)
 }

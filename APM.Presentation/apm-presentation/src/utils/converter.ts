@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 /**
  * 将 UTC DateTime 字符串转换为指定格式的日期字符串
  * @param dateString UTC DateTime 字符串 (例如: 2026-04-21T10:30:45.000Z)
@@ -54,19 +56,21 @@ export function ConvertDateTime(dateString: string, format: string = 'yyyy-mm-dd
 }
 
 /**
- * 便捷函数：转换为标准格式 (yyyy-mm-dd hh:mm:ss)
- * @param dateString UTC DateTime 字符串
- * @returns 标准格式的日期字符串
+ * 格式化日期时间
+ * @param date 原始日期数据 (Date 对象, 字符串, 或时间戳)
+ * @param pattern 格式模板，默认 YYYY-MM-DD
  */
-export function FormatDateTime(dateString: string): string {
-    return ConvertDateTime(dateString, 'yyyy-mm-dd hh:mm:ss')
-}
+export const FormatDate = (
+    date: Date | string | number | undefined | null,
+    pattern: string = 'YYYY-MM-DD'
+): string => {
+    if (!date) return '';
+    return dayjs(date).format(pattern);
+};
 
 /**
- * 便捷函数：转换为仅日期格式 (yyyy-mm-dd)
- * @param dateString UTC DateTime 字符串
- * @returns 仅日期的字符串
+ * 针对汽配业务的特殊转换：例如将毫秒转为天数（用于超期存货计算）
  */
-export function FormatDate(dateString: string): string {
-    return ConvertDateTime(dateString, 'yyyy-mm-dd')
-}
+export const daysDiff = (startDate: Date, endDate: Date): number => {
+    return dayjs(endDate).diff(dayjs(startDate), 'day');
+};

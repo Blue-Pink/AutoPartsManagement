@@ -14,7 +14,7 @@ namespace APM.Business
         public PagingData<InboundOrder> GetInboundOrders(int pageIndex = 1, int pageSize = 10)
         {
             var list = taxi.GetDataSetQuery<InboundOrder>(pageIndex: pageIndex, pageSize: pageSize).ToList();
-            var total = taxi.Total<InboundOrder>();
+            var total = taxi.Count<InboundOrder>();
             return new PagingData<InboundOrder>(list, total, pageIndex, pageSize);
         }
 

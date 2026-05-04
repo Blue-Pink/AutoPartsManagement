@@ -111,7 +111,7 @@ onMounted(() => {
     </div>
     <el-table
       class="apm-table"
-      stripe="true"
+      stripe
       :data="orders"
       @selection-change="handleSelectionChange"
       style="width: 100%"
@@ -130,10 +130,14 @@ onMounted(() => {
       </el-table-column>
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
-          <el-button link size="small" type="primary" @click="handleEdit(row)">编辑</el-button>
-          <el-button link size="small" type="danger" @click="handleDeleteSingle(row)"
-            >删除</el-button
-          >
+          <el-button link size="small" type="primary" @click="handleEdit(row)" v-text="'编辑'" />
+          <el-button
+            link
+            size="small"
+            type="danger"
+            @click="handleDeleteSingle(row)"
+            v-text="'删除'"
+          />
         </template>
       </el-table-column>
     </el-table>

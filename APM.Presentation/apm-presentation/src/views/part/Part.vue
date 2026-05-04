@@ -58,7 +58,7 @@ const handleEditPart = (row: Part) => {
 
 const handleDeleteSingle = async (row: Part) => {
   try {
-    await ElMessageBox.confirm(`确定要删除配件 ${row.model} 吗？`, '警告', {
+    await ElMessageBox.confirm(`确定要删除配件 [${row.model}] - [${row.partName}] 吗？`, '警告', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
@@ -148,7 +148,7 @@ watch([pageIndex, pageSize], loadParts)
     <el-table
       class="apm-table"
       :data="parts"
-      stripe="true"
+      stripe
       @selection-change="handleSelectionChange"
       @sort-change="handleSortChange"
     >
@@ -187,10 +187,20 @@ watch([pageIndex, pageSize], loadParts)
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleEditPart(row)">编辑</el-button>
-          <el-button link type="danger" size="small" @click="handleDeleteSingle(row)"
-            >删除</el-button
-          >
+          <el-button
+            link
+            type="primary"
+            size="small"
+            @click="handleEditPart(row)"
+            v-text="'编辑'"
+          />
+          <el-button
+            link
+            type="danger"
+            size="small"
+            @click="handleDeleteSingle(row)"
+            v-text="'删除'"
+          />
         </template>
       </el-table-column>
     </el-table>

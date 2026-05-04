@@ -31,9 +31,9 @@ namespace APM.Business
             return taxi.GetChildrenDataSetQuery(parentEntityName, childEntityName, parentId);
         }
 
-        public object Create(string entityName, JsonElement entity)
+        public object Edit(string entityName, JsonElement entity)
         {
-            return taxi.Create(entityName, entity);
+            return taxi.Edit(entityName, entity);
         }
     }
 }
