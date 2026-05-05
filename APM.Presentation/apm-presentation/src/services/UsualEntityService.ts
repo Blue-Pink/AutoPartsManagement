@@ -32,15 +32,26 @@ class UsualEntityService {
         throw new Error(`Edit 需要有效的 entityName 和 entity 参数`);
     }
 
-    GetChildrenDataSetQuery<T>(parentEntityName: string, childEntityName: string, parentId: string, pageIndex: number = 1, pageSize: number = 10, sortField: string = "", sortDesc: boolean = false): Promise<UsualApiData<T>> {
-        if (parentEntityName && childEntityName && parentId && parentId !== ConstDictionary.EMPTY_GUID) {
-
-            let url = `Entity/GetChildrenDataSetQuery/${encodeURIComponent(parentEntityName)}/${encodeURIComponent(childEntityName)}/${encodeURIComponent(parentId)}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
-            if (sortField) url += `&sortField=${encodeURIComponent(sortField)}`;
-            url += `&sortDesc=${sortDesc}`;
+    GetDataSet<T>(entityName: string, pageIndex: number = 1, pageSize: number = 10, orderBy: string = "", descending: boolean = false): Promise<UsualApiData<T>> {
+        if (entityName) {
+            let url = `Entity/GetDataSet/${encodeURIComponent(entityName)}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+            if (orderBy) url += `&orderBy=${encodeURIComponent(orderBy)}`;
+            url += `&descending=${descending}`;
             return $.get(url);
         }
-        throw new Error(`GetChildrenDataSetQuery 需要有效的 parentEntityName, childEntityName, parentId 参数`);
+        throw new Error(`GetDataSet 需要有效的 entityName 参数`);
+    }
+
+
+    GetChildrenDataSet<T>(parentEntityName: string, childEntityName: string, parentId: string, pageIndex: number = 1, pageSize: number = 10, orderBy: string = "", descending: boolean = false): Promise<UsualApiData<T>> {
+        if (parentEntityName && childEntityName && parentId && parentId !== ConstDictionary.EMPTY_GUID) {
+
+            let url = `Entity/GetChildrenDataSet/${encodeURIComponent(parentEntityName)}/${encodeURIComponent(childEntityName)}/${encodeURIComponent(parentId)}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+            if (orderBy) url += `&orderBy=${encodeURIComponent(orderBy)}`;
+            url += `&descending=${descending}`;
+            return $.get(url);
+        }
+        throw new Error(`GetChildrenDataSet 需要有效的 parentEntityName, childEntityName, parentId 参数`);
     }
 }
 

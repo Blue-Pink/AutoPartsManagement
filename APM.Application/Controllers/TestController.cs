@@ -96,12 +96,12 @@ namespace APM.Application.Controllers
             return UsualResult(parts.FirstOrDefault());
         }
 
-        [HttpGet, Route("[action]")]
-        public dynamic Test2()
-        {
-            var a = taxi.GetChildrenDataSetQuery("InboundOrder", "InboundItem",
-                new Guid("b4efd9a0-6351-48c2-81a7-871cd07e89ee"));
-            return UsualResult(a);
-        }
+        //[HttpGet, Route("[action]")]
+        //public dynamic Test2()
+        //{
+        //    var a = taxi.GetChildrenDataSet("InboundOrder", "InboundItem",
+        //        new Guid("b4efd9a0-6351-48c2-81a7-871cd07e89ee"));
+        //    return UsualResult(a);
+        //}
     }
 }

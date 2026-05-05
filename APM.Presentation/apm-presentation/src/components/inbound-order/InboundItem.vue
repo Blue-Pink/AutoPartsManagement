@@ -6,31 +6,60 @@ import InboundItemEdit from '@/components/inbound-order/InboundItemEdit.vue'
 import UsualEntityService from '@/services/UsualEntityService'
 import { ConstDictionary } from '@/utils/const-dictionary'
 import { _initialInboundItem } from '@/utils/initialEntity'
+import { ConvertDateTime } from '@/utils/converter'
 
 const props = defineProps<{ orderId: string | null }>()
-const emit = defineEmits(['saved'])
-
+const pageIndex = ref(1)
+const pageSize = ref(5)
+const sortField = ref<string | null>(null)
+const sortDesc = ref<boolean>(false)
+const total = ref(0)
 const items = ref<InboundItem[]>([])
 const editVisible = ref(false)
 const editing = ref<InboundItem>({ ..._initialInboundItem })
 const selected = ref<InboundItem[]>([])
+const emit = defineEmits(['saved'])
 
 const load = async () => {
+  console.log('加载入库单明细，orderId=', props.orderId)
   if (!props.orderId) return
   try {
     if (props.orderId && props.orderId !== ConstDictionary.EMPTY_GUID) {
-      const res = await UsualEntityService.GetChildrenDataSetQuery<InboundItem>(
+      const res = await UsualEntityService.GetChildrenDataSet<InboundItem>(
         'InboundOrder',
         'InboundItem',
         props.orderId,
-        1,
-        10,
+        pageIndex.value,
+        pageSize.value,
+        sortField.value || undefined,
+        sortDesc.value,
       )
       items.value = res.dataList || []
+      total.value = res.total || 0
     }
   } catch (e) {
     console.error(e)
   }
+}
+
+const handleSortChange = (options: {
+  column: any
+  prop: string
+  order: 'ascending' | 'descending' | null
+}) => {
+  if (!options || !options.prop) return
+  if (options.order === 'ascending') {
+    sortField.value = options.prop
+    sortDesc.value = false
+  } else if (options.order === 'descending') {
+    sortField.value = options.prop
+    sortDesc.value = true
+  } else {
+    sortField.value = null
+    sortDesc.value = false
+  }
+  pageIndex.value = 1
+  load()
 }
 
 const handleAdd = () => {
@@ -99,16 +128,22 @@ const handleSaved = () => {
   emit('saved')
 }
 
-onMounted(() => {
+const handleCurrentPageChange = (page: number) => {
+  pageIndex.value = page
   load()
-})
+}
+
+const handlePageSizeChange = (size: number) => {
+  pageSize.value = size
+  pageIndex.value = 1
+}
 
 watch(
   () => props.orderId,
-  () => {
-    load()
-  },
+  async () => await load(),
 )
+
+watch([pageIndex, pageSize], load)
 </script>
 
 <template>
@@ -122,7 +157,12 @@ watch(
         <el-button type="danger" @click="handleBatchDelete">删除</el-button>
       </div>
     </div>
-    <el-table :data="items" class="apm-table" @selection-change="handleSelectionChange">
+    <el-table
+      :data="items"
+      class="apm-table"
+      @selection-change="handleSelectionChange"
+      @sort-change="handleSortChange"
+    >
       <el-table-column type="selection" width="55" />
       <el-table-column label="配件">
         <template #default="{ row }">{{
@@ -132,6 +172,28 @@ watch(
       <el-table-column prop="quantity" label="数量" />
       <el-table-column prop="price" label="单价" />
       <el-table-column prop="totalAmount" label="合计" />
+      <el-table-column
+        prop="createdAt"
+        label="创建时间"
+        width="auto"
+        min-width="180"
+        sortable="custom"
+      >
+        <template #default="{ row }">
+          {{ ConvertDateTime(row.createdAt, 'yyyy-mm-dd hh:mm:ss') }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="modifiedAt"
+        label="修改时间"
+        width="auto"
+        min-width="180"
+        sortable="custom"
+      >
+        <template #default="{ row }">
+          {{ ConvertDateTime(row.modifiedAt, 'yyyy-mm-dd hh:mm:ss') }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="140">
         <template #default="{ row }">
           <el-button link size="small" type="primary" @click="handleEdit(row)" v-text="'编辑'" />
@@ -139,6 +201,18 @@ watch(
         </template>
       </el-table-column>
     </el-table>
+
+    <div class="pagination">
+      <el-pagination
+        v-model:current-page="pageIndex"
+        v-model:page-size="pageSize"
+        :page-sizes="ConstDictionary.CHILD_TABLE_PAGE_SIZES"
+        :total="total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @current-page-change="handleCurrentPageChange"
+        @page-size-change="handlePageSizeChange"
+      />
+    </div>
 
     <InboundItemEdit
       v-model="editVisible"

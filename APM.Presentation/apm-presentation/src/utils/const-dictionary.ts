@@ -17,5 +17,13 @@ export const ConstDictionary = {
 
     get EMPTY_GUID() {
         return '00000000-0000-0000-0000-000000000000';
-    }
+    },
+
+    get TABLE_PAGE_SIZES() {
+        return [25, 50, 100];
+    },
+
+    get CHILD_TABLE_PAGE_SIZES() {
+        return [5, 10, 20];
+    },
 };

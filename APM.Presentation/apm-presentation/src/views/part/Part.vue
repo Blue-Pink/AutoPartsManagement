@@ -7,6 +7,7 @@ import { ConvertDateTime } from '@/utils/converter'
 import PartEdit from '@/components/part/PartEdit.vue'
 import UsualEntityService from '@/services/UsualEntityService'
 import { _initialPart } from '@/utils/initialEntity'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const parts = ref<Part[] | null>([])
 const pageIndex = ref(1)
@@ -18,7 +19,7 @@ const editingPart = ref<Part>({ ..._initialPart })
 const sortField = ref<string | null>(null)
 const sortDesc = ref<boolean>(false)
 
-const loadParts = async () => {
+const load = async () => {
   try {
     const res = await PartService.GetParts(
       pageIndex.value,
@@ -37,13 +38,11 @@ const loadParts = async () => {
 
 const handleCurrentPageChange = (page: number) => {
   pageIndex.value = page
-  loadParts()
 }
 
 const handlePageSizeChange = (size: number) => {
   pageSize.value = size
   pageIndex.value = 1
-  loadParts()
 }
 
 const handleAddPart = () => {
@@ -66,7 +65,7 @@ const handleDeleteSingle = async (row: Part) => {
     const ids = [row.id!]
     await UsualEntityService.Delete('Part', ids)
     ElMessage.success('删除成功')
-    loadParts()
+    load()
   } catch (error: any) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败')
@@ -96,7 +95,7 @@ const handleBatchDelete = async () => {
     await UsualEntityService.Delete('Part', ids)
     ElMessage.success('删除成功')
     selectedParts.value = []
-    loadParts()
+    load()
   } catch (error: any) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败')
@@ -126,12 +125,12 @@ const handleSortChange = (options: {
     sortDesc.value = false
   }
   pageIndex.value = 1
-  loadParts()
+  load()
 }
 
-onMounted(loadParts)
+onMounted(load)
 
-watch([pageIndex, pageSize], loadParts)
+watch([pageIndex, pageSize], load)
 </script>
 
 <template>
@@ -209,7 +208,7 @@ watch([pageIndex, pageSize], loadParts)
       <el-pagination
         v-model:current-page="pageIndex"
         v-model:page-size="pageSize"
-        :page-sizes="[25, 50, 100]"
+        :page-sizes="ConstDictionary.TABLE_PAGE_SIZES"
         :total="total"
         layout="total, sizes, prev, pager, next, jumper"
         @current-page-change="handleCurrentPageChange"
@@ -217,7 +216,7 @@ watch([pageIndex, pageSize], loadParts)
       />
     </div>
 
-    <PartEdit v-model="editVisible" :part="editingPart" @saved="loadParts" />
+    <PartEdit v-model="editVisible" :part="editingPart" @saved="load" />
   </div>
 </template>
 

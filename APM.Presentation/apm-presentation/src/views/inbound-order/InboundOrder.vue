@@ -6,6 +6,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { ConvertDateTime } from '@/utils/converter'
 import UsualEntityService from '@/services/UsualEntityService'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const orders = ref<InboundOrder[] | null>([])
 const pageIndex = ref(1)
@@ -18,7 +19,8 @@ const router = useRouter()
 
 const load = async () => {
   try {
-    const res = await InboundOrderService.GetInboundOrders(
+    const res = await UsualEntityService.GetDataSet<InboundOrder>(
+      'InboundOrder',
       pageIndex.value,
       pageSize.value,
       sortField.value || undefined,
@@ -34,11 +36,11 @@ const load = async () => {
 }
 
 const handleAdd = () => {
-  router.push({ path: '/InboundOrder/edit' })
+  router.push({ path: '/InboundOrder/Edit' })
 }
 
 const handleEdit = (row: InboundOrder) => {
-  router.push({ path: `/InboundOrder/edit/${row.id}` })
+  router.push({ path: `/InboundOrder/Edit/${row.id}` })
 }
 
 const handleDeleteSingle = async (row: InboundOrder) => {
@@ -146,7 +148,7 @@ onMounted(() => {
       <el-pagination
         :current-page="pageIndex"
         :page-size="pageSize"
-        :page-sizes="[25, 50, 100]"
+        :page-sizes="ConstDictionary.TABLE_PAGE_SIZES"
         :total="total"
         layout="total, sizes, prev, pager, next, jumper"
         @current-change="handleCurrentPageChange"

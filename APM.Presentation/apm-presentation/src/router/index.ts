@@ -26,12 +26,12 @@ const router = createRouter({
       component: InboundOrder,
     },
     {
-      path: '/InboundOrder/edit/:id?',
+      path: '/InboundOrder/Edit/:id?',
       name: '入库单编辑',
       component: InboundOrderEdit,
     },
     {
-      path: '/user',
+      path: '/User',
       name: '用户管理',
       component: User,
     },

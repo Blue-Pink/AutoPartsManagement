@@ -7,6 +7,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import UserEdit from '@/components/user/UserEdit.vue'
 import { ConvertDateTime } from '@/utils/converter'
 import { createDefaultEntity, _initialUser } from '@/utils/initialEntity'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const users = ref<User[]>([])
 const pageIndex = ref(1)
@@ -162,7 +163,7 @@ onMounted(() => {
         :current-page="pageIndex"
         :page-size="pageSize"
         :total="total"
-        :page-sizes="[25, 50, 100]"
+        :page-sizes="ConstDictionary.TABLE_PAGE_SIZES"
         layout="total, sizes, prev, pager, next, jumper"
         @current-change="handleCurrentPageChange"
         @size-change="handlePageSizeChange"

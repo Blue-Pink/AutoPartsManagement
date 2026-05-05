@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using APM.UtilEntities;
 
 namespace APM.Business
 {
@@ -26,9 +27,21 @@ namespace APM.Business
             return !ids.Any() ? 0 : taxi.Delete(entityName, ids);
         }
 
-        public List<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName, Guid parentId)
+        public PagingData<object> GetChildrenDataSet(string parentEntityName,
+            string childEntityName,
+            Guid parentId,
+            int pageIndex = 0,
+            int pageSize = 10,
+            string orderBy = "",
+            bool descending = false)
         {
-            return taxi.GetChildrenDataSetQuery(parentEntityName, childEntityName, parentId);
+            return taxi.GetChildrenDataSet(parentEntityName, childEntityName, parentId, pageIndex, pageSize, orderBy, descending);
+        }
+
+        public PagingData<object> GetDataSet(string entityName, int pageIndex = 0, int pageSize = 10, string orderBy = "",
+            bool descending = false)
+        {
+            return taxi.GetDataSet(entityName, pageIndex, pageSize, orderBy, descending);
         }
 
         public object Edit(string entityName, JsonElement entity)

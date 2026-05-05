@@ -157,7 +157,7 @@ onMounted(() => {
       <el-pagination
         v-model:current-page="pageIndex"
         v-model:page-size="pageSize"
-        :page-sizes="[25, 50, 100]"
+        :page-sizes="ConstDictionary.TABLE_PAGE_SIZES"
         :total="total"
         layout="total, sizes, prev, pager, next, jumper"
         @current-page-change="handleCurrentPageChange"

@@ -5,6 +5,7 @@
   --basic-color-white: #fafafa;
   --basic-box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
   --basic-border-radius: 6px;
+  --basic-hightlight-color: #000470;
 }
 
 html.dark {
@@ -13,6 +14,7 @@ html.dark {
   --font-size: 17.5px;
   --basic-color-white: #2c2c2c;
   --basic-box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+  --basic-hightlight-color: #ffd04b;
 }
 
 body {
@@ -26,6 +28,10 @@ body {
 }
 .gap-2 {
   gap: 0.5rem;
+}
+
+.el-menu.apm-menu {
+  border-right: none;
 }
 
 .apm-container {

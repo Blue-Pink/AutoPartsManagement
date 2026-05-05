@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
 using APM.DbEntities.DTOs;
+using APM.UtilEntities;
 
 namespace APM.ConTaxi.Taxi
 {
@@ -19,7 +20,6 @@ namespace APM.ConTaxi.Taxi
         public T? Get<T>(Guid id) where T : APMBaseEntity;
         public T? FirstOrDefault<T>(Expression<Func<T, bool>>? selector = null) where T : APMBaseEntity;
         public int Count<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity;
-
         public IQueryable<T> GetDataSetQuery<T>(
             Expression<Func<T, bool>>? where = null,
             int pageIndex = 1,
@@ -40,7 +40,18 @@ namespace APM.ConTaxi.Taxi
         public int Delete<T>(IEnumerable<Guid> ids) where T : BaseEntity;
         public int Delete<T>(Expression<Func<T, bool>>? where) where T : BaseEntity;
         public UserDTO GetCurrentUser(Guid userId);
-        public List<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName, Guid parentId);
         public object Edit(string entityName, JsonElement entity);
+        public PagingData<object> GetChildrenDataSet(string? parentEntityName, string childEntityName,
+            Guid? parentId,
+            int pageIndex = 0,
+            int pageSize = 10,
+            string orderBy = "",
+            bool descending = false);
+
+        public PagingData<object> GetDataSet(string entityName,
+            int pageIndex = 0,
+            int pageSize = 10,
+            string orderBy = "",
+            bool descending = false);
     }
 }

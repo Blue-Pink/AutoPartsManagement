@@ -26,11 +26,26 @@ namespace APM.Application.Controllers
             return UsualResult(usualEntity.Delete(entityName, ids));
         }
 
-        [HttpGet, Route("[action]/{parentEntityName}/{childEntityName}/{parentId}")]
-        public UsualApiData<object> GetChildrenDataSetQuery(string parentEntityName, string childEntityName,
-            Guid parentId)
+        [HttpGet, Route("[action]/{entityName}")]
+        public UsualApiData<object> GetDataSet(string entityName,
+            int pageIndex = 0,
+            int pageSize = 10,
+            string orderBy = "",
+            bool descending = false)
         {
-            return UsualResult(usualEntity.GetChildrenDataSetQuery(parentEntityName, childEntityName, parentId).AsEnumerable());
+            return UsualResult(usualEntity.GetDataSet(entityName, pageIndex, pageSize, orderBy, descending));
+        }
+
+        [HttpGet, Route("[action]/{parentEntityName}/{childEntityName}/{parentId}")]
+        public UsualApiData<object> GetChildrenDataSet(string parentEntityName,
+            string childEntityName,
+            Guid parentId,
+            int pageIndex = 0,
+            int pageSize = 10,
+            string orderBy = "",
+            bool descending = false)
+        {
+            return UsualResult(usualEntity.GetChildrenDataSet(parentEntityName, childEntityName, parentId, pageIndex, pageSize, orderBy, descending));
         }
 
         [HttpPost, Route("[action]/{entityName}")]
