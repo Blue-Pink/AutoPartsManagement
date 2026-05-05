@@ -15,6 +15,7 @@ namespace APM.ConTaxi.Taxi
     {
         public object? Get(string entityName, Guid id);
         public int Delete(string entityName, IEnumerable<Guid> ids);
+        public IQueryable<T> BuildQuery<T>() where T : APMBaseEntity;
         public T? Get<T>(Guid id) where T : APMBaseEntity;
         public T? FirstOrDefault<T>(Expression<Func<T, bool>>? selector = null) where T : APMBaseEntity;
         public int Count<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity;

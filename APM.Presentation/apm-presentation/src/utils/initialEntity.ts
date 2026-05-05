@@ -10,6 +10,7 @@ export function createDefaultEntity<T extends BaseEntity>(overrides?: Partial<T>
         id: ConstDictionary.EMPTY_GUID,
         createdAt: ConstDictionary.CURRENT_DATETIME,
         modifiedAt: ConstDictionary.CURRENT_DATETIME,
+        operatorUserId: ConstDictionary.EMPTY_GUID,
     };
     return { ...base, ...(overrides || {}) } as T;
 }

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import InboundOrderService from '@/services/InboundOrderService'
 import SupplierService from '@/services/SupplierService'
 import type { InboundOrder, Supplier } from '@/interfaces/DTOEntities'
 import { ElMessage, type FormInstance } from 'element-plus'
@@ -13,7 +12,7 @@ import { ConstDictionary } from '@/utils/const-dictionary'
 
 const route = useRoute()
 const router = useRouter()
-const id = route.params.id as string | undefined
+const id = ref<string | undefined>(route.params.id as string | undefined)
 const emit = defineEmits(['saved'])
 
 const order = ref<InboundOrder>({ ..._initialInboundOrder })
@@ -30,9 +29,9 @@ const loadOptions = async () => {
 }
 
 const load = async () => {
-  if (id && id !== ConstDictionary.EMPTY_GUID) {
+  if (id.value && id.value !== ConstDictionary.EMPTY_GUID) {
     try {
-      const res = await UsualEntityService.Get<InboundOrder>('InboundOrder', id)
+      const res = await UsualEntityService.Get<InboundOrder>('InboundOrder', id.value)
       if (res.stateCode && res.data) order.value = res.data as InboundOrder
     } catch (e) {
       console.error(e)
@@ -55,9 +54,18 @@ const load = async () => {
 const handleSave = async () => {
   try {
     await formRef.value?.validate?.()
-    await UsualEntityService.Edit<InboundOrder>('InboundOrder', order.value)
-    await load()
-    ElMessage.success('保存成功')
+    UsualEntityService.Edit<InboundOrder>('InboundOrder', order.value)
+      .then((res) => {
+        if (res.data && !id.value) {
+          router.replace(`/InboundOrder/edit/${res.data.id}`)
+        } else {
+          load()
+          ElMessage.success('保存成功')
+        }
+      })
+      .catch((e) => {
+        console.error(e)
+      })
   } catch (e) {
     console.error(e)
   }
@@ -76,6 +84,7 @@ onMounted(async () => {
 watch(
   () => route.params.id,
   async () => {
+    id.value = route.params.id as string | undefined
     await load()
   },
 )
@@ -123,7 +132,7 @@ watch(
         <el-button @click="router.back">返回</el-button>
       </div>
     </div>
-    <div class="apm-container">
+    <div class="apm-container" v-if="id">
       <InboundItem :orderId="order.id" @saved="handleSaved" />
     </div>
   </div>

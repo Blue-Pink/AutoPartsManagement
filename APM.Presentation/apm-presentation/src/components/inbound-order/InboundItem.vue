@@ -5,13 +5,14 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import InboundItemEdit from '@/components/inbound-order/InboundItemEdit.vue'
 import UsualEntityService from '@/services/UsualEntityService'
 import { ConstDictionary } from '@/utils/const-dictionary'
+import { _initialInboundItem } from '@/utils/initialEntity'
 
 const props = defineProps<{ orderId: string | null }>()
 const emit = defineEmits(['saved'])
 
 const items = ref<InboundItem[]>([])
 const editVisible = ref(false)
-const editing = ref<InboundItem | null>(null)
+const editing = ref<InboundItem>({ ..._initialInboundItem })
 const selected = ref<InboundItem[]>([])
 
 const load = async () => {
@@ -33,7 +34,7 @@ const load = async () => {
 }
 
 const handleAdd = () => {
-  editing.value = null
+  editing.value = { ..._initialInboundItem }
   editVisible.value = true
 }
 

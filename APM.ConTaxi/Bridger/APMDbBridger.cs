@@ -14,7 +14,7 @@ namespace APM.ConTaxi.Bridger
 {
     public static class APMDbBridger
     {
-        public static void ConnectAPMDbContext(this IServiceCollection services, Action<DbContextOptionsBuilder> action)
+        public static void ConnectAPMDbContext(this IServiceCollection services, Action<IServiceProvider, DbContextOptionsBuilder> action)
         {
             services.AddDbContext<APMDbContext>(action);
         }

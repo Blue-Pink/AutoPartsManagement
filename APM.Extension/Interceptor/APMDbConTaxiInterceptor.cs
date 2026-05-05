@@ -1,14 +1,13 @@
 ﻿using APM.DbEntities;
+using APM.DbEntities.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using APM.IServices;
 using APM.UtilEntities;
 
 namespace APM.Extensions.Interceptor
 {
-    public class CalculatorInterceptor : SaveChangesInterceptor
+    public class APMDbConTaxiInterceptor(IUserContext userContext) : SaveChangesInterceptor
     {
         // 重写同步保存前的拦截方法
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -17,6 +16,7 @@ namespace APM.Extensions.Interceptor
             if (context == null) return result;
 
             SaveInboundItemTotalCalAmount(context);
+            UpdateOperatorUserId(context);
 
             return base.SavingChanges(eventData, result);
         }
@@ -61,6 +61,30 @@ namespace APM.Extensions.Interceptor
                 context.Update(order);
             }
 
+        }
+
+        private void UpdateOperatorUserId(DbContext context)
+        {
+            if (!userContext.UserId.HasValue)
+                return;
+
+            var changeEntries = context.ChangeTracker.Entries<BaseEntity>()
+                .Where(e => e.State is EntityState.Added or EntityState.Modified);
+
+            foreach (var entry in changeEntries)
+            {
+                entry.Entity.OperatorUserId = userContext.UserId.Value;
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.Id = entry.Entity.Id == Guid.Empty ? Guid.NewGuid() : entry.Entity.Id;
+                        entry.Entity.CreatedAt = DateTime.UtcNow;
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.ModifiedAt = DateTime.UtcNow;
+                        break;
+                }
+            }
         }
     }
 }

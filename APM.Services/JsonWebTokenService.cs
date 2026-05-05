@@ -25,10 +25,10 @@ namespace APM.Services
                 throw new APMException("User's Id,Username,Realname,PasswordHash cannot be null or empty.");
 
             IEnumerable<Claim> claims = [
-                new Claim("Id", user.Id.ToString()),
-                new Claim("Roles", JsonSerializer.Serialize(roles)),
-                new Claim(ClaimTypes.Name, $"{user.Id}"),
-                new Claim(ClaimTypes.Anonymous, user.Username),
+                new Claim(ConstDictionary.JwtClaimsUserId, user.Id.ToString()),
+                new Claim(ConstDictionary.JwtClaimsRoleIds, JsonSerializer.Serialize(roles)),
+                new Claim(ClaimTypes.Name, $"{user.Username}"),
+                new Claim(ClaimTypes.Anonymous, user.Realname),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Expiration, DateTime.UtcNow.AddDays(30).ToString("MMM ddd dd yyyy HH:mm:ss tt"))
             ];

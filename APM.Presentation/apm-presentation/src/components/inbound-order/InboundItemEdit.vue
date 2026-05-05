@@ -18,7 +18,7 @@ const inboundItem = ref<InboundItem>({ ..._initialInboundItem })
 const parts = ref<Part[]>([])
 const formRef = ref<FormInstance>()
 const rules = {
-  partId: [{ required: true, message: '请选择配件', trigger: 'change' }],
+  partId: [{ required: true, message: '请选择配件', trigger: 'blur' }],
   quantity: [{ required: true, message: '请输入数量', trigger: 'blur' }],
   price: [{ required: true, message: '请输入单价', trigger: 'blur' }],
 }
@@ -73,7 +73,15 @@ const handleSave = async () => {
 
 watch(
   () => props.modelValue,
-  (v) => (visible.value = v),
+  (v) => {
+    if (v)
+      loadParts().then(() => {
+        visible.value = v
+      })
+    else {
+      visible.value = v
+    }
+  },
 )
 
 watch(visible, (v) => emit('update:modelValue', v))
@@ -85,17 +93,11 @@ watch(
       UsualEntityService.Get<InboundItem>('InboundItem', i.id).then((res) => {
         if (res && res.data) inboundItem.value = res.data
       })
-    } else
-      inboundItem.value = {
-        ..._initialInboundItem,
-        inboundOrderId: props.orderId || inboundItem.value.inboundOrderId,
-      }
+    } else {
+      inboundItem.value = { ..._initialInboundItem }
+    }
   },
 )
-
-onMounted(() => {
-  loadParts()
-})
 </script>
 
 <template>

@@ -10,5 +10,7 @@ namespace APM.UtilEntities
         public const string Bearer = JwtBearerDefaults.AuthenticationScheme;
         public const string RedisCacheRolePermission = "RolePermission";
         public const string RedisCacheEntityRecord = "EntityRecord";
+        public const string JwtClaimsUserId = "JwtClaimsUserId";
+        public const string JwtClaimsRoleIds = "JwtClaimsRoleIds";
     }
 }

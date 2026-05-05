@@ -4,6 +4,7 @@ export interface BaseEntity {
     id: string | null;
     createdAt: string | null;
     modifiedAt: string | null;
+    operatorUserId: string | null;
 }
 
 export interface Part extends BaseEntity {

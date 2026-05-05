@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace APM.ConTaxi.Taxi
 {
@@ -34,29 +35,15 @@ namespace APM.ConTaxi.Taxi
             return type;
         }
 
-        private void UpdateIdAndTimestamps<T>(T entity, EntityState entityState) where T : BaseEntity
-        {
-            if (entityState == EntityState.Added)
-            {
-                entity.Id = entity.Id == Guid.Empty ? Guid.NewGuid() : entity.Id;
-                entity.CreatedAt = DateTime.UtcNow;
-            }
-            if (entityState == EntityState.Modified)
-                entity.ModifiedAt = DateTime.UtcNow;
-        }
-
-        /// <summary>
-        /// 动态获取实体中所有的导航属性类型（用于 Include）
-        /// </summary>
-        private IEnumerable<Type> GetNavigationPropertyTypes(Type entityType)
-        {
-            // 获取 EF Core 对该实体的元数据定义
-            var entityMetadata = context.Model.FindEntityType(entityType);
-            return entityMetadata == null ? Enumerable.Empty<Type>() :
-                entityMetadata.GetNavigations().Select(n => n.ClrType);
-        }
-
         #region 泛型
+
+        public IQueryable<T> BuildQuery<T>() where T : APMBaseEntity
+        {
+            if (!UseAdministration)
+                permission.CheckPermission<T>(PermissionType.Read);
+
+            return context.Set<T>();
+        }
 
         public T Create<T>(T entity) where T : BaseEntity
         {
@@ -170,8 +157,6 @@ namespace APM.ConTaxi.Taxi
             using var transaction = context.Database.BeginTransaction();
             try
             {
-                UpdateIdAndTimestamps(entity, entityState);
-
                 context.Entry(entity).State = entityState;
                 result = context.SaveChanges();
                 transaction.Commit();
@@ -194,7 +179,6 @@ namespace APM.ConTaxi.Taxi
             {
                 foreach (var entity in entities)
                 {
-                    UpdateIdAndTimestamps(entity, entityState);
                     context.Entry(entity).State = entityState;
                 }
 
@@ -224,7 +208,6 @@ namespace APM.ConTaxi.Taxi
                     if (!keyExists)
                         continue;
 
-                    UpdateIdAndTimestamps(entity, entityState);
                     context.Entry(entity).State = entityState;
                 }
 
@@ -294,7 +277,12 @@ namespace APM.ConTaxi.Taxi
 
             var type = CheckEntityName(entityName);
 
-            var entity = context.Find(type, id);
+            var query = BuildQuery(type);
+            GetEntityNavigationNames(type, out _, out string[] navigationNames, out _);
+            query = LinkWhereExpression(query, type, nameof(BaseEntity.Id), id);
+            query = LinkIncludeExpression(query, type, navigationNames);
+
+            var entity = BuildList(query, type).FirstOrDefault();
 
             return entity;
         }
@@ -404,66 +392,89 @@ namespace APM.ConTaxi.Taxi
             var parentType = CheckEntityName(parentEntityName);
             var childType = CheckEntityName(childEntityName);
 
-            var navigateTypes = GetNavigationPropertyTypes(childType);
-            var entityType = context.Model.FindEntityType(childType);
-            if (entityType is null)
-                throw new APMException($"Context 中未找到 {childEntityName}");
-
-            var foreignKeys = entityType?.GetForeignKeys()
-                .Where(fk => navigateTypes.Contains(fk.PrincipalEntityType.ClrType));
-            if (foreignKeys is null)
-                throw new APMException($"{childEntityName} 缺少与任一表的关系");
+            GetEntityNavigationNames(childType, out _, out string[] navigationNames, out var foreignKeys);
 
             var parentForeignKey = foreignKeys.FirstOrDefault(fk => fk.PrincipalEntityType.ClrType == parentType);
             if (parentForeignKey == null)
                 throw new APMException($"{childEntityName} 中没有找到指向 {parentEntityName} 的关联字段");
 
             //获取到子实体的 DbSet
-            var query = context.GetType().GetMethod(nameof(context.Set), 1, Type.EmptyTypes)?.MakeGenericMethod(childType).Invoke(context, null) as IQueryable;
-            if (query == null)
-                throw new APMException($"无法获取 {childEntityName} 的 DbSet");
+            //var query = context.GetType().GetMethod(nameof(context.Set), 1, Type.EmptyTypes)?.MakeGenericMethod(childType).Invoke(context, null) as IQueryable;
 
-            var parameter = Expression.Parameter(childType, "e");
-            var property = Expression.Property(parameter, parentForeignKey.Properties[0].Name);
-            var constant = Expression.Constant(parentId);
+            var query = BuildQuery(childType);
+            query = LinkWhereExpression(query, childType, parentForeignKey.Properties[0].Name, parentId);
+            query = LinkIncludeExpression(query, childType, navigationNames);
+
+            return BuildList(query, childType);
+        }
+
+        private IQueryable BuildQuery(Type entityType)
+        {
+            return GetType().GetMethod(nameof(BuildQuery), 1, Type.EmptyTypes)
+                ?.MakeGenericMethod(entityType).Invoke(this, null) is not IQueryable query
+                ? throw new APMException($"无法获取 {entityType.Name} 的 DbSet")
+                : query;
+        }
+
+        private IQueryable LinkWhereExpression(IQueryable query, Type entityType, string entityFieldName, object? entityFieldValue)
+        {
+            var properties = entityType.GetProperties().Where(p => p.Name.Equals(entityFieldName) && p.DeclaringType is not null);
+            if (!properties.Any())
+                throw new APMException($"{entityType} 中不存在属性 {entityFieldName}");
+
+            var parameter = Expression.Parameter(entityType);
+            var property = Expression.Property(parameter, properties.Count() == 1
+                ? properties.First()
+                : properties.First(p => p.DeclaringType.Name.Equals(nameof(BaseEntity))));
+            var constant = Expression.Constant(entityFieldValue);
             var equality = Expression.Equal(property, constant);
             var lambda = Expression.Lambda(equality, parameter);
 
-            var whereMethod = typeof(Queryable).GetMethods().First(m => m.Name == "Where" && m.GetParameters().Length == 2)?.MakeGenericMethod(childType);
+            var whereMethod = typeof(Queryable).GetMethods().First(m => m.Name == "Where" && m.GetParameters().Length == 2)?.MakeGenericMethod(entityType);
             if (whereMethod == null)
                 throw new APMException("无法获取 Where 方法");
 
-            query = whereMethod.Invoke(null, [query, lambda]) as IQueryable;
+            return whereMethod.Invoke(null, [query, lambda]) as IQueryable ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkWhereExpression)}]");
+        }
+
+        private IQueryable LinkIncludeExpression(IQueryable query, Type entityType, IEnumerable<string> navigations)
+        {
+            var navigationArray = navigations as string[] ?? navigations.ToArray();
+            if (!navigationArray.Any()) return query;
 
             var includeMethod = typeof(EntityFrameworkQueryableExtensions)
                 .GetMethods()
                 .FirstOrDefault(m => m.Name == "Include"
                                      && m.GetParameters().Length == 2
-                                     && m.GetParameters()[1].ParameterType == typeof(string));
-            if (includeMethod == null)
-                throw new APMException("无法获取 Include 方法");
+                                     && m.GetParameters()[1].ParameterType == typeof(string))
+                ?.MakeGenericMethod(entityType);
+            return includeMethod == null ? throw new APMException("无法获取 Include 方法") : navigationArray.Aggregate(query, (current, navigation) => (IQueryable)includeMethod.Invoke(null, [current, navigation])!);
+        }
 
-            if (navigateTypes.Any())
-            {
-                foreach (var navigateType in navigateTypes)
-                {
-                    var genericInclude = includeMethod.MakeGenericMethod(childType);
-                    query = (IQueryable)genericInclude.Invoke(null, [query, navigateType.Name])!;
-                }
-            }
-
-            var toListMethod = typeof(Enumerable).GetMethod("ToList", BindingFlags.Public | BindingFlags.Static)?.MakeGenericMethod(childType);
+        private List<object> BuildList(IQueryable query, Type entityType)
+        {
+            var toListMethod = typeof(Enumerable).GetMethod("ToList", BindingFlags.Public | BindingFlags.Static)?.MakeGenericMethod(entityType);
             if (toListMethod == null)
                 throw new APMException("无法获取 ToList 方法");
 
             var typedList = toListMethod.Invoke(null, [query]);
             var resultAsEnumerable = typedList as System.Collections.IEnumerable
                                      ?? throw new APMException("查询结果为空");
-            var resultList = resultAsEnumerable.Cast<object>().ToList();
-
-            return resultList;
+            return resultAsEnumerable.Cast<object>().ToList();
         }
 
+        private void GetEntityNavigationNames(Type entityType, out IEnumerable<INavigation> navigations, out string[] navigationNames, out IEnumerable<IForeignKey> foreignKeys)
+        {
+            var efEntityType = context.Model.FindEntityType(entityType);
+            if (efEntityType is null)
+                throw new APMException($"Context 中未找到 {entityType.Name}");
+
+            navigations = efEntityType.GetNavigations();
+            navigationNames = navigations.Select(n => n.Name).ToArray();
+            var linkNames = navigationNames;
+            foreignKeys = efEntityType?.GetForeignKeys()
+               .Where(fk => linkNames.Contains(fk.DependentToPrincipal?.Name)) ?? throw new APMException($"{entityType.Name} 缺少与任一表的关系"); ;
+        }
         #endregion
 
         public void Migrate()

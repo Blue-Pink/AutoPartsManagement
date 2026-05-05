@@ -124,7 +124,7 @@ namespace APM.ConTaxi.Permission
 
         private List<Guid> GetCurrentUserRoles()
         {
-            var claim = httpContextAccessor.HttpContext?.User?.FindFirst("Roles");
+            var claim = httpContextAccessor.HttpContext?.User?.FindFirst(ConstDictionary.JwtClaimsRoleIds);
             var roles = JsonSerializer.Deserialize<List<Guid>>(claim?.Value ?? "[]");
             return roles ?? new List<Guid>();
         }

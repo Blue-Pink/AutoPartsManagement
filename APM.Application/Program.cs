@@ -39,10 +39,10 @@ namespace APM.Application
                 }); ;
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
-            builder.Services.ConnectAPMDbContext(optionsBuilder =>
+            builder.Services.ConnectAPMDbContext((serviceProvider, optionsBuilder) =>
             {
                 optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-                optionsBuilder.AddInterceptors(new CalculatorInterceptor());
+                optionsBuilder.AddInterceptors(serviceProvider.GetRequiredService<APMDbConTaxiInterceptor>());
             });
             builder.Services.GetInAPMConTaxi();
 
@@ -75,7 +75,9 @@ namespace APM.Application
             builder.Services.AddJsonWebTokenService(builder.Configuration);
 
             builder.Services.AddScoped<APMActionFilter>();
+            builder.Services.AddScoped<APMDbConTaxiInterceptor>();
 
+            builder.Services.AddProxiedScoped<IUserContext, UserContext>();
             builder.Services.AddProxiedScoped<IUsualEntityService, UsualEntityService>();
             builder.Services.AddProxiedScoped<IUserRoleService, UserRoleService>();
             builder.Services.AddProxiedScoped<IPartService, PartService>();
