@@ -1,4 +1,4 @@
-import type { Role, User } from '@/interfaces/DTOEntities'
+import type { Role, User } from '@/interfaces/Entities'
 import $ from '@/utils/requestor'
 import type { UsualApiData } from '@/interfaces/HttpReponse'
 

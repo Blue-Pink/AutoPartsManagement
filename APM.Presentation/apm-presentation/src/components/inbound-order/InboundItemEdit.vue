@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
-import PartService from '@/services/PartService'
-import type { InboundItem, Part } from '@/interfaces/DTOEntities'
+import type { InboundItem, Part } from '@/interfaces/Entities'
 import { _initialInboundItem } from '@/utils/initialEntity'
 import UsualEntityService from '@/services/UsualEntityService'
 import { ConstDictionary } from '@/utils/const-dictionary'
@@ -24,8 +23,10 @@ const rules = {
 }
 const loadParts = async () => {
   try {
-    const res = await PartService.GetParts(1, 1000)
-    parts.value = res.dataList || []
+    if (!parts.value.length) {
+      const p = await UsualEntityService.GetDataSet<Part>('Part', 0)
+      parts.value = p.dataList || []
+    }
   } catch (e) {
     console.error(e)
   }
@@ -108,7 +109,7 @@ watch(
           <el-option
             v-for="p in parts"
             :key="p.id"
-            :label="`[${p.model}] - [${p.partName}] - [¥${p.costPrice}/${p.unitName}]`"
+            :label="`[${p.model}] - [${p.partName}] - [¥${p.costPrice}/${p.unit?.name}]`"
             :value="p.id"
           />
         </el-select>

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, reactive } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import SupplierService from '@/services/SupplierService'
-import type { Supplier } from '@/interfaces/DTOEntities'
+import type { Supplier } from '@/interfaces/Entities'
 import UsualEntityService from '@/services/UsualEntityService'
 import type { UsualApiData } from '@/interfaces/HttpReponse'
 import { _initialSupplier } from '@/utils/initialEntity'
@@ -32,7 +31,7 @@ const close = () => {
 const handleSave = async () => {
   try {
     await formRef.value?.validate()
-    await SupplierService.EditSupplier(supplier.value)
+    await UsualEntityService.Edit('Supplier', supplier.value)
     ElMessage.success('保存成功')
     emit('saved')
     close()

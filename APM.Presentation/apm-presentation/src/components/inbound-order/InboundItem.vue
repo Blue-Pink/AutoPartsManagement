@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import type { InboundItem } from '@/interfaces/DTOEntities'
+import type { InboundItem } from '@/interfaces/Entities'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import InboundItemEdit from '@/components/inbound-order/InboundItemEdit.vue'
 import UsualEntityService from '@/services/UsualEntityService'
@@ -154,7 +154,7 @@ watch([pageIndex, pageSize], load)
       </div>
       <div class="toolbar-right">
         <el-button type="primary" @click="handleAdd">添加明细</el-button>
-        <el-button type="danger" @click="handleBatchDelete">删除</el-button>
+        <el-button type="danger" @click="handleBatchDelete">删除明细</el-button>
       </div>
     </div>
     <el-table

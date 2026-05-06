@@ -8,11 +8,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using APM.IServices;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace APM.ConTaxi.Taxi
 {
-    internal class ConTaxiService(APMDbContext context, ITaxiPermission permission) : IConTaxiService
+    internal class ConTaxiService(APMDbContext context, ITaxiPermission permission, IUserContext userContext) : IConTaxiService
     {
         internal bool UseAdministration { get; set; }
 
@@ -313,7 +314,7 @@ namespace APM.ConTaxi.Taxi
             if (id is null || id == Guid.Empty)
                 return Create(type, instance) ?? throw new APMException($"{entityName} 创建失败");
 
-            return Update(entityName, type, id.Value, instance, properties) ?? throw new APMException($"{entityName} - [{id.Value}] 更新失败");
+            return Update(entityName, type, id.Value, instance, properties) ?? throw new APMException($"[{entityName}] - [{id.Value}] 更新失败");
 
         }
 
@@ -324,7 +325,7 @@ namespace APM.ConTaxi.Taxi
                 .FirstOrDefault(m => m is { Name: nameof(Create), IsGenericMethodDefinition: true } && m.GetParameters().Length == 1);
 
             if (createMethod == null)
-                throw new APMException($"未找到泛型 {nameof(Create)} 方法");
+                throw new APMException($"未找到泛型 [{nameof(Create)}] 方法");
 
             var generic = createMethod.MakeGenericMethod(entityType);
             var created = generic.Invoke(this, [instance]);
@@ -336,15 +337,25 @@ namespace APM.ConTaxi.Taxi
         {
             var efInstance = Get(entityName, id);
             if (efInstance is null)
-                throw new APMException($"更新失败, 未找到对应数据：{entityName}({id})");
+                throw new APMException($"更新失败, 未找到对应数据：[{entityName}] - [{id}]");
 
             foreach (var propertyInfo in properties)
             {
-                var efValue = propertyInfo.GetValue(efInstance);
-                var value = propertyInfo.GetValue(instance);
-                if (efValue != value)
+                switch (propertyInfo.Name)
                 {
-                    propertyInfo.SetValue(efInstance, value);
+                    case nameof(BaseEntity.OperatorUserId):
+                        propertyInfo.SetValue(efInstance, userContext.UserId ?? throw new APMException("未登录"));
+                        break;
+                    case nameof(BaseEntity.OperatorUser):
+                        var user = Get(nameof(User), userContext.UserId ?? throw new APMException("未登录"));
+                        propertyInfo.SetValue(efInstance, user);
+                        break;
+                    default:
+                        var efValue = propertyInfo.GetValue(efInstance);
+                        var value = propertyInfo.GetValue(instance);
+                        if (efValue != value)
+                            propertyInfo.SetValue(efInstance, value);
+                        break;
                 }
             }
 
@@ -352,7 +363,7 @@ namespace APM.ConTaxi.Taxi
                 .FirstOrDefault(m => m is { Name: nameof(Update), IsGenericMethodDefinition: true } && m.GetParameters().Length == 1);
 
             if (updateMethod == null)
-                throw new APMException($"未找到泛型 {nameof(Update)} 方法");
+                throw new APMException($"未找到泛型 [{nameof(Update)}] 方法");
 
             var generic = updateMethod.MakeGenericMethod(entityType);
             var updated = generic.Invoke(this, [efInstance]);
@@ -363,6 +374,7 @@ namespace APM.ConTaxi.Taxi
         private Type BuildRawTextEntity(string entityName, JsonElement entity, out IEnumerable<PropertyInfo> properties, out object instance, out Guid? id)
         {
             var type = CheckEntityName(entityName);
+            GetEntityNavigations(type, out var navigationNames);
 
             var options = new JsonSerializerOptions
             {
@@ -383,6 +395,15 @@ namespace APM.ConTaxi.Taxi
             var serializedInstance = JsonSerializer.Deserialize(entity.GetRawText(), type, options);
 
             instance = serializedInstance ?? throw new APMException($"更新失败, 数据实例化失败");
+
+            foreach (var navigationName in navigationNames)
+            {
+                var propertyInfo = properties.FirstOrDefault(p => p.Name == navigationName);
+                if (propertyInfo is null) continue;
+
+                propertyInfo.SetValue(instance, null);
+            }
+
             id = (instance as BaseEntity)?.Id;
             return type;
         }
@@ -497,9 +518,21 @@ namespace APM.ConTaxi.Taxi
                             && m.GetParameters().Length == 2
                             && m.GetParameters()[1].ParameterType == typeof(string))
                 ?.MakeGenericMethod(entityType);
-            return includeMethod == null
-                ? throw new APMException($"无法获取 [{nameof(EntityFrameworkQueryableExtensions.Include)}] 方法")
-                : navigationArray.Aggregate(query, (current, navigation) => (IQueryable)includeMethod.Invoke(null, [current, navigation])!);
+            if (includeMethod == null)
+                throw new APMException($"无法获取 [{nameof(EntityFrameworkQueryableExtensions.Include)}] 方法");
+            foreach (var navigation in navigationArray)
+            {
+                // todo 后续需要深度include
+                //var propertyInfo = entityType.GetProperty(navigation) ?? throw new APMException($"联查失败 [{entityType.Name}] 中未找到 [{navigation}]");
+                //var propertyType = propertyInfo.PropertyType;
+                //if (!UseAdministration)
+                //    permission.CheckPermission(propertyInfo.Name, PermissionType.Read);
+
+                query = includeMethod.Invoke(null, [query, navigation]) as IQueryable
+                        ?? throw new APMException($"联查失败 [{entityType.Name}] - [{navigation}] - [{nameof(EntityFrameworkQueryableExtensions.Include)}] 方法");
+            }
+
+            return query;
         }
 
         private IQueryable LinkPaginationExpression(IQueryable query, int pageIndex, int pageSize)

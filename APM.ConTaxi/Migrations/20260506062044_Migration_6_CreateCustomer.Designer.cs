@@ -4,6 +4,7 @@ using APM.ConTaxi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APM.ConTaxi.Migrations
 {
     [DbContext(typeof(APMDbContext))]
-    partial class APMDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506062044_Migration_6_CreateCustomer")]
+    partial class Migration_6_CreateCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -342,7 +345,7 @@ namespace APM.ConTaxi.Migrations
                             CreatedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
                             Description = "系统管理员",
                             ModifiedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
-                            OperatorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            OperatorUserId = new Guid("7035810c-ede3-4ffc-ab72-14cf85061a04"),
                             RoleName = "Administrator"
                         },
                         new
@@ -351,7 +354,7 @@ namespace APM.ConTaxi.Migrations
                             CreatedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
                             Description = "仓库管理员",
                             ModifiedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
-                            OperatorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            OperatorUserId = new Guid("7035810c-ede3-4ffc-ab72-14cf85061a04"),
                             RoleName = "Warehouse Manager"
                         });
                 });
@@ -484,7 +487,7 @@ namespace APM.ConTaxi.Migrations
                             CreatedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
                             IsActive = true,
                             ModifiedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
-                            OperatorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            OperatorUserId = new Guid("7035810c-ede3-4ffc-ab72-14cf85061a04"),
                             PasswordHash = "$2a$11$ToqAlthCo6lbu4j6kAb8m.7XIP9gCOUgQRCBsSorupnn88xK9S5ee",
                             Realname = "Administrator",
                             Username = "Administrator"
@@ -533,7 +536,7 @@ namespace APM.ConTaxi.Migrations
                             AssignedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
                             CreatedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
                             ModifiedAt = new DateTime(2026, 3, 25, 6, 20, 21, 0, DateTimeKind.Unspecified),
-                            OperatorUserId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            OperatorUserId = new Guid("7035810c-ede3-4ffc-ab72-14cf85061a04"),
                             RoleId = new Guid("7035810c-ede3-4ffc-ab72-14cf85061a04"),
                             UserId = new Guid("f1a89d52-1c0f-4070-a6dd-761a04fcf7f4")
                         });

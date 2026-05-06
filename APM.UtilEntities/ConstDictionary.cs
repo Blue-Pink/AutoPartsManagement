@@ -12,5 +12,6 @@ namespace APM.UtilEntities
         public const string RedisCacheEntityRecord = "EntityRecord";
         public const string JwtClaimsUserId = "JwtClaimsUserId";
         public const string JwtClaimsRoleIds = "JwtClaimsRoleIds";
+        public const string AdministratorId = "F1A89D52-1C0F-4070-A6DD-761A04FCF7F4";
     }
 }

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import PartService from '@/services/PartService'
-import type { Category, Part, Unit } from '@/interfaces/DTOEntities'
+import type { PartCategory, Part, PartUnit } from '@/interfaces/Entities'
 import UsualEntityService from '@/services/UsualEntityService'
 import type { UsualApiData } from '@/interfaces/HttpReponse'
 import { _initialPart } from '@/utils/initialEntity'
@@ -16,8 +15,8 @@ const emit = defineEmits(['update:modelValue', 'saved'])
 const visible = ref(props.modelValue)
 const formRef = ref<FormInstance>()
 const part = ref<Part>({ ..._initialPart })
-const categories = ref<Category[]>([])
-const units = ref<Unit[]>([])
+const categories = ref<PartCategory[]>([])
+const units = ref<PartUnit[]>([])
 const rules = reactive<FormRules>({
   partName: [
     { required: true, message: '请输入名称', trigger: 'blur' },
@@ -35,8 +34,8 @@ const rules = reactive<FormRules>({
     { required: true, message: '请输入品牌', trigger: 'blur' },
     { min: 2, max: 50, message: '品牌长度必须在 2-50 之间', trigger: 'blur' },
   ],
-  categories: [{ required: true, message: '请选择分类', trigger: 'change' }],
-  units: [{ required: true, message: '请选择单位', trigger: 'change' }],
+  categoryId: [{ required: true, message: '请选择分类', trigger: 'blur' }],
+  unitId: [{ required: true, message: '请选择单位', trigger: 'blur' }],
   costPrice: [{ required: true, message: '请输入成本价', trigger: 'blur' }],
   sellingPrice: [{ required: true, message: '请输入售价', trigger: 'blur' }],
   minStock: [{ required: true, message: '请输入最小库存', trigger: 'blur' }],
@@ -45,12 +44,14 @@ const rules = reactive<FormRules>({
 
 const loadOptions = async () => {
   try {
-    const c = await PartService.GetCategories()
-    categories.value = c.dataList || []
-    part.value.categoryId = part.value.categoryId || categories.value[0]?.id || null
-    const u = await PartService.GetUnits()
-    units.value = u.dataList || []
-    part.value.unitId = part.value.unitId || units.value[0]?.id || null
+    if (!categories.value.length) {
+      const c = await UsualEntityService.GetDataSet<PartCategory>('PartCategory', 0)
+      categories.value = c.dataList || []
+    }
+    if (!units.value.length) {
+      const u = await UsualEntityService.GetDataSet<PartUnit>('PartUnit', 0)
+      units.value = u.dataList || []
+    }
   } catch (e) {
     console.error(e)
   }
@@ -64,7 +65,7 @@ const close = () => {
 const handleSave = async () => {
   try {
     await formRef.value?.validate()
-    await PartService.EditPart(part.value)
+    await UsualEntityService.Edit('Part', part.value)
     ElMessage.success('保存成功')
     emit('saved')
     close()
@@ -73,12 +74,16 @@ const handleSave = async () => {
   }
 }
 
-onMounted(loadOptions)
-
 watch(
   () => props.modelValue,
   (val: boolean) => {
-    visible.value = val
+    if (val) {
+      loadOptions().then(() => {
+        visible.value = val
+      })
+    } else {
+      visible.value = val
+    }
   },
 )
 
@@ -131,12 +136,12 @@ watch(
       <el-form-item label="品牌" prop="brand">
         <el-input v-model="part.brand" />
       </el-form-item>
-      <el-form-item label="分类">
+      <el-form-item label="分类" prop="categoryId">
         <el-select v-model="part.categoryId" placeholder="请选择分类">
           <el-option v-for="c in categories" :key="c.id" :label="c.name" :value="c.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="单位">
+      <el-form-item label="单位" prop="unitId">
         <el-select v-model="part.unitId" placeholder="请选择单位">
           <el-option v-for="u in units" :key="u.id" :label="u.name" :value="u.id" />
         </el-select>

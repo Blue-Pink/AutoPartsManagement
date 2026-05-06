@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import InboundOrderService from '@/services/InboundOrderService'
-import type { InboundOrder } from '@/interfaces/DTOEntities'
+import type { InboundOrder } from '@/interfaces/Entities'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { ConvertDateTime } from '@/utils/converter'
@@ -13,8 +12,8 @@ const pageIndex = ref(1)
 const pageSize = ref(25)
 const total = ref(0)
 const selected = ref<InboundOrder[]>([])
-const sortField = ref<string | null>(null)
-const sortDesc = ref<boolean>(false)
+const orderBy = ref<string>('')
+const descending = ref<boolean>(false)
 const router = useRouter()
 
 const load = async () => {
@@ -23,8 +22,8 @@ const load = async () => {
       'InboundOrder',
       pageIndex.value,
       pageSize.value,
-      sortField.value || undefined,
-      sortDesc.value,
+      orderBy.value,
+      descending.value,
     )
     if (res.dataList) {
       orders.value = res.dataList || []
@@ -36,11 +35,11 @@ const load = async () => {
 }
 
 const handleAdd = () => {
-  router.push({ path: '/InboundOrder/Edit' })
+  router.push({ path: '/inbound-order/edit' })
 }
 
 const handleEdit = (row: InboundOrder) => {
-  router.push({ path: `/InboundOrder/Edit/${row.id}` })
+  router.push({ path: `/inbound-order/edit/${row.id}` })
 }
 
 const handleDeleteSingle = async (row: InboundOrder) => {

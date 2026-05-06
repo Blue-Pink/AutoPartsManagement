@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import SupplierService from '@/services/SupplierService'
-import type { Supplier } from '@/interfaces/DTOEntities'
+import type { Supplier } from '@/interfaces/Entities'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import SupplierEdit from '@/components/inbound-order/SupplierEdit.vue'
+import SupplierEdit from '@/components/supplier/SupplierEdit.vue'
 import { ConvertDateTime } from '@/utils/converter'
 import UsualEntityService from '@/services/UsualEntityService'
 import { _initialSupplier } from '@/utils/initialEntity'
+import { ConstDictionary } from '@/utils/const-dictionary'
 
 const suppliers = ref<Supplier[] | null>([])
 const pageIndex = ref(1)
@@ -15,16 +15,17 @@ const total = ref(0)
 const selectedSuppliers = ref<Supplier[]>([])
 const editVisible = ref(false)
 const editingSupplier = ref<Supplier>({ ..._initialSupplier })
-const sortField = ref<string | null>(null)
-const sortDesc = ref<boolean>(false)
+const orderBy = ref<string>('')
+const descending = ref<boolean>(false)
 
 const loadSuppliers = async () => {
   try {
-    const res = await SupplierService.GetSuppliers(
+    const res = await UsualEntityService.GetDataSet<Supplier>(
+      'Supplier',
       pageIndex.value,
       pageSize.value,
-      sortField.value || undefined,
-      sortDesc.value,
+      orderBy.value,
+      descending.value,
     )
     if (res.dataList) {
       suppliers.value = res.dataList || []

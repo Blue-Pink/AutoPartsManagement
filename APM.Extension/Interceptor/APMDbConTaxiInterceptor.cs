@@ -16,6 +16,7 @@ namespace APM.Extensions.Interceptor
             if (context == null) return result;
 
             SaveInboundItemTotalCalAmount(context);
+
             UpdateOperatorUserId(context);
 
             return base.SavingChanges(eventData, result);
@@ -65,15 +66,11 @@ namespace APM.Extensions.Interceptor
 
         private void UpdateOperatorUserId(DbContext context)
         {
-            if (!userContext.UserId.HasValue)
-                return;
-
-            var changeEntries = context.ChangeTracker.Entries<BaseEntity>()
+            var changedEntries = context.ChangeTracker.Entries<BaseEntity>()
                 .Where(e => e.State is EntityState.Added or EntityState.Modified);
 
-            foreach (var entry in changeEntries)
+            foreach (var entry in changedEntries)
             {
-                entry.Entity.OperatorUserId = userContext.UserId.Value;
                 switch (entry.State)
                 {
                     case EntityState.Added:

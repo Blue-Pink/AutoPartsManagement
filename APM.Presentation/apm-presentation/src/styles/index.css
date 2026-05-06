@@ -67,13 +67,17 @@ body {
 }
 
 .apm-container .pagination {
-  background-color: var(--basic-backcolor-light);
   display: flex;
   justify-content: center;
+  margin-top: 14px;
+}
+
+.apm-container .pagination .el-pagination {
+  background-color: transparent;
+  padding: 13.5px;
   box-shadow: var(--basic-box-shadow);
   border-radius: var(--basic-border-radius);
-  margin-top: 10px;
-  padding: 14px 0;
+  background-color: var(--basic-backcolor-light);
 }
 
 .apm-editor-container {

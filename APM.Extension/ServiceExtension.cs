@@ -140,7 +140,8 @@ namespace APM.Extensions
                var entityAssembly = typeof(APMBaseEntity).Assembly;
                var assemblyEntities = entityAssembly
                     .GetTypes()
-                    .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(APMBaseEntity))
+                    .Where(t => t is { IsClass: true, IsAbstract: false } 
+                                && t.IsSubclassOf(typeof(APMBaseEntity))
                                 && t != typeof(EntityRecord))
                     .Select(t => new { t.Name, FullName = t.FullName ?? "", t.GetCustomAttribute<DescriptionAttribute>()?.Description })
                     .Where(t => !string.IsNullOrEmpty(t.FullName))
@@ -172,7 +173,7 @@ namespace APM.Extensions
                    else
                    {
                        var update = false;
-                       if (record.IsActive == false)
+                       if (!record.IsActive)
                        {
                            record.IsActive = true;
                            update = true;
@@ -184,7 +185,7 @@ namespace APM.Extensions
                            update = true;
                        }
 
-                       if (update == true)
+                       if (update)
                        {
                            record.EntityName = entity.Name;
                            record.FullName = entity.FullName;
@@ -195,14 +196,11 @@ namespace APM.Extensions
                }
 
                //处理被删除或不再继承的实体
-               foreach (var record in entityRecords)
+               foreach (var record in entityRecords.Where(record => assemblyEntities.All(e => e.FullName != record.FullName)))
                {
-                   if (!assemblyEntities.Any(e => e.FullName == record.FullName))
-                   {
-                       record.IsActive = false;
-                       updateEntityRecords.Add(record);
-                       recordsState[record.Id] = EntityState.Modified;
-                   }
+                   record.IsActive = false;
+                   updateEntityRecords.Add(record);
+                   recordsState[record.Id] = EntityState.Modified;
                }
 
                if (updateEntityRecords.Any() && recordsState.Any() && updateEntityRecords.Count == recordsState.Count)

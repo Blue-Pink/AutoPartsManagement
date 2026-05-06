@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import UserService from '@/services/UserService'
 import UsualEntityService from '@/services/UsualEntityService'
-import type { InboundOrder, Role, User } from '@/interfaces/DTOEntities'
+import type { InboundOrder, Role, User } from '@/interfaces/Entities'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import UserEdit from '@/components/user/UserEdit.vue'
 import { ConvertDateTime } from '@/utils/converter'

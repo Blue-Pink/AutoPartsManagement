@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import UserService from '@/services/UserService'
 import UsualEntityService from '@/services/UsualEntityService'
-import type { User, Role } from '@/interfaces/DTOEntities'
+import type { User, Role } from '@/interfaces/Entities'
 import { _initialUser } from '@/utils/initialEntity'
 import { ConstDictionary } from '@/utils/const-dictionary'
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import UserService from '@/services/UserService'
-import type { User } from '@/interfaces/DTOEntities'
+import type { User } from '@/interfaces/Entities'
 import { userAuthStore } from '@/stores/auth'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import router from '@/router'

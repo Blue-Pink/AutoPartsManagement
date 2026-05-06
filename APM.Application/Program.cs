@@ -67,6 +67,7 @@ namespace APM.Application
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddSingleton<IRedisService, RedisService>();
             builder.Services.AddSingleton<IJsonWebTokenService, JsonWebTokenService>();
+            builder.Services.AddScoped<IUserContext, UserContext>();
 
             builder.Services.AddScoped<IInterceptor, APMExtensionInterceptor>();
 
@@ -77,12 +78,8 @@ namespace APM.Application
             builder.Services.AddScoped<APMActionFilter>();
             builder.Services.AddScoped<APMDbConTaxiInterceptor>();
 
-            builder.Services.AddProxiedScoped<IUserContext, UserContext>();
             builder.Services.AddProxiedScoped<IUsualEntityService, UsualEntityService>();
             builder.Services.AddProxiedScoped<IUserRoleService, UserRoleService>();
-            builder.Services.AddProxiedScoped<IPartService, PartService>();
-            builder.Services.AddProxiedScoped<ISupplierService, SupplierService>();
-            builder.Services.AddProxiedScoped<IInboundOrderService, InboundOrderService>();
 
             var app = builder.Build();
 

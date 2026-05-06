@@ -1,4 +1,4 @@
-import type { BaseEntity, InboundItem, InboundOrder, Part, Supplier, User } from "../interfaces/DTOEntities";
+import type { BaseEntity, Customer, InboundItem, InboundOrder, Part, Supplier, User } from "../interfaces/Entities";
 import { ConstDictionary } from "./const-dictionary";
 
 /**
@@ -28,8 +28,8 @@ export const _initialPart: Part = {
         remark: null,
         partName: null,
         oeCode: null,
-        categoryName: null,
-        unitName: null,
+        category: null,
+        unit: null,
     })
 }
 
@@ -39,6 +39,16 @@ export const _initialSupplier = {
         contact: null,
         phone: null,
         address: null,
+    })
+}
+
+export const _initialCustomer = {
+    ...createDefaultEntity<Customer>({
+        name: null,
+        contactPerson: null,
+        phone: null,
+        address: null,
+        remark: null,
     })
 }
 

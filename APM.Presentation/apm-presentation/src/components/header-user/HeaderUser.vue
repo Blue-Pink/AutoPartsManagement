@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import UserService from '@/services/UserService'
-import type { User } from '@/interfaces/DTOEntities'
+import type { User } from '@/interfaces/Entities'
 import { _initialUser } from '@/utils/initialEntity'
 import { MoonNight, Sunrise } from '@element-plus/icons-vue'
 

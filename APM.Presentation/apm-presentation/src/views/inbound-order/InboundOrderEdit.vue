@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import SupplierService from '@/services/SupplierService'
-import type { InboundOrder, Supplier } from '@/interfaces/DTOEntities'
+import type { InboundOrder, Supplier } from '@/interfaces/Entities'
 import { ElMessage, type FormInstance } from 'element-plus'
 import InboundItem from '@/components/inbound-order/InboundItem.vue'
 import UsualEntityService from '@/services/UsualEntityService'
@@ -18,10 +17,13 @@ const emit = defineEmits(['saved'])
 const order = ref<InboundOrder>({ ..._initialInboundOrder })
 const suppliers = ref<Supplier[]>([])
 const formRef = ref<FormInstance>()
+const rules = ref({
+  supplierId: [{ required: true, message: '请选择供应商', trigger: 'blur' }],
+})
 
 const loadOptions = async () => {
   try {
-    const s = await SupplierService.GetSuppliers(1, 1000)
+    const s = await UsualEntityService.GetDataSet<Supplier>('Supplier', 0)
     suppliers.value = s.dataList || []
   } catch (e) {
     console.error(e)
@@ -57,7 +59,7 @@ const handleSave = async () => {
     UsualEntityService.Edit<InboundOrder>('InboundOrder', order.value)
       .then((res) => {
         if (res.data && !id.value) {
-          router.replace(`/InboundOrder/edit/${res.data.id}`)
+          router.replace(`/inbound-order/edit/${res.data.id}`)
         } else {
           load()
           ElMessage.success('保存成功')
@@ -94,27 +96,27 @@ watch(
   <div class="apm-editor-container">
     <div class="apm-container">
       <div class="title">入库单 {{ id ? order.orderNo : '新建' }}</div>
-      <el-form :model="order" ref="formRef" label-width="100px">
+      <el-form :model="order" ref="formRef" label-width="100px" :rules="rules">
         <el-row :gutter="16">
           <el-col :span="6">
-            <el-form-item label="订单号">
+            <el-form-item label="订单号" prop="orderNo">
               <el-input v-model="order.orderNo" disabled />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="供应商">
+            <el-form-item label="供应商" prop="supplierId">
               <el-select v-model="order.supplierId" placeholder="选择供应商">
                 <el-option v-for="s in suppliers" :key="s.id" :label="s.name" :value="s.id" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="总金额">
+            <el-form-item label="总金额" prop="totalAmount">
               <el-input-number v-model="order.totalAmount" disabled />
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="经办人">
+            <el-form-item label="经办人" prop="operatorUserId">
               <el-input disabled :value="order.operatorUser?.realname" />
             </el-form-item>
           </el-col>

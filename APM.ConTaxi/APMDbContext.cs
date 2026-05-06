@@ -38,6 +38,9 @@ namespace APM.ConTaxi
 
         public DbSet<InboundItem> InboundItem { get; set; }
 
+        public DbSet<Customer> Customer { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -85,7 +88,7 @@ namespace APM.ConTaxi
             });
             #endregion
 
-            #region 关系
+            #region 实体经办人关系
 
             modelBuilder.Entity<User>()
                 .HasOne(o => o.OperatorUser)
@@ -152,6 +155,16 @@ namespace APM.ConTaxi
                 .WithMany()
                 .HasForeignKey(o => o.OperatorUserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Customer>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            #endregion
+
+            #region 实体与实体关系
 
             modelBuilder.Entity<UserRole>()
                 .HasOne(userRole => userRole.User)

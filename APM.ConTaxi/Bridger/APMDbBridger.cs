@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Security;
 using System.Text;
+using APM.DbEntities;
 
 namespace APM.ConTaxi.Bridger
 {
@@ -34,15 +35,22 @@ namespace APM.ConTaxi.Bridger
             if (action != null)
                 action.Invoke(taxi);
         }
-        public static void TaxiInvokeAdmin(this IApplicationBuilder applicationBuilder, Action<IConTaxiService, IRedisService?>? action = null)
+        public static void TaxiInvokeAdmin(this IApplicationBuilder applicationBuilder, Action<IConTaxiService, IRedisService>? action = null)
         {
             var serviceProvider = applicationBuilder.ApplicationServices;
             using var scope = serviceProvider.CreateScope();
             var taxi = scope.ServiceProvider.GetRequiredService<IConTaxiService>();
-            var redis = serviceProvider.GetService<IRedisService>();
             if (taxi is ConTaxiService conTaxiService)
                 conTaxiService.UseAdministration = true;
 
+            var redis = serviceProvider.GetRequiredService<IRedisService>();
+            var user = taxi.Get<User>(new Guid(ConstDictionary.AdministratorId));
+            var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();
+            if (user is not null)
+            {
+                userContext.Impersonation(user);
+            }
+            
             action?.Invoke(taxi, redis);
 
         }

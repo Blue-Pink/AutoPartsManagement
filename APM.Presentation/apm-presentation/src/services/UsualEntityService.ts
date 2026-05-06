@@ -1,7 +1,7 @@
 import $ from '@/utils/requestor';
 import type { UsualApiData } from '@/interfaces/HttpReponse';
 import { ConstDictionary } from '@/utils/const-dictionary';
-import type { BaseEntity } from '@/interfaces/DTOEntities';
+import type { BaseEntity } from '@/interfaces/Entities';
 
 class UsualEntityService {
     Get<T>(entityName: string, id: string): Promise<UsualApiData<T>> {

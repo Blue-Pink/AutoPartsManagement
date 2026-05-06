@@ -30,15 +30,15 @@ export interface Part extends BaseEntity {
     unitId: string | null;
     /** 备注 */
     remark: string | null;
-    categoryName: string | null;
-    unitName: string | null;
+    category: PartCategory | null;
+    unit: PartUnit | null;
 }
 
-export interface Unit extends BaseEntity {
+export interface PartUnit extends BaseEntity {
     name: string | null;
 }
 
-export interface Category extends BaseEntity {
+export interface PartCategory extends BaseEntity {
     name: string | null;
     description: string | null;
 }
@@ -107,4 +107,17 @@ export interface InboundItem extends BaseEntity {
     price: number | null;
     /** 合计金额(入库数量x入库单价) */
     totalAmount: number | null;
+}
+
+export interface Customer extends BaseEntity {
+    /** 客户名称 */
+    name: string | null;
+    /** 联系人 */
+    contactPerson?: string | null;
+    /** 联系电话 */
+    phone?: string | null;
+    /** 联系地址 */
+    address?: string | null;
+    /** 备注 */
+    remark?: string | null;
 }
