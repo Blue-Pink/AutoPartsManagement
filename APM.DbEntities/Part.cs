@@ -49,5 +49,8 @@ namespace APM.DbEntities
 
         [Description("备注")]
         public string? Remark { get; set; }
+
+        [Description("当前库存")]
+        public int Stockpiles { get; set; }
     }
 }

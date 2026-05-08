@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { ElMessage, type FormInstance } from 'element-plus'
-import type { InboundItem, Part } from '@/interfaces/Entities'
-import { _initialInboundItem } from '@/utils/initialEntity'
+import type { OutboundItem, Part } from '@/interfaces/Entities'
+import { _initialOutboundItem, createDefaultEntity } from '@/utils/initialEntity'
 import UsualEntityService from '@/services/UsualEntityService'
 import { ConstDictionary } from '@/utils/const-dictionary'
 import { NumberToFixed } from '@/utils/converter'
 
 const props = defineProps<{
   modelValue: boolean
-  item: InboundItem | null
+  item: OutboundItem | null
   orderId: string | null
 }>()
 const emit = defineEmits(['update:modelValue', 'saved'])
 const visible = ref(props.modelValue)
-const inboundItem = ref<InboundItem>({ ..._initialInboundItem })
+const outboundItem = ref<OutboundItem>(
+  createDefaultEntity<OutboundItem>({ ..._initialOutboundItem }),
+)
 const parts = ref<Part[]>([])
 const formRef = ref<FormInstance>()
 const rules = {
@@ -22,9 +24,10 @@ const rules = {
   quantity: [{ required: true, message: '请输入数量', trigger: 'blur' }],
   price: [{ required: true, message: '请输入单价', trigger: 'blur' }],
 }
+
 const loadParts = async () => {
   try {
-    const p = await UsualEntityService.GetDataSet<Part>('Part', 0)
+    const p = await UsualEntityService.GetDataSet<Part>('Part', 0, 0, 'stockpiles', true)
     parts.value = p.dataList || []
   } catch (e) {
     console.error(e)
@@ -39,21 +42,23 @@ const close = () => {
 const handlePartChange = (partId: string) => {
   const selectedPart = parts.value.find((p) => p.id === partId)
   if (selectedPart) {
-    inboundItem.value.price = selectedPart.costPrice || 0
-    handlePriceChange(inboundItem.value.price || 0)
+    outboundItem.value.price = selectedPart.sellingPrice || 0
+    handlePriceChange(outboundItem.value.price || 0)
   }
 }
 
 const handleQuantityChange = (quantity: number) => {
-  if (inboundItem.value.price) {
-    inboundItem.value.totalAmount = NumberToFixed(quantity * (inboundItem.value.price || 0) || 0.01)
+  if (outboundItem.value.price) {
+    outboundItem.value.totalAmount = NumberToFixed(
+      quantity * (outboundItem.value.price || 0) || 0.01,
+    )
   }
 }
 
 const handlePriceChange = (price: number) => {
-  if (inboundItem.value.quantity) {
-    inboundItem.value.totalAmount = NumberToFixed(
-      (inboundItem.value.quantity || 0) * (price || 0) || 0.01,
+  if (outboundItem.value.quantity) {
+    outboundItem.value.totalAmount = NumberToFixed(
+      (outboundItem.value.quantity || 0) * (price || 0) || 0.01,
     )
   }
 }
@@ -61,11 +66,11 @@ const handlePriceChange = (price: number) => {
 const handleSave = async () => {
   try {
     await formRef.value?.validate?.()
-    inboundItem.value.inboundOrderId = props.orderId || inboundItem.value.inboundOrderId
-    inboundItem.value.totalAmount = NumberToFixed(
-      (inboundItem.value.quantity || 0) * (inboundItem.value.price || 0) || 0.01,
+    outboundItem.value.outboundOrderId = props.orderId || outboundItem.value.outboundOrderId
+    outboundItem.value.totalAmount = NumberToFixed(
+      (outboundItem.value.quantity || 0) * (outboundItem.value.price || 0) || 0.01,
     )
-    await UsualEntityService.Edit('InboundItem', inboundItem.value)
+    await UsualEntityService.Edit('OutboundItem', outboundItem.value)
     ElMessage.success('保存成功')
     emit('saved')
     close()
@@ -93,11 +98,11 @@ watch(
   () => props.item,
   (i) => {
     if (i && i.id && i.id !== ConstDictionary.EMPTY_GUID) {
-      UsualEntityService.Get<InboundItem>('InboundItem', i.id).then((res) => {
-        if (res && res.data) inboundItem.value = res.data
+      UsualEntityService.Get<OutboundItem>('OutboundItem', i.id).then((res) => {
+        if (res && res.data) outboundItem.value = res.data
       })
     } else {
-      inboundItem.value = { ..._initialInboundItem }
+      outboundItem.value = createDefaultEntity<OutboundItem>({ ..._initialOutboundItem })
     }
   },
 )
@@ -105,9 +110,9 @@ watch(
 
 <template>
   <el-dialog v-model="visible" title="明细编辑" width="36vw" @close="close">
-    <el-form :model="inboundItem" :rules="rules" ref="formRef" label-width="100px">
+    <el-form :model="outboundItem" :rules="rules" ref="formRef" label-width="100px">
       <el-form-item label="配件" prop="partId">
-        <el-select v-model="inboundItem.partId" placeholder="选择配件" @change="handlePartChange">
+        <el-select v-model="outboundItem.partId" placeholder="选择配件" @change="handlePartChange">
           <el-option
             v-for="p in parts"
             :key="p.id"
@@ -119,18 +124,18 @@ watch(
         </el-select>
       </el-form-item>
       <el-form-item label="数量" prop="quantity">
-        <el-input-number v-model="inboundItem.quantity" :min="1" @change="handleQuantityChange" />
+        <el-input-number v-model="outboundItem.quantity" :min="1" @change="handleQuantityChange" />
       </el-form-item>
       <el-form-item label="单价" prop="price">
         <el-input-number
-          v-model="inboundItem.price"
+          v-model="outboundItem.price"
           :min="0.01"
           :step="0.01"
           @change="handlePriceChange"
         />
       </el-form-item>
       <el-form-item label="合计" prop="totalAmount">
-        <el-input-number v-model="inboundItem.totalAmount" :min="0.01" :step="0.01" disabled />
+        <el-input-number v-model="outboundItem.totalAmount" :min="0.01" :step="0.01" disabled />
       </el-form-item>
     </el-form>
     <template #footer>

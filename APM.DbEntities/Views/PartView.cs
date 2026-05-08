@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace APM.DbEntities.Views
 {
@@ -14,7 +15,9 @@ namespace APM.DbEntities.Views
         public required string OECode { get; set; }
         public string? Model { get; set; }
         public string? Brand { get; set; }
+        [Precision(18, 2)]
         public decimal CostPrice { get; set; }
+        [Precision(18, 2)]
         public decimal SellingPrice { get; set; }
         public int MinStock { get; set; }
         public int MaxStock { get; set; }

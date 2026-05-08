@@ -4,6 +4,7 @@ using APM.ConTaxi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APM.ConTaxi.Migrations
 {
     [DbContext(typeof(APMDbContext))]
-    partial class APMDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260507004617_Migration_7_CreateOutbound")]
+    partial class Migration_7_CreateOutbound
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,7 +60,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("OperatorUserId");
 
-                    b.ToTable("Customer", (string)null);
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("APM.DbEntities.EntityRecord", b =>
@@ -99,7 +102,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("OperatorUserId");
 
-                    b.ToTable("EntityRecord", (string)null);
+                    b.ToTable("EntityRecord");
                 });
 
             modelBuilder.Entity("APM.DbEntities.InboundItem", b =>
@@ -142,7 +145,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("PartId");
 
-                    b.ToTable("InboundItem", (string)null);
+                    b.ToTable("InboundItem");
                 });
 
             modelBuilder.Entity("APM.DbEntities.InboundOrder", b =>
@@ -183,7 +186,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("InboundOrder", (string)null);
+                    b.ToTable("InboundOrder");
                 });
 
             modelBuilder.Entity("APM.DbEntities.OutboundItem", b =>
@@ -224,7 +227,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("PartId");
 
-                    b.ToTable("OutboundItem", (string)null);
+                    b.ToTable("OutboundItem");
                 });
 
             modelBuilder.Entity("APM.DbEntities.OutboundOrder", b =>
@@ -268,7 +271,7 @@ namespace APM.ConTaxi.Migrations
                     b.HasIndex("OrderNo")
                         .IsUnique();
 
-                    b.ToTable("OutboundOrder", (string)null);
+                    b.ToTable("OutboundOrder");
                 });
 
             modelBuilder.Entity("APM.DbEntities.Part", b =>
@@ -320,9 +323,6 @@ namespace APM.ConTaxi.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Stockpiles")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uniqueidentifier");
 
@@ -337,7 +337,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("Part", (string)null);
+                    b.ToTable("Part");
                 });
 
             modelBuilder.Entity("APM.DbEntities.PartCategory", b =>
@@ -366,7 +366,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("OperatorUserId");
 
-                    b.ToTable("PartCategory", (string)null);
+                    b.ToTable("PartCategory");
                 });
 
             modelBuilder.Entity("APM.DbEntities.PartUnit", b =>
@@ -392,7 +392,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("OperatorUserId");
 
-                    b.ToTable("PartUnit", (string)null);
+                    b.ToTable("PartUnit");
                 });
 
             modelBuilder.Entity("APM.DbEntities.Role", b =>
@@ -424,7 +424,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("OperatorUserId");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("Role");
 
                     b.HasData(
                         new
@@ -489,7 +489,7 @@ namespace APM.ConTaxi.Migrations
                     b.HasIndex("RoleId", "EntityId")
                         .IsUnique();
 
-                    b.ToTable("RolePermission", (string)null);
+                    b.ToTable("RolePermission");
                 });
 
             modelBuilder.Entity("APM.DbEntities.Supplier", b =>
@@ -524,7 +524,7 @@ namespace APM.ConTaxi.Migrations
 
                     b.HasIndex("OperatorUserId");
 
-                    b.ToTable("Supplier", (string)null);
+                    b.ToTable("Supplier");
                 });
 
             modelBuilder.Entity("APM.DbEntities.User", b =>
@@ -566,7 +566,7 @@ namespace APM.ConTaxi.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
 
                     b.HasData(
                         new
@@ -615,7 +615,7 @@ namespace APM.ConTaxi.Migrations
                     b.HasIndex("UserId", "RoleId")
                         .IsUnique();
 
-                    b.ToTable("UserRole", (string)null);
+                    b.ToTable("UserRole");
 
                     b.HasData(
                         new

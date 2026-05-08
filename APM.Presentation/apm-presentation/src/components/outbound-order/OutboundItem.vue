@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import type { InboundItem } from '@/interfaces/Entities'
+import { ref, watch } from 'vue'
+import type { OutboundItem } from '@/interfaces/Entities'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import InboundItemEdit from '@/components/inbound-order/InboundItemEdit.vue'
+import OutboundItemEdit from '@/components/outbound-order/OutboundItemEdit.vue'
 import UsualEntityService from '@/services/UsualEntityService'
 import { ConstDictionary } from '@/utils/const-dictionary'
-import { _initialInboundItem } from '@/utils/initialEntity'
 import { ConvertDateTime } from '@/utils/converter'
+import { _initialOutboundItem } from '@/utils/initialEntity'
 
 const props = defineProps<{ orderId: string | null }>()
 const pageIndex = ref(1)
@@ -14,20 +14,19 @@ const pageSize = ref(5)
 const orderBy = ref<string>('')
 const descending = ref<boolean>(false)
 const total = ref(0)
-const items = ref<InboundItem[]>([])
+const items = ref<OutboundItem[]>([])
 const editVisible = ref(false)
-const editing = ref<InboundItem>({ ..._initialInboundItem })
-const selected = ref<InboundItem[]>([])
+const editing = ref<OutboundItem>({ ..._initialOutboundItem })
+const selected = ref<OutboundItem[]>([])
 const emit = defineEmits(['saved'])
 
 const load = async () => {
-  console.log('加载入库单明细，orderId=', props.orderId)
   if (!props.orderId) return
   try {
     if (props.orderId && props.orderId !== ConstDictionary.EMPTY_GUID) {
-      const res = await UsualEntityService.GetChildrenDataSet<InboundItem>(
-        'InboundOrder',
-        'InboundItem',
+      const res = await UsualEntityService.GetChildrenDataSet<OutboundItem>(
+        'OutboundOrder',
+        'OutboundItem',
         props.orderId,
         pageIndex.value,
         pageSize.value,
@@ -63,20 +62,30 @@ const handleSortChange = (options: {
 }
 
 const handleAdd = () => {
-  editing.value = { ..._initialInboundItem }
+  editing.value = {
+    id: ConstDictionary.EMPTY_GUID,
+    createdAt: ConstDictionary.CURRENT_DATETIME,
+    modifiedAt: ConstDictionary.CURRENT_DATETIME,
+    operatorUserId: ConstDictionary.EMPTY_GUID,
+    outboundOrderId: null,
+    partId: null,
+    quantity: 0,
+    price: 0,
+    totalAmount: 0,
+  }
   editVisible.value = true
 }
 
-const handleSelectionChange = (sel: InboundItem[]) => {
+const handleSelectionChange = (sel: OutboundItem[]) => {
   selected.value = sel
 }
 
-const handleEdit = (row: InboundItem) => {
+const handleEdit = (row: OutboundItem) => {
   editing.value = { ...row }
   editVisible.value = true
 }
 
-const handleDelete = async (row: InboundItem) => {
+const handleDelete = async (row: OutboundItem) => {
   try {
     await ElMessageBox.confirm(
       `确定要删除明细 [${row.part?.model}] - [${row.part?.partName}] 吗？`,
@@ -88,7 +97,7 @@ const handleDelete = async (row: InboundItem) => {
       },
     )
     const ids = [row.id!]
-    await UsualEntityService.Delete('InboundItem', ids)
+    await UsualEntityService.Delete('OutboundItem', ids)
     ElMessage.success('删除成功')
     load()
     emit('saved')
@@ -99,12 +108,12 @@ const handleDelete = async (row: InboundItem) => {
 
 const handleBatchDelete = async () => {
   if (selected.value.length === 0) {
-    ElMessage.warning('请先选择要删除的入库单明细')
+    ElMessage.warning('请先选择要删除的出库单明细')
     return
   }
   try {
     await ElMessageBox.confirm(
-      `确定要删除选中的 ${selected.value.length} 个入库单明细吗？`,
+      `确定要删除选中的 ${selected.value.length} 个出库单明细吗？`,
       '警告',
       {
         confirmButtonText: '确定',
@@ -113,7 +122,7 @@ const handleBatchDelete = async () => {
       },
     )
     const ids = selected.value.map((s) => s.id!)
-    await UsualEntityService.Delete('InboundItem', ids)
+    await UsualEntityService.Delete('OutboundItem', ids)
     ElMessage.success('删除成功')
     selected.value = []
     load()
@@ -150,7 +159,7 @@ watch([pageIndex, pageSize], load)
   <div class="apm-table-container">
     <div class="toolbar">
       <div class="toolbar-left">
-        <h2>入库单明细管理</h2>
+        <h2>出库单明细管理</h2>
       </div>
       <div class="toolbar-right">
         <el-button type="primary" @click="handleAdd">添加明细</el-button>
@@ -178,7 +187,7 @@ watch([pageIndex, pageSize], load)
         sortable="custom"
       >
         <template #default="{ row }">
-          {{ ConvertDateTime(row.createdAt) }}
+          {{ ConvertDateTime(row.createdAt, 'YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
       <el-table-column
@@ -189,7 +198,7 @@ watch([pageIndex, pageSize], load)
         sortable="custom"
       >
         <template #default="{ row }">
-          {{ ConvertDateTime(row.modifiedAt) }}
+          {{ ConvertDateTime(row.modifiedAt, 'YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="140">
@@ -212,7 +221,7 @@ watch([pageIndex, pageSize], load)
       />
     </div>
 
-    <InboundItemEdit
+    <OutboundItemEdit
       v-model="editVisible"
       :item="editing"
       :orderId="props.orderId"

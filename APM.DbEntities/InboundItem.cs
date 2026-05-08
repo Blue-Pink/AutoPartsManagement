@@ -15,7 +15,6 @@ namespace APM.DbEntities
         public virtual InboundOrder? InboundOrder { get; set; }
         [Description("配件")]
         public Guid PartId { get; set; }
-
         public virtual Part? Part { get; set; }
         [Description("入库数量")]
         public int Quantity { get; set; }

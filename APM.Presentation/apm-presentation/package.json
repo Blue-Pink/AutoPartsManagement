@@ -15,6 +15,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.15.0",
     "dayjs": "^1.11.20",
+    "dayjs-plugin-utc": "^0.1.2",
     "element-plus": "^2.13.7",
     "pinia": "^3.0.4",
     "vue": "^3.5.31",

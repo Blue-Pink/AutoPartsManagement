@@ -1,5 +1,6 @@
-import type { BaseEntity, Customer, InboundItem, InboundOrder, Part, Supplier, User } from "../interfaces/Entities";
+import type { BaseEntity, Customer, InboundItem, InboundOrder, Part, Supplier, User, OutboundOrder, OutboundItem } from "../interfaces/Entities";
 import { ConstDictionary } from "./const-dictionary";
+import { Now } from "./converter";
 
 /**
  * 创建一个继承自 BaseEntity 的默认对象，可传入泛型以获得精确类型提示。
@@ -77,6 +78,30 @@ export const _initialInboundItem = {
     ...createDefaultEntity<InboundItem>({
         inboundOrderId: null,
         partId: null,
+        quantity: 0,
+        price: 0,
+        totalAmount: 0,
+    })
+}
+
+export const _initialOutboundOrder = {
+    ...createDefaultEntity<OutboundOrder>({
+        orderNo: null,
+        totalAmount: 0,
+        remark: null,
+        customerId: null,
+        customer: null,
+        outboundItems: null,
+        outboundDate: Now(),
+    })
+}
+
+export const _initialOutboundItem = {
+    ...createDefaultEntity<OutboundItem>({
+        outboundOrderId: null,
+        outboundOrder: null,
+        partId: null,
+        part: null,
         quantity: 0,
         price: 0,
         totalAmount: 0,

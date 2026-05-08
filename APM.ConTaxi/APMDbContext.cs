@@ -11,6 +11,7 @@ namespace APM.ConTaxi
 {
     internal class APMDbContext(DbContextOptions options) : DbContext(options)
     {
+        #region Entities
 
         public DbSet<User> User { get; set; }
 
@@ -28,10 +29,6 @@ namespace APM.ConTaxi
 
         public DbSet<Part> Part { get; set; }
 
-        public DbSet<UserRoleView> UserRoleView { get; set; }
-
-        public DbSet<PartView> PartView { get; set; }
-
         public DbSet<Supplier> Supplier { get; set; }
 
         public DbSet<InboundOrder> InboundOrder { get; set; }
@@ -40,7 +37,21 @@ namespace APM.ConTaxi
 
         public DbSet<Customer> Customer { get; set; }
 
+        public DbSet<OutboundOrder> OutboundOrder { get; set; }
 
+        public DbSet<OutboundItem> OutboundItem { get; set; }
+
+        #endregion
+
+        #region Views
+
+        public DbSet<PartView> PartView { get; set; }
+
+        public DbSet<UserRoleView> UserRoleView { get; set; }
+
+        public DbSet<AllBoundItemView> AllBoundItemView { get; set; }
+
+        #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -78,6 +89,7 @@ namespace APM.ConTaxi
 
             modelBuilder.Entity<InboundOrder>(entity =>
             {
+                entity.HasIndex(i => i.OrderNo).IsUnique();
                 entity.Property(i => i.TotalAmount).HasPrecision(18, 2);
             });
 
@@ -86,6 +98,19 @@ namespace APM.ConTaxi
                 entity.Property(i => i.Price).HasPrecision(18, 2);
                 entity.Property(i => i.TotalAmount).HasPrecision(18, 2);
             });
+
+            modelBuilder.Entity<OutboundOrder>(entity =>
+            {
+                entity.HasIndex(o => o.OrderNo).IsUnique();
+                entity.Property(o => o.TotalAmount).HasPrecision(18, 2);
+            });
+
+            modelBuilder.Entity<OutboundItem>(entity =>
+            {
+                entity.Property(i => i.Price).HasPrecision(18, 2);
+                entity.Property(i => i.TotalAmount).HasPrecision(18, 2);
+            });
+
             #endregion
 
             #region 实体经办人关系
@@ -162,6 +187,18 @@ namespace APM.ConTaxi
                 .HasForeignKey(o => o.OperatorUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<OutboundOrder>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OutboundItem>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             #endregion
 
             #region 实体与实体关系
@@ -188,17 +225,29 @@ namespace APM.ConTaxi
                 .HasForeignKey(o => o.SupplierId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<InboundOrder>()
-                .HasOne(o => o.OperatorUser)
-                .WithMany()
-                .HasForeignKey(o => o.OperatorUserId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<InboundItem>()
                 .HasOne(i => i.Part)
                 .WithMany()
                 .HasForeignKey(i => i.PartId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OutboundOrder>()
+                .HasOne(o => o.Customer)
+                .WithMany()
+                .HasForeignKey(o => o.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OutboundItem>()
+                .HasOne(o => o.Part)
+                .WithMany()
+                .HasForeignKey(o => o.PartId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<OutboundItem>()
+                .HasOne(i => i.OutboundOrder)
+                .WithMany(o => o.OutboundItems)
+                .HasForeignKey(i => i.OutboundOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             #endregion
 
@@ -259,6 +308,12 @@ namespace APM.ConTaxi
             {
                 eb.HasNoKey(); // 视图无主键
                 eb.ToView("vw_PartView"); // 映射到数据库视图名称
+            });
+
+            modelBuilder.Entity<PartView>(eb =>
+            {
+                eb.HasNoKey(); // 视图无主键
+                eb.ToView("vw_AllBoundItemView"); // 映射到数据库视图名称
             });
 
             #endregion

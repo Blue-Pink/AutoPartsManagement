@@ -154,12 +154,13 @@ watch([pageIndex, pageSize], load)
       <el-table-column type="selection" width="55" />
       <el-table-column prop="partName" label="名称" width="180" sortable="custom" />
       <el-table-column prop="oeCode" label="OE代码" width="180" sortable="custom" />
-      <el-table-column prop="model" label="型号" width="180" />
-      <el-table-column prop="brand" label="品牌" width="180" />
-      <el-table-column prop="category.name" label="分类" width="180" />
-      <el-table-column prop="unit.name" label="单位" width="100" />
+      <el-table-column prop="model" label="型号" width="180" sortable="custom" />
+      <el-table-column prop="brand" label="品牌" width="180" sortable="custom" />
+      <el-table-column prop="category.name" label="分类" width="180" sortable="custom" />
+      <el-table-column prop="unit.name" label="单位" width="100" sortable="custom" />
       <el-table-column prop="costPrice" label="成本价" width="120" sortable="custom" />
       <el-table-column prop="sellingPrice" label="售价" width="120" sortable="custom" />
+      <el-table-column prop="stockpiles" label="当前库存" width="120" sortable="custom" />
       <el-table-column prop="minStock" label="最小库存" width="120" sortable="custom" />
       <el-table-column prop="maxStock" label="最大库存" width="120" sortable="custom" />
       <el-table-column
@@ -170,7 +171,7 @@ watch([pageIndex, pageSize], load)
         sortable="custom"
       >
         <template #default="{ row }">
-          {{ ConvertDateTime(row.createdAt, 'yyyy-mm-dd hh:mm:ss') }}
+          {{ ConvertDateTime(row.createdAt, 'YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
       <el-table-column
@@ -181,7 +182,7 @@ watch([pageIndex, pageSize], load)
         sortable="custom"
       >
         <template #default="{ row }">
-          {{ ConvertDateTime(row.modifiedAt, 'yyyy-mm-dd hh:mm:ss') }}
+          {{ ConvertDateTime(row.modifiedAt, 'YYYY-MM-DD HH:mm:ss') }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">

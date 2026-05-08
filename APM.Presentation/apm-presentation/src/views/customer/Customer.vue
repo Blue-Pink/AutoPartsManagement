@@ -166,7 +166,7 @@ watch([pageIndex, pageSize], loadCustomers)
         sortable="custom"
       >
         <template #default="{ row }">{{
-          ConvertDateTime(row.createdAt, 'yyyy-mm-dd hh:mm:ss')
+          ConvertDateTime(row.createdAt, 'YYYY-MM-DD HH:mm:ss')
         }}</template>
       </el-table-column>
       <el-table-column
@@ -177,7 +177,7 @@ watch([pageIndex, pageSize], loadCustomers)
         sortable="custom"
       >
         <template #default="{ row }">{{
-          ConvertDateTime(row.modifiedAt, 'yyyy-mm-dd hh:mm:ss')
+          ConvertDateTime(row.modifiedAt, 'YYYY-MM-DD HH:mm:ss')
         }}</template>
       </el-table-column>
       <el-table-column label="操作" width="150" fixed="right">

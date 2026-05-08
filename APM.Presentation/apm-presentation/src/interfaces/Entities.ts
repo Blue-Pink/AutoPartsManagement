@@ -1,5 +1,3 @@
-import type { Type } from "typescript";
-
 export interface BaseEntity {
     id: string | null;
     createdAt: string | null;
@@ -32,6 +30,7 @@ export interface Part extends BaseEntity {
     remark: string | null;
     category: PartCategory | null;
     unit: PartUnit | null;
+    stockpiles: number | null;
 }
 
 export interface PartUnit extends BaseEntity {
@@ -121,3 +120,25 @@ export interface Customer extends BaseEntity {
     /** 备注 */
     remark?: string | null;
 }
+
+export interface OutboundOrder extends BaseEntity {
+    orderNo: string | null;
+    customerId: string | null;
+    customer?: Customer | null;
+    totalAmount: number | null;
+    outboundDate: string | null;
+    remark?: string | null;
+    outboundItems: OutboundItem[] | null;
+}
+
+export interface OutboundItem extends BaseEntity {
+    outboundOrderId: string | null;
+    outboundOrder?: OutboundOrder | null;
+    partId: string | null;
+    part?: Part | null;
+    quantity: number | null;
+    price: number | null;
+    totalAmount: number | null;
+}
+
+

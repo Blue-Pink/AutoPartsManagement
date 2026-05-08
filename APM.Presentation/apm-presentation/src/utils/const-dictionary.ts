@@ -1,18 +1,13 @@
-import { FormatDate } from './converter';
+import { FormatDate, Now } from './converter';
 
 /**
  * 常量字典
  * 使用 get 语法实现动态属性，确保每次获取都是当前系统时间
  */
 export const ConstDictionary = {
-    // 获取当前日期字符串 (例如: 2026-05-04)
-    get CURRENT_DATE() {
-        return FormatDate(new Date(), 'YYYY-MM-DD');
-    },
-
     // 获取当前详细时间字符串 (例如: 2026-05-04 14:30:05)
     get CURRENT_DATETIME() {
-        return FormatDate(new Date(), 'YYYY-MM-DD HH:mm:ss');
+        return Now();
     },
 
     get EMPTY_GUID() {

@@ -2,18 +2,20 @@
 using APM.DbEntities;
 using APM.DbEntities.Base;
 using APM.DbEntities.DTOs;
+using APM.IServices;
 using APM.UtilEntities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using APM.IServices;
-using Microsoft.EntityFrameworkCore.Metadata;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace APM.ConTaxi.Taxi
 {
-    internal class ConTaxiService(APMDbContext context, ITaxiPermission permission, IUserContext userContext) : IConTaxiService
+    internal class ConTaxiService(APMDbContext context, ITaxiPermission permission) : IConTaxiService
     {
         internal bool UseAdministration { get; set; }
 
@@ -311,10 +313,24 @@ namespace APM.ConTaxi.Taxi
 
             var type = BuildRawTextEntity(entityName, entity, out var properties, out var instance, out var id);
 
-            if (id is null || id == Guid.Empty)
-                return Create(type, instance) ?? throw new APMException($"{entityName} 创建失败");
+            try
+            {
+                if (id is null || id == Guid.Empty)
+                    return Create(type, instance) ?? throw new APMException($"{entityName} 创建失败");
 
-            return Update(entityName, type, id.Value, instance, properties) ?? throw new APMException($"[{entityName}] - [{id.Value}] 更新失败");
+                return Update(entityName, type, id.Value, instance, properties) ??
+                       throw new APMException($"[{entityName}] - [{id.Value}] 更新失败");
+            }
+            catch (APMException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                if (exception.InnerException != null)
+                    throw exception.InnerException;
+                throw;
+            }
 
         }
 
@@ -344,16 +360,16 @@ namespace APM.ConTaxi.Taxi
                 switch (propertyInfo.Name)
                 {
                     case nameof(BaseEntity.OperatorUserId):
-                        propertyInfo.SetValue(efInstance, userContext.UserId ?? throw new APMException("未登录"));
+                        //propertyInfo.SetValue(efInstance, userContext.UserId ?? throw new APMException("未登录"));
                         break;
                     case nameof(BaseEntity.OperatorUser):
-                        var user = Get(nameof(User), userContext.UserId ?? throw new APMException("未登录"));
-                        propertyInfo.SetValue(efInstance, user);
+                        //var user = Get(nameof(User), userContext.UserId ?? throw new APMException("未登录"));
+                        //propertyInfo.SetValue(efInstance, user);
                         break;
                     default:
                         var efValue = propertyInfo.GetValue(efInstance);
                         var value = propertyInfo.GetValue(instance);
-                        if (efValue != value)
+                        if (efValue != value && value != null)
                             propertyInfo.SetValue(efInstance, value);
                         break;
                 }
@@ -426,8 +442,6 @@ namespace APM.ConTaxi.Taxi
             return GetChildrenDataSet(null, entityName, null, pageIndex, pageSize, orderBy, descending);
         }
 
-
-
         public PagingData<object> GetChildrenDataSet(string? parentEntityName,
             string childEntityName,
             Guid? parentId,
@@ -458,18 +472,13 @@ namespace APM.ConTaxi.Taxi
                 query = LinkWhereExpression(query, parentForeignKey.Properties[0].Name, parentId);
             }
 
-            var countMethod = typeof(Queryable).GetMethods()
-                .First(m => m is { Name: nameof(Queryable.Count), IsGenericMethod: true }
-                            && m.GetParameters().Length == 1)
-                ?.MakeGenericMethod(childType);
-            if (countMethod == null)
-                throw new APMException($"无法获取 [{nameof(Queryable.Count)}] 方法");
+            var total = ExecuteQueryCount(query);
 
-            var total = Convert.ToInt32(countMethod.Invoke(null, [query]));
+            query = LinkOrderByExpression(query, orderBy, descending);
+
             query = LinkIncludeExpression(query, navigationNames);
             if (pageIndex > 0)
                 query = LinkPaginationExpression(query, pageIndex, pageSize);
-            query = LinkOrderByExpression(query, orderBy, descending);
 
             return new PagingData<object>(BuildList(query), total, pageIndex, pageSize);
         }
@@ -503,7 +512,21 @@ namespace APM.ConTaxi.Taxi
             if (whereMethod == null)
                 throw new APMException($"无法获取 [{nameof(Queryable.Where)}] 方法");
 
-            return whereMethod.Invoke(null, [query, lambda]) as IQueryable ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkWhereExpression)}]");
+            return whereMethod.Invoke(null, [query, lambda]) as IQueryable
+                   ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkWhereExpression)}]");
+        }
+
+        private int ExecuteQueryCount(IQueryable query)
+        {
+            var entityType = query.ElementType;
+            var countMethod = typeof(Queryable).GetMethods()
+                .First(m => m is { Name: nameof(Queryable.Count), IsGenericMethod: true }
+                            && m.GetParameters().Length == 1)
+                ?.MakeGenericMethod(entityType);
+            if (countMethod == null)
+                throw new APMException($"无法获取 [{nameof(Queryable.Count)}] 方法");
+
+            return Convert.ToInt32(countMethod.Invoke(null, [query]));
         }
 
         private IQueryable LinkIncludeExpression(IQueryable query, IEnumerable<string> navigations)
@@ -562,18 +585,41 @@ namespace APM.ConTaxi.Taxi
             var entityType = query.ElementType;
             descending = string.IsNullOrEmpty(orderBy) || descending;
             orderBy = string.IsNullOrEmpty(orderBy) ? nameof(APMBaseEntity.CreatedAt) : orderBy;
+
             var methodName = descending ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy);
             var propertyInfo = entityType.GetProperties().First(p => p.Name.Equals(orderBy, StringComparison.CurrentCultureIgnoreCase))
                                ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkOrderByExpression)}] - [{entityType.Name}] - [{orderBy}]");
+
             var orderByMethod = typeof(Queryable).GetMethods()
-                .First(m => m.Name == methodName && m.IsGenericMethod && m.GetParameters().Length == 2)
-                ?.MakeGenericMethod(entityType, propertyInfo.PropertyType);
+                .FirstOrDefault(m => m.Name == methodName && m.IsGenericMethod && m.GetParameters().Length == 2);
+
+            LambdaExpression lambda;
+            var navigations = GetEntityNavigations(entityType, out var navigationNames);
+            if (navigationNames.Contains(propertyInfo.Name))
+            {
+                var navigation = navigations.First(n => n.Name == propertyInfo.Name);
+                var entityProperty = navigation.TargetEntityType.ClrType.GetProperties()
+                    .First(p => p.Name.ToLower().Contains("name", StringComparison.CurrentCultureIgnoreCase)
+                                || p.Name.Contains("no", StringComparison.CurrentCultureIgnoreCase)
+                                || p.Name.Contains("id", StringComparison.CurrentCultureIgnoreCase));
+                var parameter = Expression.Parameter(entityType);
+                var property = Expression.Property(parameter, propertyInfo);
+                property = Expression.Property(property, entityProperty);
+                lambda = Expression.Lambda(property, parameter);
+
+                orderByMethod = orderByMethod?.MakeGenericMethod(entityType, entityProperty.PropertyType);
+
+            }
+            else
+            {
+                var parameter = Expression.Parameter(entityType);
+                var property = Expression.Property(parameter, propertyInfo);
+                lambda = Expression.Lambda(property, parameter);
+                orderByMethod = orderByMethod?.MakeGenericMethod(entityType, propertyInfo.PropertyType);
+            }
+
             if (orderByMethod == null)
                 throw new APMException($"无法获取 [{methodName}] 方法");
-
-            var parameter = Expression.Parameter(entityType);
-            var property = Expression.Property(parameter, propertyInfo);
-            var lambda = Expression.Lambda(property, parameter);
 
             return orderByMethod.Invoke(null, [query, lambda]) as IQueryable ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkOrderByExpression)}]");
         }

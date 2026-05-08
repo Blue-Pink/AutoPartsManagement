@@ -25,6 +25,7 @@ import router from '@/router'
         </template>
         <el-menu-item index="/part/list">配件管理</el-menu-item>
         <el-menu-item index="/inbound-order/list">入库单管理</el-menu-item>
+        <el-menu-item index="/outbound-order/list">出库单管理</el-menu-item>
       </el-sub-menu>
       <el-sub-menu index="2">
         <template #title>
