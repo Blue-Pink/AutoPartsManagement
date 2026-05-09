@@ -70,8 +70,8 @@ namespace APM.Application.Controllers
             //taxi.Transaction(categories, EntityState.Added);
             //taxi.Transaction(units, EntityState.Added);
 
-            var categories = taxi.GetDataSetQuery<PartCategory>(paging: false).ToList();
-            var units = taxi.GetDataSetQuery<PartUnit>(paging: false).ToList();
+            var categories = taxi.GetDataSetQuery<PartCategory>().ToList();
+            var units = taxi.GetDataSetQuery<PartUnit>().ToList();
 
             // 2. 定义配件名称的随机池，让数据看起来更像汽配
             var partNames = new[] { "滤清器", "制动片", "火花塞", "减震器", "雨刮片", "蓄电池", "正时皮带", "控制臂", "点火线圈", "发电机" };

@@ -55,7 +55,7 @@ namespace APM.Application.Controllers
         }
 
         [HttpGet, Route("[action]")]
-        public UsualApiData<string?> AutoNumber(string entityName, string prefix, int digit = 4)
+        public UsualApiData<string?> AutoNumber(string entityName, string prefix = "", int digit = 4)
         {
             return UsualResult(usualEntity.AutoNumber(entityName, prefix, digit));
         }

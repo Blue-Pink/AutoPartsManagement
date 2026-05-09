@@ -310,7 +310,7 @@ namespace APM.ConTaxi
                 eb.ToView("vw_PartView"); // 映射到数据库视图名称
             });
 
-            modelBuilder.Entity<PartView>(eb =>
+            modelBuilder.Entity<AllBoundItemView>(eb =>
             {
                 eb.HasNoKey(); // 视图无主键
                 eb.ToView("vw_AllBoundItemView"); // 映射到数据库视图名称

@@ -45,6 +45,7 @@ const load = async () => {
       const userRes = await UserService.GetCurrentUser()
       if (userRes.data) {
         order.value.operatorUserId = userRes.data.id
+        order.value.operatorUser = userRes.data
       }
       if (orderNoRes.data) order.value.orderNo = orderNoRes.data
       if (!order.value.outboundDate) order.value.outboundDate = ConstDictionary.CURRENT_DATETIME
@@ -98,7 +99,7 @@ watch(
     <div class="apm-container">
       <div class="title">出库单 {{ id ? order.orderNo : '新建' }}</div>
       <el-form :model="order" ref="formRef" label-width="100px" :rules="rules">
-        <el-row :gutter="16">
+        <el-row :gutter="24">
           <el-col :span="6">
             <el-form-item label="订单号" prop="orderNo">
               <el-input v-model="order.orderNo" disabled />
@@ -127,7 +128,11 @@ watch(
               <el-input-number v-model="order.totalAmount" disabled />
             </el-form-item>
           </el-col>
-
+          <el-col :span="6">
+            <el-form-item label="经办人" prop="operatorUserId">
+              <el-input disabled :value="order.operatorUser?.realname" />
+            </el-form-item>
+          </el-col>
           <el-col :span="24">
             <el-form-item label="备注">
               <el-input type="textarea" v-model="order.remark" />

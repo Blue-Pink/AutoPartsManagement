@@ -89,6 +89,8 @@ export interface InboundOrder extends BaseEntity {
     operatorUser?: User | null;
     /** 备注 */
     remark?: string | null;
+    /** 出库日期 */
+    inboundDate: string | null;
 }
 
 export interface InboundItem extends BaseEntity {
@@ -129,6 +131,8 @@ export interface OutboundOrder extends BaseEntity {
     outboundDate: string | null;
     remark?: string | null;
     outboundItems: OutboundItem[] | null;
+    oepratorUserId: string | null;
+    operatorUser?: User | null;
 }
 
 export interface OutboundItem extends BaseEntity {
@@ -141,4 +145,27 @@ export interface OutboundItem extends BaseEntity {
     totalAmount: number | null;
 }
 
+export interface DashboardDTO {
+    todayInboundQuantity: number;
+    todayInboundTotalAmount: number;
+    todayOutboundQuantity: number;
+    todayOutboundTotalAmount: number;
+    categoryDistribution: PieChartData[];
+    lastSevenDaysTrend: LineChartData[];
+}
 
+export interface PieChartData {
+    categoryName: string;
+    inboundQuantity: number;
+    inboundTotalAmount: number;
+    outboundQuantity: number;
+    outboundTotalAmount: number;
+}
+
+export interface LineChartData {
+    date: string;
+    inboundQuantity: number;
+    inboundTotalAmount: number;
+    outboundQuantity: number;
+    outboundTotalAmount: number;
+}

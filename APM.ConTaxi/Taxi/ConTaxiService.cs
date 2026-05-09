@@ -87,7 +87,7 @@ namespace APM.ConTaxi.Taxi
 
         public int Delete<T>(Expression<Func<T, bool>>? where) where T : BaseEntity
         {
-            var entities = GetDataSetQuery(where, paging: false);
+            var entities = GetDataSetQuery(where);
             if (entities.Any())
                 return Transaction(entities, EntityState.Deleted);
             return 0;
@@ -121,9 +121,8 @@ namespace APM.ConTaxi.Taxi
 
         public IQueryable<T> GetDataSetQuery<T>(
             Expression<Func<T, bool>>? where = null,
-            int pageIndex = 1,
+            int pageIndex = 0,
             int pageSize = 10,
-            bool paging = true,
             Expression<Func<T, object?>>? orderBy = null,
             bool descending = false,
             Expression<Func<T, object?>>[]? includes = null) where T : APMBaseEntity
@@ -146,7 +145,7 @@ namespace APM.ConTaxi.Taxi
                 query = query.OrderByDescending(t => t.CreatedAt);
             }
 
-            if (paging)
+            if (pageIndex != 0)
                 query = query.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return query;

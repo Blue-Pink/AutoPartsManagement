@@ -1,7 +1,5 @@
 import type { BaseEntity, Customer, InboundItem, InboundOrder, Part, Supplier, User, OutboundOrder, OutboundItem } from "../interfaces/Entities";
 import { ConstDictionary } from "./const-dictionary";
-import { Now } from "./converter";
-
 /**
  * 创建一个继承自 BaseEntity 的默认对象，可传入泛型以获得精确类型提示。
  * 可通过 overrides 覆盖默认字段。
@@ -71,6 +69,7 @@ export const _initialInboundOrder = {
         totalAmount: 0,
         operatorUserId: null,
         remark: null,
+        outboundDate: ConstDictionary.CURRENT_DATETIME,
     })
 }
 
@@ -92,7 +91,7 @@ export const _initialOutboundOrder = {
         customerId: null,
         customer: null,
         outboundItems: null,
-        outboundDate: Now(),
+        outboundDate: ConstDictionary.CURRENT_DATETIME,
     })
 }
 

@@ -53,7 +53,7 @@ public partial class UserRoleService(
 
             AsignRolesForUser(user.Id, userDTO.Roles.Select(r => r.Id ?? Guid.Empty).Where(id => id != Guid.Empty));
 
-            var roleDTOs = taxi.GetDataSetQuery<UserRoleView>(where: urv => urv.UserId == user.Id, paging: false)
+            var roleDTOs = taxi.GetDataSetQuery<UserRoleView>(where: urv => urv.UserId == user.Id)
                 .Select(urv => new RoleDTO { RoleName = urv.RoleName, Id = urv.RoleId, Description = urv.RoleDescription }).ToList();
 
             return new UserDTO
@@ -89,7 +89,7 @@ public partial class UserRoleService(
             if (userDTO.Roles != null && userDTO.Roles.Any())
                 AsignRolesForUser(user.Id, userDTO.Roles.Select(r => r.Id ?? Guid.Empty).Where(id => id != Guid.Empty));
 
-            var roleDTOs = taxi.GetDataSetQuery<UserRoleView>(where: urv => urv.UserId == user.Id, paging: false)
+            var roleDTOs = taxi.GetDataSetQuery<UserRoleView>(where: urv => urv.UserId == user.Id)
                 .Select(urv => new RoleDTO { RoleName = urv.RoleName, Id = urv.RoleId, Description = urv.RoleDescription }).ToList();
 
             return new UserDTO
@@ -128,7 +128,7 @@ public partial class UserRoleService(
         taxi.Delete<UserRole>(ur => ur.UserId == userId);
 
         //重新分派角色至用户
-        roles = taxi.GetDataSetQuery<Role>(r => roles.Contains(r.Id), paging: false).Select(r => r.Id).ToList();
+        roles = taxi.GetDataSetQuery<Role>(r => roles.Contains(r.Id)).Select(r => r.Id).ToList();
 
         var userRoles = roles.Select(r => new UserRole { UserId = user.Id, RoleId = r }).ToList();
         taxi.Create(userRoles);
@@ -181,7 +181,7 @@ public partial class UserRoleService(
             ? u => u.IsActive && (u.Username.Contains(search) || u.Realname.Contains(search))
             : u => u.IsActive;
         var total = taxi.Count(where);
-        var users = taxi.GetDataSetQuery(where: where, pageIndex, pageSize)
+        var users = taxi.GetDataSetQuery(where: where, pageIndex: pageIndex, pageSize: pageSize)
             .Include(u => u.UserRoles!)
             .ThenInclude(ur => ur.Role)
             .Select(u => new UserDTO

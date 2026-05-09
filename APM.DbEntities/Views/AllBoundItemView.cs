@@ -6,12 +6,14 @@ using System.Text;
 
 namespace APM.DbEntities.Views
 {
-    public class AllBoundItemView : APMBaseEntity
+    public class AllBoundItemView : BaseView
     {
         public Guid PartId { get; set; }
-        public Part? Part { get; set; }
+        public virtual Part? Part { get; set; }
         [Precision(18, 2)]
         public int Quantity { get; set; }
+        [Precision(18, 2)]
+        public decimal TotalAmount { get; set; }
         public int Type { get; set; }
     }
 }

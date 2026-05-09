@@ -17,9 +17,10 @@ namespace APM.DbEntities
         public virtual Supplier? Supplier { get; set; }
         [Description("总金额")]
         public decimal TotalAmount { get; set; }
+        [Description("入库日期")]
+        public DateTime InboundDate { get; set; }
         [Description("备注")]
         public string? Remark { get; set; }
-        [JsonIgnore]
         public virtual ICollection<InboundItem>? InboundItems { get; set; } = new List<InboundItem>();
     }
 }

@@ -140,7 +140,7 @@ namespace APM.Extensions
                var entityAssembly = typeof(APMBaseEntity).Assembly;
                var assemblyEntities = entityAssembly
                     .GetTypes()
-                    .Where(t => t is { IsClass: true, IsAbstract: false } 
+                    .Where(t => t is { IsClass: true, IsAbstract: false }
                                 && t.IsSubclassOf(typeof(APMBaseEntity))
                                 && t != typeof(EntityRecord))
                     .Select(t => new { t.Name, FullName = t.FullName ?? "", t.GetCustomAttribute<DescriptionAttribute>()?.Description })
@@ -150,7 +150,7 @@ namespace APM.Extensions
                var recordsState = new Dictionary<Guid, EntityState>();
 
                //获取数据库中已有的记录
-               var entityRecords = taxi.GetDataSetQuery<EntityRecord>(paging: false).ToList();
+               var entityRecords = taxi.GetDataSetQuery<EntityRecord>().ToList();
 
                //处理新增或重新启用的实体
                foreach (var entity in assemblyEntities)
@@ -206,7 +206,7 @@ namespace APM.Extensions
                if (updateEntityRecords.Any() && recordsState.Any() && updateEntityRecords.Count == recordsState.Count)
                    taxi.Transaction(updateEntityRecords, recordsState);
 
-               var entityRecord = taxi.GetDataSetQuery<EntityRecord>(paging: false).Select(er => new { er.Id, er.FullName }).ToList();
+               var entityRecord = taxi.GetDataSetQuery<EntityRecord>().Select(er => new { er.Id, er.FullName }).ToList();
                redis?.Set(ConstDictionary.RedisCacheEntityRecord, entityRecord, TimeSpan.FromDays(365));
            });
 
@@ -222,9 +222,9 @@ namespace APM.Extensions
                     //为初始管理员创建所有实体的权限
                     if (adminRole == null) return;
                     //管理员现有权限
-                    var adminPermissionEntities = taxi.GetDataSetQuery<RolePermission>(rp => rp.RoleId == adminRole.Id, paging: false).Select(rp => rp.EntityId).ToList();
+                    var adminPermissionEntities = taxi.GetDataSetQuery<RolePermission>(rp => rp.RoleId == adminRole.Id).Select(rp => rp.EntityId).ToList();
                     //所有实体记录
-                    var entities = taxi.GetDataSetQuery<EntityRecord>(where: er => er.IsActive, paging: false).ToList();
+                    var entities = taxi.GetDataSetQuery<EntityRecord>(where: er => er.IsActive).ToList();
                     var updatePermissions = new List<RolePermission>();
                     foreach (var entity in entities)
                     {
@@ -296,8 +296,8 @@ namespace APM.Extensions
                 //taxi.Transaction(categories, EntityState.Added);
                 //taxi.Transaction(units, EntityState.Added);
 
-                var categories = taxi.GetDataSetQuery<PartCategory>(paging: false).ToList();
-                var units = taxi.GetDataSetQuery<PartUnit>(paging: false).ToList();
+                var categories = taxi.GetDataSetQuery<PartCategory>().ToList();
+                var units = taxi.GetDataSetQuery<PartUnit>().ToList();
 
                 if (!categories.Any() || !units.Any()) return;
 
@@ -331,7 +331,7 @@ namespace APM.Extensions
         {
             app.TaxiInvokeAdmin((taxi, redis) =>
             {
-                var permissions = taxi.GetDataSetQuery<RolePermission>(paging: false).Select(rp => new { rp.RoleId, rp.EntityId, rp.CanRead, rp.CanCreate, rp.CanUpdate, rp.CanDelete }).ToList();
+                var permissions = taxi.GetDataSetQuery<RolePermission>().Select(rp => new { rp.RoleId, rp.EntityId, rp.CanRead, rp.CanCreate, rp.CanUpdate, rp.CanDelete }).ToList();
                 redis?.Set(ConstDictionary.RedisCacheRolePermission, permissions, TimeSpan.FromDays(365));
             });
         }
@@ -354,6 +354,154 @@ namespace APM.Extensions
 
                 var suppliers = supplierFaker.Generate((int)createCount);
                 taxi.Transaction(suppliers, EntityState.Added);
+            });
+        }
+
+        public static void CreateCustomer(this IApplicationBuilder app)
+        {
+            app.TaxiInvokeAdmin((taxi, _) =>
+            {
+                var count = taxi.Count<Customer>();
+                var createCount = 20 - count;
+                if (createCount <= 0) return;
+
+                var customerFaker = new Faker<Customer>("zh_CN")
+                    .RuleFor(c => c.Id, f => Guid.NewGuid())
+                    .RuleFor(c => c.Name, f => f.Company.CompanyName())
+                    .RuleFor(c => c.Phone, f => f.Phone.PhoneNumber("1##########"))
+                    .RuleFor(c => c.Address, f => f.Address.FullAddress())
+                    .RuleFor(c => c.ContactPerson, f => f.Name.FullName())
+                    .RuleFor(c => c.Remark, f => f.Lorem.Sentence())
+                    .RuleFor(c => c.CreatedAt, f => f.Date.Past(1));
+
+                var customers = customerFaker.Generate((int)createCount);
+                taxi.Transaction(customers, EntityState.Added);
+            });
+        }
+
+        public static void CreateInboundAndOutboundOrders(this IApplicationBuilder app)
+        {
+            app.TaxiInvokeAdmin((taxi, redis) =>
+            {
+                const int inboundOrderCount = 20;
+                const int itemsPerInbound = 5;
+                var now = DateTime.UtcNow.AddDays(-1);
+                var todayInCount = taxi.Count<InboundOrder>(where: i => i.InboundDate.DayOfYear == now.DayOfYear);
+                var parts = taxi.GetDataSetQuery<Part>().ToList();
+                var suppliers = taxi.GetDataSetQuery<Supplier>().ToList();
+                var faker = new Faker("zh_CN");
+
+                if (todayInCount < inboundOrderCount && parts.Any() && suppliers.Any())
+                {
+                    var inboundParts = new List<Part>();
+                    // ---------- 生成入库单 ----------
+
+                    var inboundOrders = new List<InboundOrder>();
+                    var inboundItems = new List<InboundItem>();
+
+                    for (var i = 0; i < inboundOrderCount - todayInCount; i++)
+                    {
+                        var order = new InboundOrder
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderNo = redis.AutoNumber(nameof(InboundOrder)),
+                            SupplierId = faker.PickRandom(suppliers).Id,
+                            TotalAmount = 0m,
+                            Remark = "",
+                            InboundDate = DateTime.UtcNow
+                        };
+
+                        // 随机选择明细配件（允许重复配件跨单）
+                        var chosenParts = faker.PickRandom(parts.Where(p => !inboundParts.Select(p2 => p2.Id).Contains(p.Id)), itemsPerInbound);
+                        inboundParts.AddRange(chosenParts);
+                        foreach (var part in chosenParts)
+                        {
+                            var qty = Math.Max(part.MinStock, part.MaxStock / 2);
+                            var price = part.CostPrice;
+                            var item = new InboundItem
+                            {
+                                Id = Guid.NewGuid(),
+                                InboundOrderId = order.Id,
+                                PartId = part.Id,
+                                Quantity = qty,
+                                Price = price,
+                                TotalAmount = price * qty,
+                            };
+
+                            order.TotalAmount += item.TotalAmount;
+                            inboundItems.Add(item);
+
+                        }
+
+                        inboundOrders.Add(order);
+                    }
+
+                    // 保存入库单与入库明细并更新配件库存
+                    if (inboundOrders.Any())
+                        taxi.Transaction(inboundOrders, EntityState.Added);
+                    if (inboundItems.Any())
+                        taxi.Transaction(inboundItems, EntityState.Added);
+
+                    // ---------- 生成出库单（在入库完成后） ----------
+                }
+
+                const int outboundOrderCount = 20;
+                const int itemsPerOutbound = 5;
+                var todayOutCount = taxi.Count<OutboundOrder>(where: i => i.OutboundDate.DayOfYear == now.DayOfYear);
+                var customers = taxi.GetDataSetQuery<Customer>().ToList();
+                parts = taxi.GetDataSetQuery<Part>().Where(p => p.Stockpiles > p.MinStock).ToList();
+
+                if (todayOutCount < outboundOrderCount && parts.Any() && customers.Any())
+                {
+                    var outboundOrders = new List<OutboundOrder>();
+                    var outboundItems = new List<OutboundItem>();
+                    var outboundParts = new List<Part>();
+
+                    for (var i = 0; i < outboundOrderCount - todayOutCount; i++)
+                    {
+                        var order = new OutboundOrder
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderNo = redis.AutoNumber(nameof(OutboundOrder)),
+                            CustomerId = faker.PickRandom(customers).Id,
+                            TotalAmount = 0m,
+                            OutboundDate = DateTime.UtcNow,
+                            Remark = ""
+                        };
+
+                        // 为每张出库单尝试生成指定数量的明细
+                        var chosenParts = faker.PickRandom(parts.Where(p => !outboundParts.Select(p2 => p2.Id).Contains(p.Id)), itemsPerOutbound);
+                        outboundParts.AddRange(chosenParts);
+                        foreach (var part in chosenParts)
+                        {
+                            // 出库数量：1 到 maxAllowed（不超过当前库的可用量）
+                            var quantity = faker.Random.Number(part.Stockpiles / 10, part.Stockpiles / 2);
+                            var item = new OutboundItem
+                            {
+                                Id = Guid.NewGuid(),
+                                OutboundOrderId = order.Id,
+                                PartId = part.Id,
+                                Quantity = quantity,
+                                Price = part.SellingPrice,
+                                TotalAmount = part.SellingPrice * quantity,
+                            };
+
+                            order.TotalAmount += item.TotalAmount;
+                            outboundItems.Add(item);
+
+                        }
+
+                        // 只保存有明细的出库单
+                        outboundOrders.Add(order);
+                    }
+                    // 保存出库单与出库明细并更新配件库存
+                    if (outboundOrders.Any())
+                        taxi.Transaction(outboundOrders, EntityState.Added);
+                    if (outboundItems.Any())
+                        taxi.Transaction(outboundItems, EntityState.Added);
+                }
+
+
             });
         }
     }

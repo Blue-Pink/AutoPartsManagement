@@ -20,11 +20,9 @@ namespace APM.ConTaxi.Taxi
         public T? Get<T>(Guid id) where T : APMBaseEntity;
         public T? FirstOrDefault<T>(Expression<Func<T, bool>>? selector = null) where T : APMBaseEntity;
         public int Count<T>(Expression<Func<T, bool>>? where = null) where T : APMBaseEntity;
-        public IQueryable<T> GetDataSetQuery<T>(
-            Expression<Func<T, bool>>? where = null,
-            int pageIndex = 1,
+        public IQueryable<T> GetDataSetQuery<T>(Expression<Func<T, bool>>? where = null,
+            int pageIndex = 0,
             int pageSize = 10,
-            bool paging = true,
             Expression<Func<T, object?>>? orderBy = null,
             bool descending = false,
             Expression<Func<T, object?>>[]? includes = null) where T : APMBaseEntity;

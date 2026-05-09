@@ -110,6 +110,15 @@ watch(
               </el-select>
             </el-form-item>
           </el-col>
+          <el-form-item label="入库时间" prop="inboundDate">
+            <el-date-picker
+              v-model="order.inboundDate"
+              type="datetime"
+              placeholder="选择入库时间"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DD HH:mm:ss"
+            />
+          </el-form-item>
           <el-col :span="6">
             <el-form-item label="总金额" prop="totalAmount">
               <el-input-number v-model="order.totalAmount" disabled />
@@ -120,7 +129,6 @@ watch(
               <el-input disabled :value="order.operatorUser?.realname" />
             </el-form-item>
           </el-col>
-
           <el-col :span="24">
             <el-form-item label="备注">
               <el-input type="textarea" v-model="order.remark" />

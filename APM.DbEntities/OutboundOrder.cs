@@ -17,7 +17,7 @@ namespace APM.DbEntities
         [Description("总金额")]
         public decimal TotalAmount { get; set; }
         [Description("出库日期")]
-        public DateTime OutboundDate { get; set; } = DateTime.Now;
+        public DateTime OutboundDate { get; set; }
         [Description("备注")]
         public string? Remark { get; set; }
         public virtual ICollection<OutboundItem> OutboundItems { get; set; } = new List<OutboundItem>();

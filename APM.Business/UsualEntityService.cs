@@ -17,7 +17,7 @@ namespace APM.Business
             return taxi.Get(entityName, id);
         }
 
-        public string AutoNumber(string entityName, string prefix, int digit)
+        public string AutoNumber(string entityName, string prefix = "", int digit = 4)
         {
             return redis.AutoNumber(entityName, prefix, digit);
         }

@@ -80,6 +80,7 @@ namespace APM.Application
 
             builder.Services.AddProxiedScoped<IUsualEntityService, UsualEntityService>();
             builder.Services.AddProxiedScoped<IUserRoleService, UserRoleService>();
+            builder.Services.AddProxiedScoped<IDashboardService, DashboardService>();
 
             var app = builder.Build();
 
@@ -118,6 +119,10 @@ namespace APM.Application
             app.CreateParts();
 
             app.CreateSuppliers();
+
+            app.CreateCustomer();
+
+            //app.CreateInboundAndOutboundOrders();
 
             #endregion
 
