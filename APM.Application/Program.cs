@@ -122,7 +122,7 @@ namespace APM.Application
 
             app.CreateCustomer();
 
-            //app.CreateInboundAndOutboundOrders();
+            app.CreateInboundAndOutboundOrders();
 
             #endregion
 

@@ -385,7 +385,7 @@ namespace APM.Extensions
             {
                 const int inboundOrderCount = 20;
                 const int itemsPerInbound = 5;
-                var now = DateTime.UtcNow.AddDays(-1);
+                var now = DateTime.UtcNow;
                 var todayInCount = taxi.Count<InboundOrder>(where: i => i.InboundDate.DayOfYear == now.DayOfYear);
                 var parts = taxi.GetDataSetQuery<Part>().ToList();
                 var suppliers = taxi.GetDataSetQuery<Supplier>().ToList();
@@ -408,15 +408,15 @@ namespace APM.Extensions
                             SupplierId = faker.PickRandom(suppliers).Id,
                             TotalAmount = 0m,
                             Remark = "",
-                            InboundDate = DateTime.UtcNow
+                            InboundDate = now
                         };
 
                         // 随机选择明细配件（允许重复配件跨单）
-                        var chosenParts = faker.PickRandom(parts.Where(p => !inboundParts.Select(p2 => p2.Id).Contains(p.Id)), itemsPerInbound);
+                        var chosenParts = faker.PickRandom(parts.Where(p => !inboundParts.Any() || !inboundParts.Select(p2 => p2.Id).Contains(p.Id)), itemsPerInbound);
                         inboundParts.AddRange(chosenParts);
                         foreach (var part in chosenParts)
                         {
-                            var qty = Math.Max(part.MinStock, part.MaxStock / 2);
+                            var qty = faker.Random.Number(part.MinStock / 5, (part.MaxStock - part.MinStock) / 10);
                             var price = part.CostPrice;
                             var item = new InboundItem
                             {
@@ -465,17 +465,22 @@ namespace APM.Extensions
                             OrderNo = redis.AutoNumber(nameof(OutboundOrder)),
                             CustomerId = faker.PickRandom(customers).Id,
                             TotalAmount = 0m,
-                            OutboundDate = DateTime.UtcNow,
+                            OutboundDate = now,
                             Remark = ""
                         };
-
+                        //配件全部循环一遍后
+                        if (parts.Count - outboundParts.Count < itemsPerOutbound)
+                        {
+                            outboundParts = new List<Part>();
+                            parts = taxi.GetDataSetQuery<Part>().Where(p => p.Stockpiles > p.MinStock).ToList();
+                        }
                         // 为每张出库单尝试生成指定数量的明细
-                        var chosenParts = faker.PickRandom(parts.Where(p => !outboundParts.Select(p2 => p2.Id).Contains(p.Id)), itemsPerOutbound);
+                        var chosenParts = faker.PickRandom(parts.Where(p => !outboundParts.Any() || !outboundParts.Select(p2 => p2.Id).Contains(p.Id)), itemsPerOutbound);
                         outboundParts.AddRange(chosenParts);
                         foreach (var part in chosenParts)
                         {
                             // 出库数量：1 到 maxAllowed（不超过当前库的可用量）
-                            var quantity = faker.Random.Number(part.Stockpiles / 10, part.Stockpiles / 2);
+                            var quantity = faker.Random.Number(part.Stockpiles / 10, part.Stockpiles / 5);
                             var item = new OutboundItem
                             {
                                 Id = Guid.NewGuid(),

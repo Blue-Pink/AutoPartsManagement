@@ -41,7 +41,11 @@ router.beforeEach(async (to, from) => {
 
     return to.path === '/login' ? { path: '/' } : true
   } catch (error) {
-    return { path: '/login' }
+    console.log(router, error)
+    if (to.path !== '/login') {
+      return { path: '/login' };
+    }
+    return true;
   }
 })
 

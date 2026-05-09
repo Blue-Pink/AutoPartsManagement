@@ -556,7 +556,6 @@ namespace APM.ConTaxi.Taxi
 
             return query;
         }
-
         private IQueryable LinkPaginationExpression(IQueryable query, int pageIndex, int pageSize)
         {
             var entityType = query.ElementType;

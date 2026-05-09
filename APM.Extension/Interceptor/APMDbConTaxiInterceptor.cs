@@ -16,13 +16,17 @@ namespace APM.Extensions.Interceptor
             var context = eventData.Context;
             if (context == null) return result;
 
+            UpdateBaseEntityField(context);
+
+            SaveInboundOrderParallel(context);
+
             SaveInboundItemParallel(context);
+
+            SaveOutboundOrderParallel(context);
 
             SaveOutboundItemParallel(context);
 
-            UpdateBaseEntityField(context);
-
-            //SavePartParallel(context);
+            SavePartParallel(context);
 
             return base.SavingChanges(eventData, result);
         }
@@ -48,14 +52,17 @@ namespace APM.Extensions.Interceptor
             {
                 var modifiedItemIds = editItems.Select(mi => mi.Id);
                 var modifiedOrderIds = editItems.Select(mi => mi.InboundOrderId);
+                var modifiedPartIds = editItems.Select(mi => mi.PartId);
                 //当前更新的所有明细的同父级其他明细
                 var otherItems = context.Set<InboundItem>()
                     .Where(oi =>
-                        modifiedOrderIds.Contains(oi.InboundOrderId) && modifiedOrderIds.Contains(oi.PartId) &&
-                        !modifiedItemIds.Contains(oi.Id))
+                        modifiedOrderIds.Contains(oi.InboundOrderId)
+                        && modifiedPartIds.Contains(oi.PartId)
+                        && !modifiedItemIds.Contains(oi.Id))
                     .Include(oi => oi.Part)
                     .Include(oi => oi.InboundOrder)
-                    .Select(oi => new { oi.InboundOrderId, oi.PartId, oi.Id, oi.Part, oi.InboundOrder });
+                    .Select(oi => new { oi.InboundOrderId, oi.PartId, oi.Id, oi.Part, oi.InboundOrder })
+                    .ToList();
 
                 //当其他明细有同主单据同配件时阻止更新
                 foreach (var otherItem in otherItems)
@@ -78,14 +85,15 @@ namespace APM.Extensions.Interceptor
             var changedItemsEntries = GetEntries<InboundItem>(context,
                 [EntityState.Added, EntityState.Modified, EntityState.Deleted]);
             var deleteItems = GetEntities<InboundItem>(context, [EntityState.Deleted]);
-            var orderIds = changedItemsEntries.Select(e => e.Entity).Select(i => i.InboundOrderId).Distinct();
+            var orderIds = changedItemsEntries.Where(e => e.State != EntityState.Deleted)
+                .Select(e => e.Entity).Select(i => i.InboundOrderId).Distinct();
             var items = context.Set<InboundItem>()
                 .Where(i => orderIds.Contains(i.InboundOrderId)
                             && !editItems.Select(ei => ei.Id).Contains(i.Id)
                             && !deleteItems.Select(ei => ei.Id).Contains(i.Id))
                 .Select(i => new { i.TotalAmount, i.InboundOrderId })
                 .ToList();
-            var orders = context.Set<OutboundOrder>().Where(order => orderIds.Contains(order.Id)).ToList();
+            var orders = context.Set<InboundOrder>().Where(order => orderIds.Contains(order.Id)).ToList();
             foreach (var order in orders)
             {
                 //入库单总金额: 查询到的明细总金额 + 此次更新的明细总金额
@@ -95,11 +103,10 @@ namespace APM.Extensions.Interceptor
             }
 
             //更新配件库存数据
-            var allEntries = GetEntries<InboundItem>(context);
-            var parts = context.Set<Part>().Where(p => allEntries.Select(i => i.Entity.PartId).Contains(p.Id))
+            var parts = context.Set<Part>().Where(p => changedItemsEntries.Select(i => i.Entity.PartId).Contains(p.Id))
                 .ToList();
 
-            foreach (var entry in allEntries)
+            foreach (var entry in changedItemsEntries.ToList())
             {
                 var part = parts.First(p => p.Id == entry.Entity.PartId);
                 switch (entry.State)
@@ -140,12 +147,16 @@ namespace APM.Extensions.Interceptor
             {
                 var modifiedItemIds = editItems.Select(mi => mi.Id);
                 var modifiedOrderIds = editItems.Select(mi => mi.OutboundOrderId);
+                var modifiedPartIds = editItems.Select(mi => mi.PartId);
                 //当前更新的所有明细的同父级其他明细
                 var otherItems = context.Set<OutboundItem>()
-                    .Where(oi => modifiedOrderIds.Contains(oi.OutboundOrderId) && modifiedOrderIds.Contains(oi.PartId) && !modifiedItemIds.Contains(oi.Id))
+                    .Where(oi => modifiedOrderIds.Contains(oi.OutboundOrderId)
+                                 && modifiedPartIds.Contains(oi.PartId)
+                                 && !modifiedItemIds.Contains(oi.Id))
                     .Include(oi => oi.Part)
                     .Include(oi => oi.OutboundOrder)
-                    .Select(oi => new { oi.OutboundOrderId, oi.PartId, oi.Id, oi.Part, oi.OutboundOrder });
+                    .Select(oi => new { oi.OutboundOrderId, oi.PartId, oi.Id, oi.Part, oi.OutboundOrder })
+                    .ToList();
 
                 //当其他明细有同主单据同配件时阻止更新
                 foreach (var otherItem in otherItems)
@@ -165,7 +176,8 @@ namespace APM.Extensions.Interceptor
             var changedItemsEntries = GetEntries<OutboundItem>(context,
                 [EntityState.Added, EntityState.Modified, EntityState.Deleted]);
             var deleteItems = GetEntities<OutboundItem>(context, [EntityState.Deleted]);
-            var orderIds = changedItemsEntries.Select(e => e.Entity).Select(i => i.OutboundOrderId).Distinct();
+            var orderIds = changedItemsEntries.Where(e => e.State != EntityState.Deleted)
+                .Select(e => e.Entity).Select(i => i.OutboundOrderId).Distinct();
             var items = context.Set<OutboundItem>()
                 .Where(i => orderIds.Contains(i.OutboundOrderId)
                             && !editItems.Select(ei => ei.Id).Contains(i.Id)
@@ -178,13 +190,13 @@ namespace APM.Extensions.Interceptor
                 //入库单总金额: 查询到的明细总金额 + 此次更新的明细总金额
                 order.TotalAmount = items.Where(i => i.OutboundOrderId == order.Id).Sum(i => i.TotalAmount)
                                     + editItems.Where(i => i.OutboundOrderId == order.Id).Sum(i => i.TotalAmount);
+                context.Entry(order).State = EntityState.Modified;
             }
 
             //更新配件库存数据
-            var allEntries = GetEntries<OutboundItem>(context);
-            var parts = context.Set<Part>().Where(p => allEntries.Select(i => i.Entity.PartId).Contains(p.Id)).ToList();
+            var parts = context.Set<Part>().Where(p => changedItemsEntries.Select(i => i.Entity.PartId).Contains(p.Id)).ToList();
 
-            foreach (var entry in allEntries)
+            foreach (var entry in changedItemsEntries.ToList())
             {
                 var part = parts.First(p => p.Id == entry.Entity.PartId);
                 switch (entry.State)
@@ -212,6 +224,7 @@ namespace APM.Extensions.Interceptor
                         part.Stockpiles += entry.Entity.Quantity;
                         break;
                 }
+                context.Entry(part).State = EntityState.Modified;
             }
         }
 
@@ -233,10 +246,34 @@ namespace APM.Extensions.Interceptor
             }
         }
 
+        private static void SaveInboundOrderParallel(DbContext context)
+        {
+            var orders = GetEntities<InboundOrder>(context, [EntityState.Deleted]);
+            if (!orders.Any())
+                return;
+            var items = context.Set<InboundItem>().Where(i => orders.Select(o => o.Id).Contains(i.InboundOrderId)).ToList();
+            foreach (var inboundItem in items)
+            {
+                context.Entry(inboundItem).State = EntityState.Deleted;
+            }
+        }
+
+        private static void SaveOutboundOrderParallel(DbContext context)
+        {
+            var orders = GetEntities<OutboundOrder>(context, [EntityState.Deleted]);
+            if (!orders.Any())
+                return;
+            var items = context.Set<OutboundItem>().Where(i => orders.Select(o => o.Id).Contains(i.OutboundOrderId)).ToList();
+            foreach (var outboundItem in items)
+            {
+                context.Entry(outboundItem).State = EntityState.Deleted;
+            }
+        }
+
         private void UpdateBaseEntityField(DbContext context)
         {
             var changedEntries = GetEntries<BaseEntity>(context, [EntityState.Added, EntityState.Modified]);
-
+            var now = DateTime.UtcNow;
             foreach (var entry in changedEntries)
             {
                 entry.Entity.OperatorUserId = userContext.UserId ?? new Guid(ConstDictionary.AdministratorId);
@@ -244,11 +281,11 @@ namespace APM.Extensions.Interceptor
                 {
                     case EntityState.Added:
                         entry.Entity.Id = entry.Entity.Id == Guid.Empty ? Guid.NewGuid() : entry.Entity.Id;
-                        entry.Entity.CreatedAt = DateTime.UtcNow;
-                        entry.Entity.ModifiedAt = DateTime.UtcNow;
+                        entry.Entity.CreatedAt = now;
+                        entry.Entity.ModifiedAt = now;
                         break;
                     case EntityState.Modified:
-                        entry.Entity.ModifiedAt = DateTime.UtcNow;
+                        entry.Entity.ModifiedAt = now;
                         break;
                 }
             }

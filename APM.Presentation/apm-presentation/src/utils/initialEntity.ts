@@ -69,7 +69,7 @@ export const _initialInboundOrder = {
         totalAmount: 0,
         operatorUserId: null,
         remark: null,
-        outboundDate: ConstDictionary.CURRENT_DATETIME,
+        inboundDate: ConstDictionary.CURRENT_DATETIME,
     })
 }
 
