@@ -142,7 +142,7 @@ namespace APM.Extensions
                     .GetTypes()
                     .Where(t => t is { IsClass: true, IsAbstract: false }
                                 && t.IsSubclassOf(typeof(APMBaseEntity))
-                                && t != typeof(EntityRecord))
+                                && !t.Name.Contains("dto", StringComparison.CurrentCultureIgnoreCase))
                     .Select(t => new { t.Name, FullName = t.FullName ?? "", t.GetCustomAttribute<DescriptionAttribute>()?.Description })
                     .Where(t => !string.IsNullOrEmpty(t.FullName))
                     .ToList();
@@ -331,8 +331,15 @@ namespace APM.Extensions
         {
             app.TaxiInvokeAdmin((taxi, redis) =>
             {
-                var permissions = taxi.GetDataSetQuery<RolePermission>().Select(rp => new { rp.RoleId, rp.EntityId, rp.CanRead, rp.CanCreate, rp.CanUpdate, rp.CanDelete }).ToList();
-                redis?.Set(ConstDictionary.RedisCacheRolePermission, permissions, TimeSpan.FromDays(365));
+                var permissions = taxi.GetDataSetQuery<RolePermission>()
+                    .Select(rp => new { rp.RoleId, rp.EntityId, rp.CanRead, rp.CanCreate, rp.CanUpdate, rp.CanDelete })
+                    .GroupBy(rp => rp.RoleId)
+                    .ToList();
+
+                foreach (var permission in permissions)
+                {
+                    redis?.Set($"{ConstDictionary.RedisCacheRolePermission}:{permission.Key}", permission.Select(rp => rp), TimeSpan.FromDays(365));
+                }
             });
         }
 
@@ -416,7 +423,7 @@ namespace APM.Extensions
                         inboundParts.AddRange(chosenParts);
                         foreach (var part in chosenParts)
                         {
-                            var qty = faker.Random.Number(part.MinStock / 5, (part.MaxStock - part.MinStock) / 10);
+                            var qty = faker.Random.Number(part.MinStock / (part.Stockpiles > part.MaxStock ? 10 : 5), (part.MaxStock - part.MinStock) / (part.Stockpiles > part.MaxStock ? 20 : 10));
                             var price = part.CostPrice;
                             var item = new InboundItem
                             {
@@ -459,6 +466,7 @@ namespace APM.Extensions
 
                     for (var i = 0; i < outboundOrderCount - todayOutCount; i++)
                     {
+                        parts = taxi.GetDataSetQuery<Part>().Where(p => p.Stockpiles > p.MinStock).ToList();
                         var order = new OutboundOrder
                         {
                             Id = Guid.NewGuid(),
@@ -472,7 +480,6 @@ namespace APM.Extensions
                         if (parts.Count - outboundParts.Count < itemsPerOutbound)
                         {
                             outboundParts = new List<Part>();
-                            parts = taxi.GetDataSetQuery<Part>().Where(p => p.Stockpiles > p.MinStock).ToList();
                         }
                         // 为每张出库单尝试生成指定数量的明细
                         var chosenParts = faker.PickRandom(parts.Where(p => !outboundParts.Any() || !outboundParts.Select(p2 => p2.Id).Contains(p.Id)), itemsPerOutbound);

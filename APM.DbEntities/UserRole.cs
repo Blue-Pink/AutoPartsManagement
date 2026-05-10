@@ -16,13 +16,13 @@ namespace APM.DbEntities
         [Description("用户")]
         public Guid UserId { get; set; }
 
-        [ForeignKey(nameof(UserId)), JsonIgnore]
+        [ForeignKey(nameof(UserId))]
         public virtual User? User { get; set; }
 
         [Description("角色")]
         public Guid RoleId { get; set; }
 
-        [ForeignKey(nameof(RoleId)), JsonIgnore]
+        [ForeignKey(nameof(RoleId))]
         public virtual Role? Role { get; set; }
 
         [Description("角色分配时间")]

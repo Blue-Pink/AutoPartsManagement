@@ -2,10 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace APM.DbEntities.Views
 {
+    [Description("出/入库单明细视图")]
     public class AllBoundItemView : BaseView
     {
         public Guid PartId { get; set; }

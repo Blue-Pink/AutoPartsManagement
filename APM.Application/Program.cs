@@ -81,6 +81,7 @@ namespace APM.Application
             builder.Services.AddProxiedScoped<IUsualEntityService, UsualEntityService>();
             builder.Services.AddProxiedScoped<IUserRoleService, UserRoleService>();
             builder.Services.AddProxiedScoped<IDashboardService, DashboardService>();
+            builder.Services.AddHostedService<RedisCacheSubscriber>();
 
             var app = builder.Build();
 

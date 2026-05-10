@@ -5,6 +5,14 @@ export interface BaseEntity {
     operatorUserId: string | null;
 }
 
+export interface EntityRecord extends BaseEntity {
+    entityName?: string | null;
+    isActive: boolean | null;
+    fullName?: string | null;
+    description?: string | null;
+}
+
+
 export interface Part extends BaseEntity {
     /** 配件名称 */
     partName: string | null;
@@ -58,6 +66,31 @@ export interface Role extends BaseEntity {
     roleName?: string | null;
     /** 描述 */
     description?: string | null;
+}
+
+export interface RolePermission extends BaseEntity {
+    roleId: string | null;
+
+    role: Role | null;
+
+    entityId: string | null;
+
+    entity: EntityRecord | null;
+
+    /**
+    * 细分权限（增删改查）
+    */
+    canRead: boolean | null;
+
+    canCreate: boolean | null;
+
+    canUpdate: boolean | null;
+
+    canDelete: boolean | null;
+}
+
+export interface EntityAndRolePermission extends EntityRecord, RolePermission {
+
 }
 
 export interface User extends BaseEntity {

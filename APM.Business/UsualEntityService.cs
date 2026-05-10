@@ -33,15 +33,22 @@ namespace APM.Business
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false)
+            bool descending = false,
+            string filter = "",
+            int depth = 1)
         {
-            return taxi.GetChildrenDataSet(parentEntityName, childEntityName, parentId, pageIndex, pageSize, orderBy, descending);
+            return taxi.GetChildrenDataSet(parentEntityName, childEntityName, parentId, pageIndex, pageSize, orderBy, descending, filter, depth);
         }
 
-        public PagingData<object> GetDataSet(string entityName, int pageIndex = 0, int pageSize = 10, string orderBy = "",
-            bool descending = false)
+        public PagingData<object> GetDataSet(string entityName,
+            int pageIndex = 0,
+            int pageSize = 10,
+            string orderBy = "",
+            bool descending = false,
+            string filter = "",
+            int depth = 1)
         {
-            return taxi.GetDataSet(entityName, pageIndex, pageSize, orderBy, descending);
+            return taxi.GetDataSet(entityName, pageIndex, pageSize, orderBy, descending, filter, depth);
         }
 
         public object Edit(string entityName, JsonElement entity)

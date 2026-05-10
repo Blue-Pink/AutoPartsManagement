@@ -31,9 +31,11 @@ namespace APM.Application.Controllers
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false)
+            bool descending = false,
+            string filter = "",
+            int depth = 1)
         {
-            return UsualResult(usualEntity.GetDataSet(entityName, pageIndex, pageSize, orderBy, descending));
+            return UsualResult(usualEntity.GetDataSet(entityName, pageIndex, pageSize, orderBy, descending, filter, depth));
         }
 
         [HttpGet, Route("[action]/{parentEntityName}/{childEntityName}/{parentId}")]
@@ -43,9 +45,11 @@ namespace APM.Application.Controllers
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false)
+            bool descending = false,
+            string filter = "",
+            int depth = 1)
         {
-            return UsualResult(usualEntity.GetChildrenDataSet(parentEntityName, childEntityName, parentId, pageIndex, pageSize, orderBy, descending));
+            return UsualResult(usualEntity.GetChildrenDataSet(parentEntityName, childEntityName, parentId, pageIndex, pageSize, orderBy, descending, filter, depth));
         }
 
         [HttpPost, Route("[action]/{entityName}")]

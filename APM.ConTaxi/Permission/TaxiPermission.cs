@@ -25,7 +25,7 @@ namespace APM.ConTaxi.Permission
 
         public void CheckPermission<T>(EntityState state) where T : APMBaseEntity
         {
-            PermissionType? permissionType = null;
+            PermissionType permissionType;
             switch (state)
             {
                 case EntityState.Deleted:
@@ -37,10 +37,11 @@ namespace APM.ConTaxi.Permission
                 case EntityState.Added:
                     permissionType = PermissionType.Create;
                     break;
+                default:
+                    throw new APMException("Only can do Deleted/Modified/Added.");
+
             }
-            if (permissionType == null)
-                throw new APMException("Only can do Deleted/Modified/Added.");
-            CheckPermission<T>(permissionType.Value);
+            CheckPermission<T>(permissionType);
         }
 
         public void CheckPermission<T>(List<EntityState> status) where T : APMBaseEntity
@@ -56,12 +57,16 @@ namespace APM.ConTaxi.Permission
             if (string.IsNullOrEmpty(entityName))
                 throw new APMException("缺少实体的名称");
 
-            var permissions = redis.GetList<RolePermission>(ConstDictionary.RedisCacheRolePermission);
+            var roleIds = GetCurrentUserRoles();
+            var permissions = new List<RolePermission>();
+            foreach (var roleId in roleIds)
+            {
+                permissions.AddRange(redis.GetList<RolePermission>($"{ConstDictionary.RedisCacheRolePermission}:{roleId}") ?? permissions);
+            }
             var entityRecords = redis.GetList<EntityRecord>(ConstDictionary.RedisCacheEntityRecord);
             var assembly = typeof(APMBaseEntity)?.FullName?.Replace(nameof(APMBaseEntity), "")?.Replace("Base", "").Replace("..", ".") ?? "";
-            var roles = GetCurrentUserRoles();
 
-            if (!string.IsNullOrEmpty(assembly) && permissions != null && permissions.Any() && entityRecords != null && entityRecords.Any() && roles.Any())
+            if (!string.IsNullOrEmpty(assembly) && permissions.Any() && entityRecords != null && entityRecords.Any() && roleIds.Any())
             {
                 if (!entityName.Contains(assembly))
                     entityName = assembly + entityName;
@@ -69,7 +74,7 @@ namespace APM.ConTaxi.Permission
                 var currentEntityRecord = entityRecords?.FirstOrDefault(er => er?.FullName?.Equals(entityName) ?? false);
                 if (currentEntityRecord != null)
                 {
-                    var rolePermissions = permissions?.Where(p => p.EntityId == currentEntityRecord.Id && roles.Contains(p.RoleId)).ToList();
+                    var rolePermissions = permissions?.Where(p => p.EntityId == currentEntityRecord.Id && roleIds.Contains(p.RoleId)).ToList();
                     var checkResult = rolePermissions?.Where(rp =>
                     {
                         switch (type)
@@ -90,14 +95,12 @@ namespace APM.ConTaxi.Permission
                                 if (rp.CanRead)
                                     return true;
                                 break;
-                            default:
-                                return false;
                         }
                         return false;
                     });
 
                     if (checkResult is null || !checkResult.Any())
-                        throw new APMException($"当前用户无权限进行此操作");
+                        throw new APMException($"当前用户无权限进行此操作: {entityName} - {type}");
                 }
                 else
                 {
@@ -109,11 +112,6 @@ namespace APM.ConTaxi.Permission
             {
                 throw new APMException($"系统权限相关缓存丢失");
             }
-        }
-
-        public void CacheUserTokenRoles(string jwtoken, List<UserRole> roles)
-        {
-            redis.Set(jwtoken, JsonSerializer.Serialize(roles.Select(r => new { r.UserId, r.RoleId })), TimeSpan.FromDays(30));
         }
 
         private Guid GetCurrentUserId()

@@ -6,6 +6,7 @@ using System.Text;
 
 namespace APM.DbEntities
 {
+    [Description("客户")]
     public class Customer : BaseEntity
     {
         [Description("客户名称")]

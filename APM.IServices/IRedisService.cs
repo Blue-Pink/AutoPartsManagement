@@ -12,6 +12,8 @@ namespace APM.IServices
         void Set(string key, dynamic value, TimeSpan timeSpan);
         public void Delete(string key);
         public string AutoNumber(string entityName, string prefix = "", int digit = 4);
+        public void Publish(string channel, string message);
+        public void Subscribe(string channel, Action<string, string> handler);
 
     }
 }

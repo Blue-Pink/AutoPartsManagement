@@ -6,7 +6,6 @@ using StackExchange.Redis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using APM.DbEntities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace APM.Services
 {
@@ -175,5 +174,24 @@ namespace APM.Services
 
             return $"{EntityPrefix.GetValueOrDefault(entityName, prefix)}{date}{sequence}";
         }
+
+        public void Publish(string channel, string message)
+        {
+            // 获取订阅器并发送消息
+            var sub = _redisConnectionMultiplexer.GetSubscriber();
+            sub.Publish(RedisChannel.Literal(channel), message);
+        }
+
+        public void Subscribe(string channel, Action<string, string> handler)
+        {
+            var sub = _redisConnectionMultiplexer.GetSubscriber();
+            // 注册回调函数
+            sub.Subscribe(RedisChannel.Literal(channel), (chan, message) =>
+            {
+                // 执行传入的逻辑
+                handler(chan.ToString(), message.ToString());
+            });
+        }
+
     }
 }

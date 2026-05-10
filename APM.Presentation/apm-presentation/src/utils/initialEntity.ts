@@ -1,4 +1,4 @@
-import type { BaseEntity, Customer, InboundItem, InboundOrder, Part, Supplier, User, OutboundOrder, OutboundItem } from "../interfaces/Entities";
+import type { BaseEntity, Customer, InboundItem, InboundOrder, Part, Supplier, User, OutboundOrder, OutboundItem, Role, EntityRecord, RolePermission } from "../interfaces/Entities";
 import { ConstDictionary } from "./const-dictionary";
 /**
  * 创建一个继承自 BaseEntity 的默认对象，可传入泛型以获得精确类型提示。
@@ -12,6 +12,15 @@ export function createDefaultEntity<T extends BaseEntity>(overrides?: Partial<T>
         operatorUserId: ConstDictionary.EMPTY_GUID,
     };
     return { ...base, ...(overrides || {}) } as T;
+}
+
+export const _initialEntityRecord: EntityRecord = {
+    ...createDefaultEntity<EntityRecord>({
+        entityName: null,
+        isActive: null,
+        fullName: null,
+        description: null,
+    })
 }
 
 export const _initialPart: Part = {
@@ -59,6 +68,24 @@ export const _initialUser = {
         roles: null,
         confirmPassword: null,
         isActive: true,
+    })
+}
+
+export const _initialRole = {
+    ...createDefaultEntity<Role>({
+        roleName: null,
+        description: null,
+    })
+}
+
+export const _initialRolePermission: RolePermission = {
+    ...createDefaultEntity<RolePermission>({
+        roleId: null,
+        entityId: null,
+        canRead: null,
+        canCreate: null,
+        canUpdate: null,
+        canDelete: null,
     })
 }
 

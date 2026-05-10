@@ -1,27 +1,26 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import UserService from '@/services/UserService'
 import UsualEntityService from '@/services/UsualEntityService'
-import type { User } from '@/interfaces/Entities'
+import type { Role } from '@/interfaces/Entities'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import UserEdit from '@/components/system/UserEdit.vue'
+import RoleEdit from '@/components/system/RoleEdit.vue'
 import { ConvertDateTime } from '@/utils/converter'
-import { createDefaultEntity, _initialUser } from '@/utils/initialEntity'
+import { _initialRole } from '@/utils/initialEntity'
 import { ConstDictionary } from '@/utils/const-dictionary'
 
-const users = ref<User[]>([])
+const roles = ref<Role[]>([])
 const pageIndex = ref(1)
 const pageSize = ref(25)
 const total = ref(0)
-const selected = ref<User[]>([])
+const selected = ref<Role[]>([])
 const editVisible = ref(false)
-const editingUser = ref<User>({ ..._initialUser })
+const editingRole = ref<Role>({ ..._initialRole })
 
 const load = async () => {
   try {
-    const res = await UserService.GetUsers(pageIndex.value, pageSize.value)
+    const res = await UsualEntityService.GetDataSet<Role>('Role', pageIndex.value, pageSize.value)
     if (res.dataList) {
-      users.value = res.dataList || []
+      roles.value = res.dataList || []
       total.value = res.total || 0
     }
   } catch (e) {
@@ -30,23 +29,23 @@ const load = async () => {
 }
 
 const handleAdd = () => {
-  editingUser.value = { ..._initialUser }
+  editingRole.value = { ..._initialRole }
   editVisible.value = true
 }
-const handleEdit = (row: User) => {
-  editingUser.value = { ...row }
+const handleEdit = (row: Role) => {
+  editingRole.value = { ...row }
   editVisible.value = true
 }
 
-const handleDeleteSingle = async (row: User) => {
+const handleDeleteSingle = async (row: Role) => {
   try {
-    await ElMessageBox.confirm(`确定要删除用户 ${row.username} 吗？`, '警告', {
+    await ElMessageBox.confirm(`确定要删除用户 ${row.roleName} 吗？`, '警告', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
     })
     const ids = [(row as any).id]
-    await UsualEntityService.Delete('User', ids)
+    await UsualEntityService.Delete('Role', ids)
     ElMessage.success('删除成功')
     load()
   } catch (e: any) {
@@ -66,7 +65,7 @@ const handleBatchDelete = async () => {
       type: 'warning',
     })
     const ids = selected.value.map((u) => (u as any).id)
-    await UsualEntityService.Delete('User', ids)
+    await UsualEntityService.Delete('Role', ids)
     ElMessage.success('删除成功')
     selected.value = []
     load()
@@ -85,7 +84,7 @@ const handlePageSizeChange = (s: number) => {
   pageIndex.value = 1
   load()
 }
-const handleSelectionChange = (sel: User[]) => {
+const handleSelectionChange = (sel: Role[]) => {
   selected.value = sel
 }
 const handleSaved = () => {
@@ -102,7 +101,7 @@ onMounted(() => {
   <div class="apm-container">
     <div class="toolbar">
       <div class="toolbar-left">
-        <h2>用户管理</h2>
+        <h2>角色管理</h2>
       </div>
       <div class="toolbar-right">
         <el-button type="primary" @click="handleAdd">新增</el-button>
@@ -110,18 +109,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <el-table :data="users" stripe @selection-change="handleSelectionChange" class="apm-table">
+    <el-table :data="roles" stripe @selection-change="handleSelectionChange" class="apm-table">
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="username" label="用户名" min-width="280" />
-      <el-table-column prop="realname" label="真实姓名" min-width="280" />
-      <!--角色-->
-      <el-table-column prop="role" label="角色" min-width="220" width="auto">
-        <template #default="{ row }">
-          <div class="flex gap-2">
-            <el-tag v-for="r in row.roles" :key="r.id">{{ r.description }}</el-tag>
-          </div>
-        </template>
-      </el-table-column>
+      <el-table-column prop="roleName" label="角色名" min-width="280" />
+      <el-table-column prop="description" label="真实姓名" min-width="280" />
       <el-table-column
         prop="createdAt"
         label="创建时间"
@@ -170,6 +161,6 @@ onMounted(() => {
       />
     </div>
 
-    <UserEdit v-model="editVisible" :user="editingUser" @saved="handleSaved" />
+    <RoleEdit v-model="editVisible" :role="editingRole" @saved="handleSaved" />
   </div>
 </template>

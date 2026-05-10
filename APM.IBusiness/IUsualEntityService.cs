@@ -18,11 +18,15 @@ namespace APM.IBusiness
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false);
+            bool descending = false,
+            string filter = "",
+            int depth = 1);
         public PagingData<object> GetDataSet(string entityName,
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false);
+            bool descending = false,
+            string filter = "",
+            int depth = 1);
     }
 }

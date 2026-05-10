@@ -7,6 +7,8 @@ using APM.UtilEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Collections;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
@@ -427,18 +429,22 @@ namespace APM.ConTaxi.Taxi
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false)
+            bool descending = false,
+            string filter = "",
+            int depth = 1)
         {
-            return GetChildrenDataSet(entityName, pageIndex, pageSize, orderBy, descending);
+            return GetChildrenDataSet(entityName, pageIndex, pageSize, orderBy, descending, filter, depth);
         }
 
-        public PagingData<object> GetChildrenDataSet(string entityName,
+        private PagingData<object> GetChildrenDataSet(string entityName,
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false)
+            bool descending = false,
+            string filter = "",
+            int depth = 1)
         {
-            return GetChildrenDataSet(null, entityName, null, pageIndex, pageSize, orderBy, descending);
+            return GetChildrenDataSet(null, entityName, null, pageIndex, pageSize, orderBy, descending, filter, depth);
         }
 
         public PagingData<object> GetChildrenDataSet(string? parentEntityName,
@@ -447,7 +453,9 @@ namespace APM.ConTaxi.Taxi
             int pageIndex = 0,
             int pageSize = 10,
             string orderBy = "",
-            bool descending = false)
+            bool descending = false,
+            string filter = "",
+            int depth = 1)
         {
             if (!UseAdministration && !string.IsNullOrEmpty(parentEntityName))
                 permission.CheckPermission(parentEntityName, PermissionType.Read);
@@ -471,11 +479,21 @@ namespace APM.ConTaxi.Taxi
                 query = LinkWhereExpression(query, parentForeignKey.Properties[0].Name, parentId);
             }
 
+            if (!string.IsNullOrEmpty(filter))
+            {
+                ConstDictionary.EntityFieldSettings.TryGetValue(childType, out var fieldSettings);
+                if (fieldSettings != null)
+                {
+                    query = fieldSettings.Where(fieldSetting => fieldSetting.Filter).Aggregate(query, (current, fieldSetting) => LinkWhereExpression(current, fieldSetting.Name, filter));
+                }
+            }
+
             var total = ExecuteQueryCount(query);
 
             query = LinkOrderByExpression(query, orderBy, descending);
 
-            query = LinkIncludeExpression(query, navigationNames);
+            query = LinkIncludeExpression(query, navigationNames, depth);
+
             if (pageIndex > 0)
                 query = LinkPaginationExpression(query, pageIndex, pageSize);
 
@@ -493,20 +511,25 @@ namespace APM.ConTaxi.Taxi
         private IQueryable LinkWhereExpression(IQueryable query, string entityFieldName, object? entityFieldValue)
         {
             var entityType = query.ElementType;
-            var properties = entityType.GetProperties().Where(p => p.Name.Equals(entityFieldName) && p.DeclaringType is not null);
-            if (!properties.Any())
+            var propertyInfos = entityType.GetProperties().Where(p => p.Name.Equals(entityFieldName) && p.DeclaringType is not null);
+            if (!propertyInfos.Any())
+                throw new APMException($"[{entityType}] 中不存在属性 [{entityFieldName}]");
+
+            var propertyInfo = propertyInfos.Count() == 1
+                ? propertyInfos.FirstOrDefault()
+                : propertyInfos.FirstOrDefault(p => p.DeclaringType is { Name: nameof(BaseEntity) });
+
+            if (propertyInfo == null)
                 throw new APMException($"[{entityType}] 中不存在属性 [{entityFieldName}]");
 
             var parameter = Expression.Parameter(entityType);
-            var property = Expression.Property(parameter, properties.Count() == 1
-                ? properties.First()
-                : properties.First(p => p.DeclaringType is { Name: nameof(BaseEntity) }));
-            var constant = Expression.Constant(entityFieldValue);
+            var property = Expression.Property(parameter, propertyInfo);
+            var constant = Expression.Constant(DynamicConvert(entityFieldValue, propertyInfo.PropertyType));
             var equality = Expression.Equal(property, constant);
             var lambda = Expression.Lambda(equality, parameter);
 
             var whereMethod = typeof(Queryable).GetMethods()
-                .First(m => m is { Name: nameof(Queryable.Where), IsGenericMethod: true } && m.GetParameters().Length == 2)
+                .FirstOrDefault(m => m is { Name: nameof(Queryable.Where), IsGenericMethod: true } && m.GetParameters().Length == 2)
                 ?.MakeGenericMethod(entityType);
             if (whereMethod == null)
                 throw new APMException($"无法获取 [{nameof(Queryable.Where)}] 方法");
@@ -515,11 +538,34 @@ namespace APM.ConTaxi.Taxi
                    ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkWhereExpression)}]");
         }
 
+        public object? DynamicConvert(object? value, Type targetType)
+        {
+            // 如果值已经是目标类型，直接返回
+            if (value is null || value.GetType() == targetType) return value;
+
+            // 获取目标类型的转换器
+            var converter = TypeDescriptor.GetConverter(targetType);
+
+            if (converter.CanConvertFrom(value.GetType()))
+            {
+                // 这里会自动处理 string -> Guid 的内部逻辑
+                return converter.ConvertFrom(value);
+            }
+
+            // 备用逻辑：如果是 Guid 且没匹配到，强制解析字符串
+            if (targetType == typeof(Guid))
+            {
+                return Guid.Parse(value.ToString()!);
+            }
+
+            throw new InvalidOperationException($"无法将类型 {value.GetType()} 转换为 {targetType}");
+        }
+
         private int ExecuteQueryCount(IQueryable query)
         {
             var entityType = query.ElementType;
             var countMethod = typeof(Queryable).GetMethods()
-                .First(m => m is { Name: nameof(Queryable.Count), IsGenericMethod: true }
+                .FirstOrDefault(m => m is { Name: nameof(Queryable.Count), IsGenericMethod: true }
                             && m.GetParameters().Length == 1)
                 ?.MakeGenericMethod(entityType);
             if (countMethod == null)
@@ -528,7 +574,7 @@ namespace APM.ConTaxi.Taxi
             return Convert.ToInt32(countMethod.Invoke(null, [query]));
         }
 
-        private IQueryable LinkIncludeExpression(IQueryable query, IEnumerable<string> navigations)
+        private IQueryable LinkIncludeExpression(IQueryable query, IEnumerable<string> navigations, int depth = 1)
         {
             var entityType = query.ElementType;
             var navigationArray = navigations as string[] ?? navigations.ToArray();
@@ -536,31 +582,90 @@ namespace APM.ConTaxi.Taxi
 
             var includeMethod = typeof(EntityFrameworkQueryableExtensions)
                 .GetMethods()
-                .First(m => m is { Name: nameof(EntityFrameworkQueryableExtensions.Include), IsGenericMethod: true }
+                .FirstOrDefault(m => m is { Name: nameof(EntityFrameworkQueryableExtensions.Include), IsGenericMethod: true }
                             && m.GetParameters().Length == 2
                             && m.GetParameters()[1].ParameterType == typeof(string))
                 ?.MakeGenericMethod(entityType);
             if (includeMethod == null)
                 throw new APMException($"无法获取 [{nameof(EntityFrameworkQueryableExtensions.Include)}] 方法");
-            foreach (var navigation in navigationArray)
-            {
-                // todo 后续需要深度include
-                //var propertyInfo = entityType.GetProperty(navigation) ?? throw new APMException($"联查失败 [{entityType.Name}] 中未找到 [{navigation}]");
-                //var propertyType = propertyInfo.PropertyType;
-                //if (!UseAdministration)
-                //    permission.CheckPermission(propertyInfo.Name, PermissionType.Read);
 
+            var includePaths = new List<string>();
+
+            BuildIncludePaths(
+                entityType,
+                navigations,
+                depth,
+                string.Empty,
+                includePaths,
+                []);
+
+            foreach (var navigation in includePaths.Distinct())
+            {
                 query = includeMethod.Invoke(null, [query, navigation]) as IQueryable
                         ?? throw new APMException($"联查失败 [{entityType.Name}] - [{navigation}] - [{nameof(EntityFrameworkQueryableExtensions.Include)}] 方法");
             }
 
             return query;
         }
+
+        private void BuildIncludePaths(Type entityType,
+            IEnumerable<string> navigations,
+            int depth,
+            string parentPath,
+            List<string> paths,
+            HashSet<Type> visited)
+        {
+            if (depth <= 0)
+                return;
+
+            visited.Add(entityType);
+
+            foreach (var navigation in navigations)
+            {
+                var property = entityType.GetProperty(navigation);
+
+                if (property == null)
+                    continue;
+
+                var childType = property.PropertyType;
+
+                // 集合导航
+                if (childType.IsGenericType &&
+                    typeof(IEnumerable).IsAssignableFrom(childType))
+                {
+                    childType = childType.GetGenericArguments()[0];
+                }
+
+                // 防止循环导航
+                if (visited.Contains(childType))
+                    continue;
+
+                var currentPath = string.IsNullOrEmpty(parentPath)
+                    ? navigation
+                    : $"{parentPath}.{navigation}";
+
+                paths.Add(currentPath);
+
+                if (!UseAdministration)
+                    permission.CheckPermission(childType.Name, PermissionType.Read);
+
+                GetEntityNavigations(childType, out var childNavigations);
+
+                BuildIncludePaths(
+                    childType,
+                    childNavigations,
+                    depth - 1,
+                    currentPath,
+                    paths,
+                    [.. visited]);
+            }
+        }
+
         private IQueryable LinkPaginationExpression(IQueryable query, int pageIndex, int pageSize)
         {
             var entityType = query.ElementType;
             var skipMethod = typeof(Queryable).GetMethods()
-                .First(m => m is { Name: nameof(Queryable.Skip), IsGenericMethod: true } && m.GetParameters().Length == 2)
+                .FirstOrDefault(m => m is { Name: nameof(Queryable.Skip), IsGenericMethod: true } && m.GetParameters().Length == 2)
                 ?.MakeGenericMethod(entityType);
             if (skipMethod == null)
                 throw new APMException($"无法获取 [{nameof(Queryable.Skip)}] 方法");
@@ -569,7 +674,7 @@ namespace APM.ConTaxi.Taxi
                     ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkPaginationExpression)}] - [{nameof(Queryable.Skip)}]");
 
             var takeMethod = typeof(Queryable).GetMethods()
-                .First(m => m is { Name: nameof(Queryable.Take), IsGenericMethod: true } && m.GetParameters().Length == 2)
+                .FirstOrDefault(m => m is { Name: nameof(Queryable.Take), IsGenericMethod: true } && m.GetParameters().Length == 2)
                 ?.MakeGenericMethod(entityType);
             if (takeMethod == null)
                 throw new APMException($"无法获取 [{nameof(Queryable.Take)}] 方法");
@@ -585,7 +690,7 @@ namespace APM.ConTaxi.Taxi
             orderBy = string.IsNullOrEmpty(orderBy) ? nameof(APMBaseEntity.CreatedAt) : orderBy;
 
             var methodName = descending ? nameof(Queryable.OrderByDescending) : nameof(Queryable.OrderBy);
-            var propertyInfo = entityType.GetProperties().First(p => p.Name.Equals(orderBy, StringComparison.CurrentCultureIgnoreCase))
+            var propertyInfo = entityType.GetProperties().FirstOrDefault(p => p.Name.Equals(orderBy, StringComparison.CurrentCultureIgnoreCase))
                                ?? throw new APMException($"查询连接表达式时出错: [{nameof(LinkOrderByExpression)}] - [{entityType.Name}] - [{orderBy}]");
 
             var orderByMethod = typeof(Queryable).GetMethods()
@@ -595,11 +700,12 @@ namespace APM.ConTaxi.Taxi
             var navigations = GetEntityNavigations(entityType, out var navigationNames);
             if (navigationNames.Contains(propertyInfo.Name))
             {
-                var navigation = navigations.First(n => n.Name == propertyInfo.Name);
+                var navigation = navigations.FirstOrDefault(n => n.Name == propertyInfo.Name) ?? throw new APMException($"未找到导航属性 [{propertyInfo.Name}]");
                 var entityProperty = navigation.TargetEntityType.ClrType.GetProperties()
-                    .First(p => p.Name.ToLower().Contains("name", StringComparison.CurrentCultureIgnoreCase)
+                    .FirstOrDefault(p => p.Name.ToLower().Contains("name", StringComparison.CurrentCultureIgnoreCase)
                                 || p.Name.Contains("no", StringComparison.CurrentCultureIgnoreCase)
-                                || p.Name.Contains("id", StringComparison.CurrentCultureIgnoreCase));
+                                || p.Name.Contains("id", StringComparison.CurrentCultureIgnoreCase))
+                                     ?? throw new APMException($"未找到此实体的可导航属性 [{navigation.TargetEntityType.ClrType.Name}]");
                 var parameter = Expression.Parameter(entityType);
                 var property = Expression.Property(parameter, propertyInfo);
                 property = Expression.Property(property, entityProperty);
@@ -630,7 +736,7 @@ namespace APM.ConTaxi.Taxi
                 throw new APMException($"无法获取 [{nameof(Enumerable.ToList)}] 方法");
 
             var typedList = toListMethod.Invoke(null, [query]);
-            var resultAsEnumerable = typedList as System.Collections.IEnumerable
+            var resultAsEnumerable = typedList as IEnumerable
                                      ?? throw new APMException($"构建数据集失败 {nameof(BuildList)}");
             return resultAsEnumerable.Cast<object>().ToList();
         }

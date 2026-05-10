@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace APM.Extensions.Interceptor
 {
-    public class APMDbConTaxiInterceptor(IUserContext userContext) : SaveChangesInterceptor
+    public class APMDbConTaxiInterceptor(IUserContext userContext, IRedisService redisService) : SaveChangesInterceptor
     {
         // 重写同步保存前的拦截方法
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -17,6 +17,8 @@ namespace APM.Extensions.Interceptor
             if (context == null) return result;
 
             UpdateBaseEntityField(context);
+
+            SaveRolePermissionParallel(context);
 
             SaveInboundOrderParallel(context);
 
@@ -29,6 +31,35 @@ namespace APM.Extensions.Interceptor
             SavePartParallel(context);
 
             return base.SavingChanges(eventData, result);
+        }
+
+        private void SaveRolePermissionParallel(DbContext context)
+        {
+            var entries = GetEntries<RolePermission>(context, [EntityState.Added, EntityState.Modified]);
+
+            if (entries.Any())
+            {
+                var rolePermissions = entries.Select(e => e.Entity).ToList();
+                var oldPermissions = context.Set<RolePermission>()
+                    .Where(orp => !rolePermissions.Select(rp => rp.Id).Contains(orp.Id)
+                                  && rolePermissions.Select(rp => rp.RoleId).Contains(orp.RoleId))
+                    .ToList();
+                oldPermissions.AddRange(rolePermissions);
+
+                foreach (var rolePermission in rolePermissions)
+                {
+                    redisService.Set($"{ConstDictionary.RedisCacheRolePermission}:{rolePermission.RoleId}",
+                        oldPermissions.Select(rp => new
+                        {
+                            rp.RoleId,
+                            rp.EntityId,
+                            rp.CanRead,
+                            rp.CanCreate,
+                            rp.CanUpdate,
+                            rp.CanDelete
+                        }).ToList(), TimeSpan.FromDays(365));
+                }
+            }
         }
 
         private static IEnumerable<EntityEntry<T>> GetEntries<T>(DbContext context, List<EntityState>? status = null) where T : BaseEntity

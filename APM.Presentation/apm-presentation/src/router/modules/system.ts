@@ -21,6 +21,18 @@ const userRoutes: RouteRecordRaw[] = [
                 name: 'SystemSettings',
                 component: () => import('@/views/system/Settings.vue'),
                 meta: { title: '系统设置' }
+            },
+            {
+                path: 'role-list',
+                name: 'RoleList',
+                component: () => import('@/views/system/Role.vue'),
+                meta: { title: '角色管理' }
+            },
+            {
+                path: 'role-permission',
+                name: 'RolePermission',
+                component: () => import('@/views/system/RolePermission.vue'),
+                meta: { title: '角色权限管理' }
             }
         ]
     },

@@ -156,26 +156,14 @@ watch([pageIndex, pageSize], loadCustomers)
       <el-table-column prop="name" label="名称" width="180" sortable="custom" />
       <el-table-column prop="contactPerson" label="联系人" width="140" />
       <el-table-column prop="phone" label="电话" width="160" />
-      <el-table-column prop="address" label="地址" width="240" />
-      <el-table-column prop="remark" label="备注" width="240" />
-      <el-table-column
-        prop="createdAt"
-        label="创建时间"
-        width="auto"
-        min-width="180"
-        sortable="custom"
-      >
+      <el-table-column prop="address" label="地址" width="auto" />
+      <el-table-column prop="remark" label="备注" width="auto" />
+      <el-table-column prop="createdAt" label="创建时间" width="180" sortable="custom">
         <template #default="{ row }">{{
           ConvertDateTime(row.createdAt, 'YYYY-MM-DD HH:mm:ss')
         }}</template>
       </el-table-column>
-      <el-table-column
-        prop="modifiedAt"
-        label="修改时间"
-        width="auto"
-        min-width="180"
-        sortable="custom"
-      >
+      <el-table-column prop="modifiedAt" label="修改时间" width="180" sortable="custom">
         <template #default="{ row }">{{
           ConvertDateTime(row.modifiedAt, 'YYYY-MM-DD HH:mm:ss')
         }}</template>

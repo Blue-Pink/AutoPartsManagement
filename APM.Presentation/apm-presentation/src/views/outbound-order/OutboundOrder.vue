@@ -144,13 +144,14 @@ onMounted(() => {
         <template #default="{ row }">{{ row.customer?.name }}</template>
       </el-table-column>
       <el-table-column prop="totalAmount" label="总金额" />
-      <el-table-column prop="outboundDate" label="出库时间" sortable="custom">
+      <el-table-column prop="outboundDate" label="出库时间" sortable="custom" width="180">
         <template #default="{ row }">{{ ConvertDateTime(row.outboundDate) }}</template>
       </el-table-column>
-      <el-table-column prop="createdAt" label="创建时间" sortable="custom">
+      <el-table-column prop="operatorUser.username" label="经办人" />
+      <el-table-column prop="createdAt" label="创建时间" sortable="custom" width="180">
         <template #default="{ row }">{{ ConvertDateTime(row.createdAt) }}</template>
       </el-table-column>
-      <el-table-column prop="modifiedAt" label="修改时间" sortable="custom">
+      <el-table-column prop="modifiedAt" label="修改时间" sortable="custom" width="180">
         <template #default="{ row }">{{ ConvertDateTime(row.modifiedAt) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="180">

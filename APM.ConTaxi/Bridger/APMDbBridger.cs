@@ -35,6 +35,7 @@ namespace APM.ConTaxi.Bridger
             if (action != null)
                 action.Invoke(taxi);
         }
+
         public static void TaxiInvokeAdmin(this IApplicationBuilder applicationBuilder, Action<IConTaxiService, IRedisService>? action = null)
         {
             var serviceProvider = applicationBuilder.ApplicationServices;
@@ -55,5 +56,23 @@ namespace APM.ConTaxi.Bridger
 
         }
 
+        public static void TaxiInvokeAdmin(this IServiceProvider serviceProvider, Action<IConTaxiService, IRedisService>? action = null)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var taxi = scope.ServiceProvider.GetRequiredService<IConTaxiService>();
+            if (taxi is ConTaxiService conTaxiService)
+                conTaxiService.UseAdministration = true;
+
+            var redis = serviceProvider.GetRequiredService<IRedisService>();
+            var user = taxi.Get<User>(new Guid(ConstDictionary.AdministratorId));
+            var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();
+            if (user is not null)
+            {
+                userContext.Impersonation(user);
+            }
+
+            action?.Invoke(taxi, redis);
+
+        }
     }
 }
