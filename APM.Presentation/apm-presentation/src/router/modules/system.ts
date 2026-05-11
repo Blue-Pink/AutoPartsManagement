@@ -33,6 +33,12 @@ const userRoutes: RouteRecordRaw[] = [
                 name: 'RolePermission',
                 component: () => import('@/views/system/RolePermission.vue'),
                 meta: { title: '角色权限管理' }
+            },
+            {
+                path: 'entity-modify-record',
+                name: 'EntityModifyRecord',
+                component: () => import('@/views/system/EntityModifyRecord.vue'),
+                meta: { title: '数据变更记录' }
             }
         ]
     },

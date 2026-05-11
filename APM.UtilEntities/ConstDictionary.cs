@@ -16,12 +16,47 @@ namespace APM.UtilEntities
         public const string RedisCacheEntityRecord = "EntityRecord";
         public const string JwtClaimsUserId = "JwtClaimsUserId";
         public const string JwtClaimsRoleIds = "JwtClaimsRoleIds";
-        public const string AdministratorId = "F1A89D52-1C0F-4070-A6DD-761A04FCF7F4";
+        public static Guid AdministratorId => new("F1A89D52-1C0F-4070-A6DD-761A04FCF7F4");
 
         public static readonly Dictionary<Type, ICollection<EntityFieldSetting>> EntityFieldSettings = new()
         {
-            {typeof(EntityRecord), new List<EntityFieldSetting>{new(nameof(EntityRecord.EntityName),true,true)}},
-            {typeof(RolePermission), new List<EntityFieldSetting>{new(nameof(RolePermission.RoleId),true,true)}}
+            {
+                typeof(EntityRecord), new List<EntityFieldSetting>
+                {
+                    new(nameof(EntityRecord.EntityName),true,true)
+                }
+            },
+            {
+                typeof(RolePermission), new List<EntityFieldSetting>
+                {
+                    new(nameof(RolePermission.RoleId),true)
+                }
+            },
+            {
+                typeof(InboundItem), new List<EntityFieldSetting>
+                {
+                    new(nameof(InboundItem.Quantity),false,true,true)
+                }
+            },
+            {
+                typeof(OutboundItem), new List<EntityFieldSetting>
+                {
+                    new(nameof(OutboundItem.Quantity),false,true,true)
+                }
+            },
+            {
+                typeof(Part), new List<EntityFieldSetting>
+                {
+                    new(nameof(Part.Stockpiles),false,true,true)
+                }
+            },
+            {
+                typeof(EntityModifyRecord), new List<EntityFieldSetting>
+                {
+                    new(nameof(EntityModifyRecord.EntityId),true)
+                }
+            },
+
         };
     }
 }

@@ -4,10 +4,11 @@ using System.Text;
 
 namespace APM.UtilEntities
 {
-    public class EntityFieldSetting(string name, bool filter, bool orderBy)
+    public class EntityFieldSetting(string fieldName, bool filter = false, bool orderBy = false, bool record = false)
     {
-        public string Name = name;
+        public string FieldName = fieldName;
         public bool Filter = filter;
         public bool OrderByBy = orderBy;
+        public bool Record = record;
     }
 }

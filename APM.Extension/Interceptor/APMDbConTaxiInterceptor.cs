@@ -30,7 +30,44 @@ namespace APM.Extensions.Interceptor
 
             SavePartParallel(context);
 
+            RecordEntityFieldModify(context);
+
             return base.SavingChanges(eventData, result);
+        }
+
+        private void RecordEntityFieldModify(DbContext context)
+        {
+            var recordTypes = ConstDictionary.EntityFieldSettings
+                .Where(kv => kv.Key != typeof(EntityModifyRecord))
+                .Where(kv => kv.Value.Any(efs => efs.Record))
+                .ToDictionary();
+            if (!recordTypes.Any()) return;
+
+            var entries = context.ChangeTracker.Entries()
+                .Where(e => e.State is EntityState.Modified or EntityState.Added or EntityState.Deleted
+                            && recordTypes.Select(kv => kv.Key).Contains(e.Entity.GetType()))
+                .ToList();
+            if (!entries.Any()) return;
+
+            var entityRecords = context.Set<EntityRecord>().Where(er => entries.Select(e => e.Entity.GetType().Name).Contains(er.EntityName)).ToList();
+            var modifyRecords = new List<EntityModifyRecord>();
+            foreach (var entry in entries)
+            {
+                var fieldSettings = recordTypes[entry.Entity.GetType()];
+                modifyRecords.AddRange(fieldSettings.Where(efs => efs.Record && entry.OriginalValues[efs.FieldName] != entry.CurrentValues[efs.FieldName])
+                    .Select(efs => new EntityModifyRecord
+                    {
+                        FieldName = efs.FieldName,
+                        NewValue = $"{{{efs.FieldName} : {entry.CurrentValues[efs.FieldName]}}}",
+                        OldValue = $"{{{efs.FieldName} : {entry.OriginalValues[efs.FieldName]}}}",
+                        Operation = entry.State.ToString(),
+                        EntityId = entityRecords.FirstOrDefault(er => er.EntityName == entry.Entity.GetType().Name)?.Id ?? throw new APMException($"未找到实体记录: {entry.Entity.GetType().Name}"),
+                        ModifiedUserId = userContext.UserId,
+                        OperatorUserId = ConstDictionary.AdministratorId,
+                    }));
+            }
+
+            context.AddRange(modifyRecords);
         }
 
         private void SaveRolePermissionParallel(DbContext context)
@@ -307,7 +344,8 @@ namespace APM.Extensions.Interceptor
             var now = DateTime.UtcNow;
             foreach (var entry in changedEntries)
             {
-                entry.Entity.OperatorUserId = userContext.UserId ?? new Guid(ConstDictionary.AdministratorId);
+                if (entry.Entity.OperatorUserId == Guid.Empty)
+                    entry.Entity.OperatorUserId = userContext.UserId != Guid.Empty ? userContext.UserId : ConstDictionary.AdministratorId;
                 switch (entry.State)
                 {
                     case EntityState.Added:

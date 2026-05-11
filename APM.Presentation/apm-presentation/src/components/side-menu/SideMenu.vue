@@ -43,6 +43,7 @@ import router from '@/router'
         <el-menu-item index="/system/user-list">用户管理</el-menu-item>
         <el-menu-item index="/system/role-list">角色管理</el-menu-item>
         <el-menu-item index="/system/role-permission">角色权限管理</el-menu-item>
+        <el-menu-item index="/system/entity-modify-record">数据变更记录</el-menu-item>
         <el-menu-item index="/system/settings">系统设置</el-menu-item>
       </el-sub-menu>
     </el-menu>

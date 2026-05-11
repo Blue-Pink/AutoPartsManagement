@@ -45,7 +45,7 @@ namespace APM.ConTaxi.Bridger
                 conTaxiService.UseAdministration = true;
 
             var redis = serviceProvider.GetRequiredService<IRedisService>();
-            var user = taxi.Get<User>(new Guid(ConstDictionary.AdministratorId));
+            var user = taxi.Get<User>(ConstDictionary.AdministratorId);
             var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();
             if (user is not null)
             {
@@ -64,7 +64,7 @@ namespace APM.ConTaxi.Bridger
                 conTaxiService.UseAdministration = true;
 
             var redis = serviceProvider.GetRequiredService<IRedisService>();
-            var user = taxi.Get<User>(new Guid(ConstDictionary.AdministratorId));
+            var user = taxi.Get<User>(ConstDictionary.AdministratorId);
             var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();
             if (user is not null)
             {

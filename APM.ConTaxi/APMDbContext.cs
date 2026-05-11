@@ -41,6 +41,7 @@ namespace APM.ConTaxi
 
         public DbSet<OutboundItem> OutboundItem { get; set; }
 
+        public DbSet<EntityModifyRecord> EntityModifyRecord { get; set; }
         #endregion
 
         #region Views
@@ -194,6 +195,12 @@ namespace APM.ConTaxi
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<OutboundItem>()
+                .HasOne(o => o.OperatorUser)
+                .WithMany()
+                .HasForeignKey(o => o.OperatorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<EntityModifyRecord>()
                 .HasOne(o => o.OperatorUser)
                 .WithMany()
                 .HasForeignKey(o => o.OperatorUserId)

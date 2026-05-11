@@ -66,7 +66,7 @@ namespace APM.Services
                 var sections = _configuration.GetSection("RedisConfiguration");
                 var redisConfiguration = new RedisConfiguration()
                 {
-                    Name = sections.GetSection("Name").Value ?? "",
+                    Name = sections.GetSection("FieldName").Value ?? "",
                     IP = sections.GetSection("IP").Value ?? "",
                     Port = Convert.ToInt32(sections.GetSection("Port").Value ?? "0"),
                     Password = sections.GetSection("Password").Value ?? "",

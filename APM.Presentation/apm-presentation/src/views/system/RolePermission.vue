@@ -21,7 +21,7 @@ const total = ref(0)
 const roles = ref<Role[]>([])
 const currentRoleId = ref<string>('')
 const orderBy = ref<string>('isActive')
-const descending = ref<boolean>(false)
+const descending = ref<boolean>(true)
 
 const load = async () => {
   try {
@@ -45,7 +45,7 @@ const load = async () => {
       0,
       0,
       orderBy.value,
-      true,
+      descending.value,
     )
     entityRecords.value = entitiesRes.dataList || []
 
@@ -167,8 +167,8 @@ const handleSortChange = (options: {
     orderBy.value = options.prop
     descending.value = true
   } else {
-    orderBy.value = ''
-    descending.value = false
+    orderBy.value = 'isActive'
+    descending.value = true
   }
   pageIndex.value = 1
   load()

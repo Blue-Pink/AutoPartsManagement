@@ -484,7 +484,7 @@ namespace APM.ConTaxi.Taxi
                 ConstDictionary.EntityFieldSettings.TryGetValue(childType, out var fieldSettings);
                 if (fieldSettings != null)
                 {
-                    query = fieldSettings.Where(fieldSetting => fieldSetting.Filter).Aggregate(query, (current, fieldSetting) => LinkWhereExpression(current, fieldSetting.Name, filter));
+                    query = fieldSettings.Where(fieldSetting => fieldSetting.Filter).Aggregate(query, (current, fieldSetting) => LinkWhereExpression(current, fieldSetting.FieldName, filter));
                 }
             }
 
@@ -763,15 +763,7 @@ namespace APM.ConTaxi.Taxi
 
         public void Migrate()
         {
-            try
-            {
-                context.Database.Migrate();
-
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
+            context.Database.Migrate();
         }
 
     }

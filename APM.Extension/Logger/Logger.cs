@@ -29,14 +29,14 @@ namespace APM.Extensions.Logger
             if (!IsEnabled(logLevel) || exception is null) return;
 
             var applicationBasePath = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            var now = DateTime.UtcNow.ToLocalTime();
+            var now = DateTime.Now;
             var logDirectory = $"{applicationBasePath}/log/{now:yyyy-MM-dd}";
             if (!Directory.Exists(logDirectory))
                 Directory.CreateDirectory(logDirectory);
 
             var logFilePath = $"{logDirectory}/{logLevel}.log";
-            using FileStream logFileStream = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-            var logRecord = $"-[{now:yyyy-MM-dd HH:mm:ss fff tt}]- {exception.Message}:{exception}{Environment.NewLine}";
+            using FileStream logFileStream = new FileStream(logFilePath, FileMode.Append, FileAccess.Write, FileShare.None);
+            var logRecord = $"\r\n -[{now:yyyy-MM-dd HH:mm:ss fff tt}]- {exception.Message}:{exception}{Environment.NewLine} \r\n";
             logFileStream.Write(Encoding.UTF8.GetBytes(logRecord), 0, logRecord.Length);
         }
 

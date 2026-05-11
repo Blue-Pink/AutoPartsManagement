@@ -6,7 +6,7 @@ using APM.ConTaxi.Bridger;
 
 namespace APM.Extensions
 {
-    public class RedisCacheSubscriber(IRedisService redisService, IServiceProvider serviceProvider) : BackgroundService
+    public class RedisCacheSubscriber(IRedisService redisService) : BackgroundService
     {
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {

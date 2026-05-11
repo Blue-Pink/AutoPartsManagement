@@ -4,6 +4,7 @@ using APM.ConTaxi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APM.ConTaxi.Migrations
 {
     [DbContext(typeof(APMDbContext))]
-    partial class APMDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260511082150_Migration_9_AddEntityModifyRecord")]
+    partial class Migration_9_AddEntityModifyRecord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

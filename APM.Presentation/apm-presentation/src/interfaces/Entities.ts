@@ -12,6 +12,16 @@ export interface EntityRecord extends BaseEntity {
     description?: string | null;
 }
 
+export interface EntityModifyRecord extends BaseEntity {
+    entityId: string | null;
+    entity?: EntityRecord | null;
+    operation: string | null;
+    fieldName: string | null;
+    oldValue: string | null;
+    newValue: string | null;
+    modifiedUserId: string | null;
+    modifiedUser?: User | null;
+}
 
 export interface Part extends BaseEntity {
     /** 配件名称 */

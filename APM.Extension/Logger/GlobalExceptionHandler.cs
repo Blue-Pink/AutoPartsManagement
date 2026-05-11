@@ -35,6 +35,7 @@ namespace APM.Extensions.Logger
                         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                     });
 
+                _logger.Log(LogLevel.Error, ex, ex.ToString());
                 await context.Response.WriteAsync(body);
             }
             catch (Exception ex)
@@ -57,6 +58,7 @@ namespace APM.Extensions.Logger
                         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                     });
 
+                    _logger.Log(LogLevel.Error, ex, ex.ToString());
                     await context.Response.WriteAsync(body);
                 }
                 else
@@ -72,10 +74,10 @@ namespace APM.Extensions.Logger
                         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                     });
 
+                    _logger.Log(LogLevel.Error, ex, ex.ToString());
                     await context.Response.WriteAsync(body);
                 }
 
-                _logger.LogError(ex, " GlobalExceptionHandler ");
             }
         }
     }

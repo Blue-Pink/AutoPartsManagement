@@ -18,7 +18,7 @@ public class UserContext : IUserContext
             _httpContextAccessor.HttpContext?.User?.FindFirst(ConstDictionary.JwtClaimsRoleIds)?.Value ?? "[]");
     }
 
-    public Guid? UserId => Guid.TryParse(_httpContextAccessor.HttpContext?.User?.FindFirst(ConstDictionary.JwtClaimsUserId)?.Value, out var id) ? id : ImpersonatedUser?.Id;
+    public Guid UserId => Guid.TryParse(_httpContextAccessor.HttpContext?.User?.FindFirst(ConstDictionary.JwtClaimsUserId)?.Value, out var id) ? id : ImpersonatedUser?.Id ?? Guid.Empty;
 
     public string? Username => _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? ImpersonatedUser?.Username;
 
