@@ -16,4 +16,5 @@
     <Project Path="APM.IServices/APM.IServices.csproj" />
     <Project Path="APM.Services/APM.Services.csproj" />
   </Folder>
+  <Project Path="APM.Testing/APM.Testing.csproj" Id="5d852964-bc86-4dee-82b7-45868f03414b" />
 </Solution>
